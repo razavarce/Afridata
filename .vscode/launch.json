@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "name": "Attach to Chrome",
+            "port": 9222,
+            "request": "attach",
+            "type": "chrome",
+            "webRoot": "${workspaceFolder}"
+        },
+                
+        {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "file:///D:/Proyecto%20Viceministerio%20de%20%C3%81frica%20en%20Vzla/pagina%20afridataV10.5.5.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Launch Chrome",
+            "request": "launch",
+            "type": "chrome",
+            "url": "file:///D:/Proyecto%20Viceministerio%20de%20%C3%81frica%20en%20Vzla/pagina%20afridataV10.5.5.html",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "file:///D:/Proyecto%20Viceministerio%20de%20%C3%81frica%20en%20Vzla/pagina%20afridataV10.5.5.html",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}

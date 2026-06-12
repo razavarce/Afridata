@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Abrir app Vite en Chrome",
+      "url": "http://localhost:5173/afridata/",
+      "preLaunchTask": "npm: dev - app",
+      "webRoot": "${workspaceFolder}/app",
+      "sourceMaps": true
+    }
+  ]
+}

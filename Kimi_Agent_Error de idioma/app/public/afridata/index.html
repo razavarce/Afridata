@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AFRIDATA - Plataforma MPPRE para consulta y visualizacion de datos diplomaticos de Africa." />
+  <meta name="theme-color" content="#0a1628" />
+  <title>AFRIDATA - Plataforma MPPRE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loader"></div>
+  </div>
+
+  <div id="loginPage" class="page">
+    <div class="dev-banner">AFRIDATA v1.0 - PAGINA EN DESARROLLO</div>
+    <div class="login-container">
+      <div class="login-logo">🌍</div>
+      <h1>AFRIDATA</h1>
+      <p>MPPRE - Despacho para Africa</p>
+      <label for="loginUser">Usuario</label>
+      <input id="loginUser" type="text" value="admin" autocomplete="username" />
+      <label for="loginPass">Contrasena</label>
+      <input id="loginPass" type="password" value="admin" autocomplete="current-password" />
+      <button id="loginBtn" class="btn-primary">Iniciar sesion</button>
+      <div id="loginError" class="login-error" role="alert" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div id="appPage" class="page hidden">
+    <header class="app-header">
+      <h1><span>🌍</span> AFRIDATA</h1>
+      <div class="header-user">
+        <span id="headerUsername">Administrador</span>
+        <span id="headerRole" class="role-badge role-admin">Admin</span>
+      </div>
+    </header>
+
+    <nav class="module-nav" aria-label="Modulos">
+      <button class="module-btn active" data-module="mapa">Mapa</button>
+      <button class="module-btn" data-module="paises">Paises</button>
+      <button class="module-btn" data-module="autoridades">Autoridades</button>
+      <button class="module-btn" data-module="multilateral">Multilateral</button>
+      <button class="module-btn" data-module="admin">Admin</button>
+      <button class="module-btn danger" id="logoutBtn">Salir</button>
+    </nav>
+
+    <main>
+      <section id="panel-mapa" class="module-panel active">
+        <div class="search-row">
+          <input id="searchBox" type="search" placeholder="Buscar pais, capital o lider..." />
+          <select id="regionFilter">
+            <option value="all">Todas las regiones</option>
+            <option value="norte">Africa del Norte</option>
+            <option value="occidental">Africa Occidental</option>
+            <option value="central">Africa Central</option>
+            <option value="oriental">Africa Oriental</option>
+            <option value="austral">Africa Austral</option>
+          </select>
+        </div>
+        <div id="map"></div>
+      </section>
+
+      <section id="panel-paises" class="module-panel">
+        <h2>Lista de paises</h2>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Pais</th><th>Capital</th><th>Region</th><th>Lider</th><th>Poblacion (M)</th></tr>
+            </thead>
+            <tbody id="countriesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="panel-autoridades" class="module-panel">
+        <h2>Autoridades</h2>
+        <div id="authoritiesGrid" class="card-grid"></div>
+      </section>
+
+      <section id="panel-multilateral" class="module-panel">
+        <h2>Participacion multilateral</h2>
+        <div class="chip-row" id="orgFilters">
+          <button class="filter-chip active" data-org="all">Todos</button>
+          <button class="filter-chip" data-org="onu">ONU</button>
+          <button class="filter-chip" data-org="ua">UA</button>
+          <button class="filter-chip" data-org="opec">OPEP</button>
+        </div>
+        <div id="multilateralContent"></div>
+      </section>
+
+      <section id="panel-admin" class="module-panel">
+        <h2>Panel admin</h2>
+        <div id="adminContent">
+          <p>Gestion de usuarios local para demo.</p>
+          <div id="userList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

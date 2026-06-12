@@ -109,6 +109,10 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
 .app-header { background: var(--bg-panel); border-bottom: 1px solid var(--gold-primary); color: white; padding: 0 25px; height: 65px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1000; }
 .app-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 12px; color: var(--gold-primary); }
 .app-header h1 .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--gold-primary), var(--orange-primary)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #000; }
+.mppre-logo { height: 44px; width: auto; max-width: 120px; object-fit: contain; border-radius: 8px; flex-shrink: 0; }
+.admin-list-item { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 12px 14px; background: var(--bg-input); border: 1px solid rgba(212,175,55,0.2); border-radius: 10px; margin-bottom: 8px; }
+.admin-list-item .item-body { flex: 1; min-width: 0; }
+.admin-list-item .item-actions { display: flex; gap: 6px; flex-shrink: 0; }
 .header-right { display: flex; align-items: center; gap: 12px; }
 .header-btn { background: rgba(255,255,255,0.08); border: 1px solid var(--gold-dark); color: var(--gold-primary); padding: 10px 18px; border-radius: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 8px; transition: background 0.2s; white-space: nowrap; }
 .modal-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end; margin-bottom: 0; }
@@ -165,6 +169,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
     .login-container { width: min(100%, 360px); padding: 30px 20px 26px; }
     .app-header { padding: 12px; }
     .app-header h1 { font-size: 18px; }
+    .mppre-logo { height: 34px; max-width: 88px; }
     .header-right { display: none !important; }
     .header-menu-toggle { display: flex !important; }
     .header-btn { padding: 6px 10px; font-size: 10px; min-width: auto; }
@@ -710,7 +715,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
 <div id="appPage">
     <div class="app-header">
         <h1>
-            <div class="logo-icon">🌍</div>
+            <img src="logo MPPRE.jpeg" alt="MPPRE" class="mppre-logo" onerror="this.style.display='none'">
             AFRIDATA <small data-translate-key="headerSubtitle" style="font-size:11px;opacity:0.6;font-weight:400;margin-left:8px;color:var(--text-muted);">MPPRE — Despacho para África</small>
         </h1>
         <div class="header-right">
@@ -1008,7 +1013,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                 </div>
                 <div style="overflow-x:auto;border-radius:16px;border:1px solid rgba(212, 175, 55, 0.3);">
                     <table class="data-table">
-                        <thead><tr><th>Fecha</th><th>Hora</th><th>Usuario</th><th>Acción</th><th>Cambio / Detalle</th></tr></thead>
+                        <thead><tr><th>Fecha</th><th>Hora</th><th>Usuario</th><th>IP</th><th>Acción</th><th>Cambio / Detalle</th></tr></thead>
                         <tbody id="auditTableBody"></tbody>
                     </table>
                 </div>
@@ -1058,57 +1063,217 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                     <div id="authorityImportStatus" style="margin-top:10px;color:var(--text-muted);font-size:12px;">Sin importaciones recientes.</div>
                 </div>
                 <div class="admin-section" id="adminEditSection">
-                    <h3><i class="fas fa-edit"></i> Editar Contenido del País</h3>
+                    <h3><i class="fas fa-edit"></i> Editar Información del País (Mapa, Ficha, Autoridades)</h3>
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">Seleccione un país y modifique los campos. Los cambios se reflejan en el mapa, la ficha del país y las tarjetas de autoridades.</p>
                     <div class="admin-form">
                         <div class="form-group">
                             <label>Seleccionar País</label>
                             <select id="editCountrySelect" onchange="loadCountryForEdit()"><option value="">-- Seleccionar --</option></select>
                         </div>
                         <div class="form-group">
-                            <label>Presidente</label>
+                            <label>Nombre Oficial</label>
+                            <input type="text" id="editOficial" placeholder="Nombre oficial del país">
+                        </div>
+                        <div class="form-group">
+                            <label>Capital</label>
+                            <input type="text" id="editCapital" placeholder="Capital">
+                        </div>
+                        <div class="form-group">
+                            <label>Presidente / Líder</label>
                             <input type="text" id="editPresident" placeholder="Presidente actual">
+                        </div>
+                        <div class="form-group">
+                            <label>Presidente Anterior</label>
+                            <input type="text" id="editPresidentAnterior" placeholder="Líder anterior o histórico">
                         </div>
                         <div class="form-group">
                             <label>Tipo de Gobierno</label>
                             <input type="text" id="editGovernment" placeholder="Tipo de gobierno">
                         </div>
                         <div class="form-group">
-                            <label>Embajada</label>
+                            <label>URL Foto del Líder</label>
+                            <input type="text" id="editFoto" placeholder="https://... (opcional)">
+                        </div>
+                        <div class="form-group">
+                            <label>Idioma</label>
+                            <input type="text" id="editIdioma" placeholder="Idioma(s)">
+                        </div>
+                        <div class="form-group">
+                            <label>Moneda</label>
+                            <input type="text" id="editMoneda" placeholder="Moneda">
+                        </div>
+                        <div class="form-group">
+                            <label>Industrias</label>
+                            <input type="text" id="editIndustrias" placeholder="Principales industrias">
+                        </div>
+                        <div class="form-group">
+                            <label>Recursos Naturales</label>
+                            <input type="text" id="editRecursos" placeholder="Recursos naturales">
+                        </div>
+                        <div class="form-group">
+                            <label>Embajada Venezuela</label>
                             <input type="text" id="editEmbassy" placeholder="Embajada venezolana">
                         </div>
                         <div class="form-group">
                             <label>Relaciones desde</label>
                             <input type="text" id="editRelations" placeholder="Año de relaciones">
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="grid-column:1/-1;">
                             <label>Economía</label>
-                            <textarea id="editEconomy" rows="3" placeholder="Situación económica"></textarea>
+                            <textarea id="editEconomy" rows="2" placeholder="Situación económica"></textarea>
                         </div>
-                        <div class="form-group" style="justify-content:flex-end;">
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Cultura</label>
+                            <textarea id="editCultura" rows="2" placeholder="Cultura"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Tradiciones</label>
+                            <textarea id="editTradicion" rows="2" placeholder="Tradiciones"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;justify-content:flex-end;">
                             <label>&nbsp;</label>
-                            <button class="admin-btn admin-btn-success" type="button" onclick="saveCountryEdit()"><i class="fas fa-save"></i> Guardar Cambios</button>
+                            <button class="admin-btn admin-btn-success" type="button" onclick="saveCountryEdit()"><i class="fas fa-save"></i> Guardar País</button>
                         </div>
                     </div>
                 </div>
-                <div class="admin-section">
-                    <h3><i class="fas fa-calendar-day"></i> Importar / Gestionar Efemérides</h3>
-                    <p style="color:var(--text-muted);font-size:13px;line-height:1.4;margin-bottom:8px;">Puedes pegar un JSON con efemérides organizadas por id de país. Formato: {"1":[{"fecha":"1963","titulo":"Independencia","desc":"..."}],"20":[...]}.</p>
-                    <textarea id="efemeridesJsonInput" rows="6" style="width:100%;background:var(--bg-card);color:var(--text-main);border:1px solid rgba(212,175,55,0.16);border-radius:10px;padding:12px;" placeholder='{"1":[{"fecha":"1963","titulo":"Independencia","desc":"..."}]}'></textarea>
-                    <div style="display:flex;gap:8px;margin-top:10px;">
-                        <button class="admin-btn admin-btn-primary" type="button" onclick="importEfemeridesFromTextarea()"><i class="fas fa-upload"></i> Importar JSON</button>
-                        <button class="admin-btn" type="button" onclick="exportEfemeridesToClipboard()"><i class="fas fa-copy"></i> Exportar JSON</button>
+                <div class="admin-section" id="adminEfemeridesSection">
+                    <h3><i class="fas fa-calendar-day"></i> Gestionar Efemérides por País</h3>
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">Agregue fechas importantes para cada país. Aparecen en la pestaña Efemérides de la ficha del país.</p>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>País</label>
+                            <select id="adminEfemeridesCountry" onchange="renderAdminEfemeridesList()"><option value="">-- Seleccionar --</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha / Año</label>
+                            <input type="text" id="adminEfemerideFecha" placeholder="Ej: 1963 o 15 de marzo">
+                        </div>
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="adminEfemerideTitulo" placeholder="Título del evento">
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Descripción</label>
+                            <textarea id="adminEfemerideDesc" rows="2" placeholder="Descripción del evento"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <button class="admin-btn admin-btn-primary" type="button" onclick="addAdminEfemeride()"><i class="fas fa-plus"></i> Agregar Efeméride</button>
+                        </div>
                     </div>
-                    <div id="efemeridesImportStatus" style="margin-top:8px;color:var(--text-muted);font-size:12px;">Sin importaciones recientes.</div>
+                    <div id="adminEfemeridesList" style="margin-top:12px;"></div>
+                    <div id="efemeridesImportStatus" style="margin-top:8px;color:var(--text-muted);font-size:12px;"></div>
                 </div>
-                <div class="admin-section">
-                    <h3><i class="fas fa-handshake"></i> Importar / Gestionar Bilaterales</h3>
-                    <p style="color:var(--text-muted);font-size:13px;line-height:1.4;margin-bottom:8px;">Pega un JSON con la estructura de `bilateralData` para fusionar convenios. Formato: {"1":{...},"20":{...}}</p>
-                    <textarea id="bilateralJsonInput" rows="6" style="width:100%;background:var(--bg-card);color:var(--text-main);border:1px solid rgba(212,175,55,0.16);border-radius:10px;padding:12px;" placeholder='{"1":{...}}'></textarea>
-                    <div style="display:flex;gap:8px;margin-top:10px;">
-                        <button class="admin-btn admin-btn-primary" type="button" onclick="importBilateralFromTextarea()"><i class="fas fa-upload"></i> Importar JSON</button>
-                        <button class="admin-btn" type="button" onclick="exportBilateralToClipboard()"><i class="fas fa-copy"></i> Exportar JSON</button>
+                <div class="admin-section" id="adminBilateralSection">
+                    <h3><i class="fas fa-handshake"></i> Gestionar Relaciones Bilaterales</h3>
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">Edite el estado de relaciones y los acuerdos de cada país en el módulo Bilaterales.</p>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>País</label>
+                            <select id="adminBilateralCountry" onchange="loadAdminBilateralForm()"><option value="">-- Seleccionar --</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado de Relación</label>
+                            <select id="adminBilateralStatus">
+                                <option value="active">Activas</option>
+                                <option value="limited">Limitadas</option>
+                                <option value="none">Sin relación</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Relaciones desde</label>
+                            <input type="text" id="adminBilateralDate" placeholder="Año">
+                        </div>
+                        <div class="form-group">
+                            <label>Nivel Estratégico</label>
+                            <select id="adminBilateralLevel">
+                                <option value="alta">Alta</option>
+                                <option value="media">Media</option>
+                                <option value="baja">Baja</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="align-items:center;flex-direction:row;gap:10px;padding-top:24px;">
+                            <input type="checkbox" id="adminBilateralEmbassy" style="width:18px;height:18px;">
+                            <label for="adminBilateralEmbassy" style="margin:0;text-transform:none;">Tiene embajada residente</label>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Áreas de cooperación (separadas por coma)</label>
+                            <input type="text" id="adminBilateralCoop" placeholder="Energía, Cultura, Comercio">
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <button class="admin-btn admin-btn-success" type="button" onclick="saveAdminBilateralForm()"><i class="fas fa-save"></i> Guardar Bilateral</button>
+                        </div>
                     </div>
-                    <div id="bilateralImportStatus" style="margin-top:8px;color:var(--text-muted);font-size:12px;">Sin importaciones recientes.</div>
+                    <h4 style="color:var(--gold-primary);margin:18px 0 10px;font-size:15px;"><i class="fas fa-file-contract"></i> Acuerdos y Convenios</h4>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>Título del acuerdo</label>
+                            <input type="text" id="adminAgreementTitle" placeholder="Nombre del acuerdo">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <input type="text" id="adminAgreementTipo" placeholder="Energético, Comercial, etc.">
+                        </div>
+                        <div class="form-group">
+                            <label>Fecha</label>
+                            <input type="text" id="adminAgreementDate" placeholder="Año o fecha">
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select id="adminAgreementStatus">
+                                <option value="Vigente">Vigente</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Vencido">Vencido</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Descripción</label>
+                            <textarea id="adminAgreementDesc" rows="2" placeholder="Descripción del acuerdo"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <button class="admin-btn admin-btn-primary" type="button" onclick="addAdminBilateralAgreement()"><i class="fas fa-plus"></i> Agregar Acuerdo</button>
+                        </div>
+                    </div>
+                    <div id="adminBilateralAgreementsList" style="margin-top:12px;"></div>
+                    <div id="bilateralImportStatus" style="margin-top:8px;color:var(--text-muted);font-size:12px;"></div>
+                </div>
+                <div class="admin-section" id="adminHitosSection">
+                    <h3><i class="fas fa-calendar-alt"></i> Gestionar Hitos Históricos</h3>
+                    <p style="color:var(--text-muted);font-size:13px;margin-bottom:14px;">Edite la línea de tiempo del módulo Hitos. Los IDs de país son opcionales (ej: 20,36,48).</p>
+                    <div class="admin-form">
+                        <div class="form-group">
+                            <label>Fecha / Año</label>
+                            <input type="text" id="adminHitoFecha" placeholder="Ej: 2024">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoría</label>
+                            <select id="adminHitoCategoria">
+                                <option value="diplomatico">Diplomático</option>
+                                <option value="embajada">Embajada</option>
+                                <option value="visita">Visita</option>
+                                <option value="cumbre">Cumbre</option>
+                                <option value="acuerdo">Acuerdo</option>
+                                <option value="organismo">Organismo</option>
+                                <option value="foro">Foro</option>
+                                <option value="cooperacion">Cooperación</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Título</label>
+                            <input type="text" id="adminHitoTitulo" placeholder="Título del hito">
+                        </div>
+                        <div class="form-group">
+                            <label>IDs de países (opcional)</label>
+                            <input type="text" id="adminHitoPaises" placeholder="Ej: 20,36,48">
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label>Descripción</label>
+                            <textarea id="adminHitoDesc" rows="2" placeholder="Descripción del hito"></textarea>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <button class="admin-btn admin-btn-primary" type="button" onclick="addAdminHito()"><i class="fas fa-plus"></i> Agregar Hito</button>
+                        </div>
+                    </div>
+                    <div id="adminHitosList" style="margin-top:14px;max-height:420px;overflow-y:auto;"></div>
                 </div>
             </div>
             <div id="viewerMessage" style="display:none;text-align:center;padding:60px 20px;">
@@ -1142,13 +1307,24 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                 <button class="modal-tab" type="button" onclick="showTab('cultura',this)"><i class="fas fa-masks-theater"></i> Cultura</button>
                 <button class="modal-tab" type="button" onclick="showTab('venezuela',this)"><i class="fas fa-handshake"></i> Venezuela</button>
                 <button class="modal-tab" type="button" onclick="showTab('efemerides',this)"><i class="fas fa-calendar-day"></i> Efemérides</button>
+                <button class="modal-tab" type="button" onclick="showTab('carpeta',this);renderCarpetaInfo(document.getElementById('countryModal')?.dataset?.countryId || '');"><i class="fas fa-folder-open"></i> Carpeta de información</button>
             </div>
             <div class="tab-content active" id="tab-general"><div class="info-grid" id="generalInfo"></div></div>
             <div class="tab-content" id="tab-gobierno"><div class="info-grid" id="gobiernoInfo"></div></div>
             <div class="tab-content" id="tab-economia"><div class="info-grid" id="economiaInfo"></div></div>
             <div class="tab-content" id="tab-cultura"><div class="info-grid" id="culturaInfo"></div></div>
             <div class="tab-content" id="tab-venezuela"><div class="info-grid" id="venezuelaInfo"></div></div>
+            <div class="tab-content" id="tab-carpeta">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+                    <h3 style="margin:0;"><i class="fas fa-folder-open"></i> Carpeta de información — País seleccionado</h3>
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                        <button class="header-btn" type="button" onclick="renderCarpetaInfo(getActiveCountryId());"><i class="fas fa-rotate-right"></i> Actualizar</button>
+                    </div>
+                </div>
+                <div id="carpetaInfoContainer" class="info-grid"></div>
+            </div>
             <div class="tab-content" id="tab-efemerides">
+
                 <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
                     <h3 style="margin:0;"><i class="fas fa-calendar-day"></i> Efemérides y días importantes</h3>
                     <button class="header-btn" type="button" onclick="openEfemeridesEditor()"><i class="fas fa-edit"></i> Editar (Admin)</button>
@@ -1272,7 +1448,7 @@ const paisesDB = [
 // ==================== CONFIGURACIÓN GLOBAL ====================
 const regionColors = { norte: '#ef4444', occidental: '#3b82f6', central: '#10b981', oriental: '#f59e0b', austral: '#9b5cf6' };
 const regionNames = { norte: 'Norte', occidental: 'Occidental', central: 'Central', oriental: 'Oriental', austral: 'Austral' };
-const hitosData = [
+const HITOS_DEFAULT = [
 {fecha:"1948",titulo:"Relaciones con Etiopía",desc:"Primer país africano con relaciones diplomáticas.",categoria:"diplomatico",icono:"handshake"},
 {fecha:"1960",titulo:"Nigeria y Marruecos",desc:"Relaciones durante año de independencia.",categoria:"diplomatico",icono:"flag"},
 {fecha:"1961",titulo:"Camerún",desc:"Reconocimiento de Camerún.",categoria:"diplomatico",icono:"handshake"},
@@ -1298,6 +1474,8 @@ const hitosData = [
 {fecha:"2024",titulo:"MNOAL Kampala",desc:"Cumbre MNOAL.",categoria:"cumbre",icono:"users", paisIds:[20,36]},
 {fecha:"2025",titulo:"Acuerdos Cooperación",desc:"Nuevos acuerdos con Ghana, Kenia y Tanzania.",categoria:"acuerdo",icono:"file-signature", paisIds:[13,37,46]}
 ];
+let hitosData = [];
+const HITOS_STORAGE_KEY = 'afridata_hitos_v1';
 const hitosCategorias = {
 diplomatico: { color: '#3498DB', icon: 'fa-handshake', label: 'Diplomático' },
 embajada: { color: '#9B59B6', icon: 'fa-building', label: 'Embajada' },
@@ -1308,6 +1486,18 @@ organismo: { color: '#1ABC9C', icon: 'fa-globe-africa', label: 'Organismo' },
 foro: { color: '#E74C3C', icon: 'fa-chart-line', label: 'Foro' },
 cooperacion: { color: '#E91E63', icon: 'fa-heart', label: 'Cooperación' }
 };
+function loadHitosData() {
+    try {
+        const raw = localStorage.getItem(HITOS_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        hitosData = (Array.isArray(parsed) && parsed.length) ? parsed : HITOS_DEFAULT.slice();
+    } catch (e) {
+        hitosData = HITOS_DEFAULT.slice();
+    }
+}
+function persistHitosData() {
+    try { localStorage.setItem(HITOS_STORAGE_KEY, JSON.stringify(hitosData)); } catch (e) { }
+}
 
 let map, markers = [], currentRegion = 'all';
 let currentUser = null;
@@ -1320,11 +1510,15 @@ const USERS_STORAGE_KEY = 'afridata_users_v1';
 const NEXT_USER_ID_KEY = 'afridata_next_user_id_v1';
 const AUDIT_STORAGE_KEY = 'afridata_audit_log_v1';
 const AUTHORITY_PHOTO_CACHE_KEY = 'afridata_authority_photo_cache_v1';
+const PAISES_OVERRIDES_STORAGE_KEY = 'afridata_paises_overrides_v1';
+const PAISES_EDITABLE_FIELDS = ['oficial', 'capital', 'presidente', 'presidente_anterior', 'gobierno', 'embajada', 'relacionesVenezuela', 'economia', 'idioma', 'moneda', 'industrias', 'recursos', 'cultura', 'tradicion', 'foto'];
+let paisesOverrides = {};
 let auditLog = [];
 let auditFilters = { user: '', from: '', to: '', text: '' };
 let authorityPhotoCache = {};
 let authorityPhotoSyncStarted = false;
 let currentLanguage = 'es';
+let clientIpInfo = { ip: sessionStorage.getItem('afridata_client_ip') || 'Desconocida', fetchedAt: null };
 
 // ==================== FUNCIONES AUXILIARES ====================
 function getDateTimeParts() { const n = new Date(); return { iso: n.toISOString(), fecha: n.toLocaleDateString('es-VE'), hora: n.toLocaleTimeString('es-VE', { hour12: false }) }; }
@@ -1336,6 +1530,38 @@ function loadAuditLog() { try { const r = localStorage.getItem(AUDIT_STORAGE_KEY
 function persistAuditLog() { try { localStorage.setItem(AUDIT_STORAGE_KEY, JSON.stringify(auditLog)); } catch (e) { } }
 function loadAuthorityPhotoCache() { try { const r = localStorage.getItem(AUTHORITY_PHOTO_CACHE_KEY); authorityPhotoCache = r ? JSON.parse(r) : {}; } catch (e) { authorityPhotoCache = {}; } }
 function persistAuthorityPhotoCache() { try { localStorage.setItem(AUTHORITY_PHOTO_CACHE_KEY, JSON.stringify(authorityPhotoCache)); } catch (e) { } }
+function applyPaisesOverrides() {
+    Object.keys(paisesOverrides).forEach(k => {
+        const id = parseInt(k, 10);
+        if (Number.isNaN(id)) return;
+        const p = paisesDB.find(x => x.id === id);
+        const ov = paisesOverrides[k];
+        if (!p || !ov || typeof ov !== 'object') return;
+        PAISES_EDITABLE_FIELDS.forEach(field => {
+            if (Object.prototype.hasOwnProperty.call(ov, field)) p[field] = ov[field];
+        });
+    });
+}
+function loadPaisesOverrides() {
+    try {
+        const raw = localStorage.getItem(PAISES_OVERRIDES_STORAGE_KEY);
+        paisesOverrides = raw ? JSON.parse(raw) : {};
+        if (!paisesOverrides || typeof paisesOverrides !== 'object' || Array.isArray(paisesOverrides)) paisesOverrides = {};
+    } catch (e) {
+        paisesOverrides = {};
+    }
+    applyPaisesOverrides();
+}
+function persistPaisesOverrides() {
+    try { localStorage.setItem(PAISES_OVERRIDES_STORAGE_KEY, JSON.stringify(paisesOverrides)); } catch (e) { }
+}
+function syncPaisesOverrideForCountry(p) {
+    if (!p) return;
+    const ov = {};
+    PAISES_EDITABLE_FIELDS.forEach(field => { ov[field] = p[field] ?? ''; });
+    paisesOverrides[String(p.id)] = ov;
+    persistPaisesOverrides();
+}
 
 // ==================== TRADUCCIONES E IDIOMAS ====================
 const translations = {
@@ -1466,11 +1692,48 @@ function setLanguageFromSelect() {
     if (select) setLanguage(select.value);
 }
 
+// ==================== IP DEL CLIENTE (AUDITORÍA) ====================
+function getClientIp() {
+    return clientIpInfo.ip || sessionStorage.getItem('afridata_client_ip') || 'Desconocida';
+}
+
+async function fetchClientIp() {
+    const cached = sessionStorage.getItem('afridata_client_ip');
+    if (cached) {
+        clientIpInfo.ip = cached;
+        return cached;
+    }
+    const sources = [
+        async () => {
+            const res = await fetch('https://api.ipify.org?format=json', { cache: 'no-store' });
+            if (!res.ok) return '';
+            const data = await res.json();
+            return data?.ip || '';
+        },
+        async () => {
+            const res = await fetch('https://ipv4.icanhazip.com', { cache: 'no-store' });
+            if (!res.ok) return '';
+            return (await res.text()).trim();
+        }
+    ];
+    for (const getIp of sources) {
+        try {
+            const ip = await getIp();
+            if (ip) {
+                clientIpInfo = { ip, fetchedAt: Date.now() };
+                sessionStorage.setItem('afridata_client_ip', ip);
+                return ip;
+            }
+        } catch (e) { }
+    }
+    return getClientIp();
+}
+
 // ==================== REGISTRO DE AUDITORÍA ====================
 function registerAudit(accion, cambio = '-', actorName = null) {
     const dt = getDateTimeParts();
     const actor = actorName || currentUser?.name || 'Sistema';
-    auditLog.unshift({ id: Date.now() + Math.floor(Math.random() * 1000), fecha: dt.fecha, hora: dt.hora, timestamp: dt.iso, usuario: actor, accion, cambio });
+    auditLog.unshift({ id: Date.now() + Math.floor(Math.random() * 1000), fecha: dt.fecha, hora: dt.hora, timestamp: dt.iso, usuario: actor, ip: getClientIp(), accion, cambio });
     if (auditLog.length > 1000) auditLog = auditLog.slice(0, 1000);
     persistAuditLog();
     renderAuditLog();
@@ -1491,7 +1754,7 @@ function getFilteredAuditLog() {
         return (!auditFilters.user || i.usuario === auditFilters.user) &&
             (!auditFilters.from || (d && d >= auditFilters.from)) &&
             (!auditFilters.to || (d && d <= auditFilters.to)) &&
-            (!auditFilters.text || `${i.accion || ''}${i.cambio || ''}${i.usuario || ''}`.toLowerCase().includes(auditFilters.text.trim().toLowerCase()));
+            (!auditFilters.text || `${i.accion || ''}${i.cambio || ''}${i.usuario || ''}${i.ip || ''}`.toLowerCase().includes(auditFilters.text.trim().toLowerCase()));
     });
 }
 
@@ -1515,9 +1778,9 @@ function renderAuditLog() {
     populateAuditUserFilter();
     const f = getFilteredAuditLog();
     if (!f.length) {
-        t.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px;">Sin registros.极少</td></tr>';
+        t.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:20px;">Sin registros.</td></tr>';
     } else {
-        t.innerHTML = f.map(i => `<tr><td>${escapeHtml(i.fecha)}</td><td>${escapeHtml(i.hora)}</td><td>${escapeHtml(i.usuario)}</td><td>${escapeHtml(i.accion)}</td><td>${escapeHtml(i.cambio || '-')}</td></tr>`).join('');
+        t.innerHTML = f.map(i => `<tr><td>${escapeHtml(i.fecha)}</td><td>${escapeHtml(i.hora)}</td><td>${escapeHtml(i.usuario)}</td><td>${escapeHtml(i.ip || '-')}</td><td>${escapeHtml(i.accion)}</td><td>${escapeHtml(i.cambio || '-')}</td></tr>`).join('');
     }
     const cl = document.getElementById('auditCountLabel');
     if (cl) cl.textContent = `${f.length} de ${auditLog.length}`;
@@ -1710,9 +1973,11 @@ function initMap() {
     });
     setTimeout(() => { if (map) map.invalidateSize(); }, 1200);
     addMarkers('all');
-    
-    // Escuchar cambios de tamaño
-    window.addEventListener('resize', debounceResize);
+
+    if (!mapResizeListenerAttached) {
+        window.addEventListener('resize', debounceResize);
+        mapResizeListenerAttached = true;
+    }
 }
 
 function debounceResize() {
@@ -1722,6 +1987,7 @@ function debounceResize() {
     }, 250);
 }
 let mapResizeTimer;
+let mapResizeListenerAttached = false;
 function addMarkers(region) {
     if (markers.length) { markers.forEach(m => { try { map.removeLayer(m); } catch (e) { } }); markers = []; }
     const filtered = region === 'all' ? paisesDB : paisesDB.filter(p => p.region === region);
@@ -1828,6 +2094,717 @@ function showTab(tab, btn) {
     document.getElementById('tab-' + tab).classList.add('active');
     btn.classList.add('active');
 }
+
+function getActiveCountryId() {
+    const modal = document.getElementById('countryModal');
+    if (!modal?.dataset?.countryId) return null;
+    const id = parseInt(modal.dataset.countryId, 10);
+    return Number.isNaN(id) ? null : id;
+}
+
+function renderCarpetaInfo(countryId) {
+    const container = document.getElementById('carpetaInfoContainer');
+    if (!container) return;
+    const idNum = Number(countryId);
+    const p = paisesDB.find(x => Number(x.id) === idNum) || null;
+    if (!p) {
+        container.innerHTML = `<div class="info-item full"><div class="label">Sin país seleccionado</div><div class="value">Seleccione un país desde el mapa o las tarjetas.</div></div>`;
+        return;
+    }
+
+    const fu = `https://flagcdn.com/w320/${p.bandera}.png`;
+    const bilateral = bilateralData?.[p.id];
+
+    const folderCards = [
+        { label: '📄 Ficha del país', value: `<div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">` +
+            `<img src="${fu}" style="width:72px;height:auto;border-radius:12px;border:2px solid var(--gold-primary);" onerror="this.style.display='none'" />` +
+            `<div><div style="font-family:'Space Grotesk',sans-serif;font-weight:800;color:var(--gold-primary);font-size:18px;">${escapeHtml(p.nombre)}</div>` +
+            `<div style="color:var(--text-muted);font-size:13px;">${escapeHtml(p.oficial)}</div></div></div>` },
+        { label: '🌍 Región', value: `<div style="color:${regionColors[p.region]};font-weight:800;">${escapeHtml(regionNames[p.region])}</div>` },
+        { label: '🏙️ Capital', value: `${escapeHtml(p.capital)}` },
+        { label: '👥 Población', value: `${escapeHtml(p.poblacion)}M` },
+        { label: '📐 Superficie', value: `${p.area.toLocaleString()} km²` },
+        { label: '🗣️ Idioma / Moneda', value: `${escapeHtml(p.idioma)}<br><span style="color:var(--text-muted);">${escapeHtml(p.moneda)}</span>` },
+        { label: '🏭 Industrias', value: `${escapeHtml(p.industrias)}` },
+        { label: '🪨 Recursos', value: `${escapeHtml(p.recursos)}` },
+        { label: '🏛️ Gobierno', value: `${escapeHtml(p.gobierno)}` },
+        { label: '👤 Presidente', value: `${escapeHtml(p.presidente)}` },
+        { label: '🏛️ Embajada / Relaciones con Venezuela', value: `${escapeHtml(p.embajada)}<br><span style="color:var(--text-muted);">Relaciones desde: ${escapeHtml(p.relacionesVenezuela)}</span>` },
+        { label: '🤝 Relaciones Bilaterales (Demo)', value: bilateral?.status === 'active' ? `Activas<br><span style="color:var(--text-muted);">Fecha: ${escapeHtml(bilateral.date || p.relacionesVenezuela || '')}</span>` : 'Sin relación' }
+    ];
+
+    container.innerHTML = folderCards.map(c => {
+        return `<div class="info-item"><div class="label">${escapeHtml(c.label)}</div><div class="value">${c.value}</div></div>`;
+    }).join('');
+
+    // Inserta además un bloque de acuerdos si existen.
+    if (bilateral?.agreements && Array.isArray(bilateral.agreements) && bilateral.agreements.length) {
+        const block = `<div class="info-item full" style="margin-top:14px;">
+            <div class="label">🧾 Acuerdos / Convenios</div>
+            <div class="value">
+                ${bilateral.agreements.map(a => `
+                    <div style="margin:10px 0;padding:12px;border:1px solid rgba(212,175,55,0.18);border-radius:12px;">
+                        <div style="font-weight:800;color:var(--gold-primary);">${escapeHtml(a.title || '')}</div>
+                        <div style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-top:6px;">${escapeHtml(a.desc || '')}</div>
+                        <div style="margin-top:8px;color:var(--text-muted);font-size:12px;">Tipo: ${escapeHtml(a.tipo || '')} · Fecha: ${escapeHtml(a.date || '')} · Estado: ${escapeHtml(a.status || '')}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>`;
+        container.insertAdjacentHTML('beforeend', block);
+    }
+
+    // ================= DOCUMENTOS POR PAÍS (localStorage) =================
+    const docsBlock = `
+        <div class="info-item full" style="margin-top:16px;">
+            <div class="label">📁 Documentos del país</div>
+            <div class="value">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                    <div style="display:flex;flex-direction:column;gap:4px;">
+                        <div style="font-weight:800;color:var(--gold-primary);font-family:'Space Grotesk',sans-serif;">${escapeHtml(p.nombre)}</div>
+                        <div style="color:var(--text-muted);font-size:12px;">Sube y visualiza archivos. No requiere servidor.</div>
+                    </div>
+                    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                        <label class="admin-btn admin-btn-primary" style="margin:0;cursor:pointer;">
+                            <i class="fas fa-upload"></i> Subir documento
+                            <input type="file" id="uploadDocsInput_${p.id}" multiple accept="*/*" style="display:none;" onchange="handleDocsUploadInput(${p.id}, this)" />
+                        </label>
+                        <button class="admin-btn admin-btn-danger" type="button" style="margin:0;" onclick="clearAllDocsForCountry(${p.id})"><i class="fas fa-trash-alt"></i> Eliminar documentos</button>
+                    </div>
+                </div>
+
+                <div id="docsListContainer_${p.id}" style="display:block;"></div>
+            </div>
+        </div>
+    `;
+
+    container.insertAdjacentHTML('beforeend', docsBlock);
+    ensureDocsLoaded(p.id).then(() => renderDocsListForCountry(p.id));
+}
+
+// ================= DOCUMENTOS POR PAÍS (IndexedDB + caché) =================
+const DOCS_BY_COUNTRY_PREFIX = 'afridata_docs_country_v1_';
+const DOCS_DB_NAME = 'afridata_docs_db';
+const DOCS_DB_STORE = 'country_docs';
+const MAX_DOC_FILE_SIZE = 25 * 1024 * 1024;
+const docsCache = {};
+const docsCacheLoading = {};
+let docsDbPromise = null;
+
+function getDocsStorageKey(countryId) {
+    return `${DOCS_BY_COUNTRY_PREFIX}${String(countryId)}`;
+}
+
+function safeJsonParse(txt, fallback) {
+    try { return JSON.parse(txt); } catch (e) { return fallback; }
+}
+
+function openDocsDb() {
+    if (!docsDbPromise) {
+        docsDbPromise = new Promise((resolve, reject) => {
+            const req = indexedDB.open(DOCS_DB_NAME, 1);
+            req.onupgradeneeded = (e) => {
+                const db = e.target.result;
+                if (!db.objectStoreNames.contains(DOCS_DB_STORE)) db.createObjectStore(DOCS_DB_STORE);
+            };
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => reject(req.error);
+        });
+    }
+    return docsDbPromise;
+}
+
+function idbGetDocs(key) {
+    return openDocsDb().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(DOCS_DB_STORE, 'readonly');
+        const req = tx.objectStore(DOCS_DB_STORE).get(key);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+    }));
+}
+
+function idbSetDocs(key, value) {
+    return openDocsDb().then(db => new Promise((resolve, reject) => {
+        const tx = db.transaction(DOCS_DB_STORE, 'readwrite');
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => reject(tx.error);
+        tx.objectStore(DOCS_DB_STORE).put(value, key);
+    }));
+}
+
+function dataUrlToBlob(dataUrl) {
+    const parts = String(dataUrl || '').split(',');
+    if (parts.length < 2) return null;
+    const meta = parts[0];
+    const data = parts.slice(1).join(',');
+    const isBase64 = meta.includes(';base64');
+    const mimeMatch = meta.match(/data:([^;]+)/);
+    const mime = mimeMatch ? mimeMatch[1] : 'application/octet-stream';
+    const bytes = isBase64 ? atob(data) : decodeURIComponent(data);
+    const arr = new Uint8Array(bytes.length);
+    for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+}
+
+function normalizeLoadedDoc(doc) {
+    if (!doc || typeof doc !== 'object') return null;
+    const normalized = { ...doc };
+    if (!normalized.kind) normalized.kind = inferFileKind(normalized.mimeType, normalized.name);
+    if (!(normalized.blob instanceof Blob) && normalized.dataUrl) {
+        const blob = dataUrlToBlob(normalized.dataUrl);
+        if (blob) normalized.blob = blob;
+    }
+    return normalized;
+}
+
+async function ensureDocsLoaded(countryId) {
+    const key = String(countryId);
+    if (Array.isArray(docsCache[key])) return docsCache[key];
+    if (docsCacheLoading[key]) return docsCacheLoading[key];
+
+    docsCacheLoading[key] = (async () => {
+        let docs = [];
+        try {
+            const stored = await idbGetDocs(getDocsStorageKey(countryId));
+            if (Array.isArray(stored)) docs = stored.map(normalizeLoadedDoc).filter(Boolean);
+        } catch (e) { }
+
+        if (!docs.length) {
+            try {
+                const raw = localStorage.getItem(getDocsStorageKey(countryId));
+                const legacy = safeJsonParse(raw, []);
+                if (Array.isArray(legacy) && legacy.length) {
+                    docs = legacy.map(normalizeLoadedDoc).filter(Boolean);
+                    await persistDocsForCountry(countryId, docs);
+                    try { localStorage.removeItem(getDocsStorageKey(countryId)); } catch (e) { }
+                }
+            } catch (e) { }
+        }
+
+        docsCache[key] = docs;
+        delete docsCacheLoading[key];
+        return docs;
+    })();
+
+    return docsCacheLoading[key];
+}
+
+function loadDocsForCountry(countryId) {
+    const cached = docsCache[String(countryId)];
+    return Array.isArray(cached) ? cached : [];
+}
+
+function serializeDocForStorage(doc) {
+    const base = {
+        id: doc.id,
+        name: doc.name,
+        mimeType: doc.mimeType || '',
+        kind: doc.kind || inferFileKind(doc.mimeType, doc.name),
+        sizeBytes: doc.sizeBytes || 0,
+        lastModified: doc.lastModified || 0,
+        uploadedAt: doc.uploadedAt || '',
+        textPreview: doc.textPreview || ''
+    };
+    if (doc.blob instanceof Blob) return { ...base, blob: doc.blob };
+    if (doc.dataUrl) return { ...base, dataUrl: doc.dataUrl };
+    return base;
+}
+
+async function persistDocsForCountry(countryId, docsArr) {
+    const key = String(countryId);
+    const arr = (Array.isArray(docsArr) ? docsArr : []).map(serializeDocForStorage);
+    docsCache[key] = arr;
+    try {
+        await idbSetDocs(getDocsStorageKey(countryId), arr);
+        return true;
+    } catch (e) {
+        showToast('No se pudieron guardar los documentos. Intenta archivos más pequeños.', 'error');
+        return false;
+    }
+}
+
+function getDocBlob(d) {
+    if (!d) return null;
+    if (d.blob instanceof Blob) return d.blob;
+    if (d.dataUrl) return dataUrlToBlob(d.dataUrl);
+    return null;
+}
+
+function getDocPreviewUrl(d) {
+    if (!d) return '';
+    if (d._previewUrl) return d._previewUrl;
+    const blob = getDocBlob(d);
+    if (blob) {
+        d._previewUrl = URL.createObjectURL(blob);
+        return d._previewUrl;
+    }
+    return d.dataUrl || '';
+}
+
+function revokeDocPreviewUrl(d) {
+    if (d?._previewUrl) {
+        try { URL.revokeObjectURL(d._previewUrl); } catch (e) { }
+        delete d._previewUrl;
+    }
+}
+
+function createDocFromFile(file, existingId = null) {
+    return {
+        id: existingId || generateDocId(),
+        name: file.name,
+        mimeType: file.type || '',
+        kind: inferFileKind(file.type, file.name),
+        sizeBytes: file.size,
+        lastModified: file.lastModified,
+        uploadedAt: new Date().toLocaleString('es-VE'),
+        blob: file
+    };
+}
+
+async function clearAllDocsForCountry(countryId) {
+    const docs = await ensureDocsLoaded(countryId);
+    if (!docs.length) {
+        showToast('No hay documentos para eliminar', 'info');
+        return;
+    }
+    const p = paisesDB.find(x => Number(x.id) === Number(countryId));
+    const countryName = p ? p.nombre : `país ${countryId}`;
+    if (!confirm(`¿Eliminar todos los documentos (${docs.length}) de ${countryName}? Esta acción no se puede deshacer.`)) return;
+    docs.forEach(revokeDocPreviewUrl);
+    const ok = await persistDocsForCountry(countryId, []);
+    if (!ok) return;
+    renderDocsListForCountry(countryId);
+    try { registerAudit('Docs - Eliminar todos', `countryId=${countryId}, count=${docs.length}`); } catch (e) { }
+    showToast('Documentos eliminados', 'success');
+}
+
+function generateDocId() {
+    return `doc_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+}
+
+function inferFileKind(mimeType, fileName) {
+    const mt = String(mimeType || '').toLowerCase();
+    const fn = String(fileName || '').toLowerCase();
+    if (mt.startsWith('image/')) return 'image';
+    if (mt === 'application/pdf' || fn.endsWith('.pdf')) return 'pdf';
+    if (mt.startsWith('text/') || mt === 'application/json' || mt === 'application/xml' || mt === 'text/xml' ||
+        ['.txt', '.md', '.csv', '.log', '.json', '.html', '.htm', '.xml'].some(ext => fn.endsWith(ext))) return 'text';
+    return 'file';
+}
+
+function openDataUrlInNewTab(url, fileName) {
+    const w = window.open(url, '_blank');
+    if (!w) {
+        alert('El navegador bloqueó la apertura. Permite ventanas emergentes para ver documentos.');
+        return;
+    }
+    if (fileName) {
+        try { w.document.title = fileName; } catch (e) { }
+    }
+}
+
+function escapeAttr(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '"')
+        .replace(/</g, '<')
+        .replace(/>/g, '>');
+}
+
+function renderDocsListForCountry(countryId) {
+    const container = document.getElementById(`docsListContainer_${countryId}`);
+    if (!container) return;
+
+    const docs = loadDocsForCountry(countryId);
+    // Order newest first
+    const sorted = [...docs].sort((a, b) => Number(b.lastModified || 0) - Number(a.lastModified || 0));
+
+    if (!sorted.length) {
+        container.innerHTML = `<div class="info-item full"><div class="label">Sin documentos</div><div class="value" style="color:var(--text-muted);font-size:13px;">Sube archivos para visualizarlos aquí.</div></div>`;
+        return;
+    }
+
+    container.innerHTML = `
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">
+            <span style="color:var(--text-muted);font-size:12px;">Total: <b style="color:var(--gold-primary)">${sorted.length}</b></span>
+            <button type="button" class="admin-btn admin-btn-primary" style="margin:0;" onclick="openDocsViewerModal(${countryId})"><i class="fas fa-eye"></i> Ver documentos</button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            ${sorted.map((d) => {
+                const kind = d.kind || inferFileKind(d.mimeType, d.name);
+                const name = escapeHtml(d.name || 'Documento');
+                const sizeKb = d.sizeBytes ? `${(Number(d.sizeBytes)/1024).toFixed(1)} KB` : '';
+                const dateStr = d.uploadedAt ? escapeHtml(d.uploadedAt) : '';
+                const thumbUrl = kind === 'image' ? getDocPreviewUrl(d) : '';
+                const preview = (kind === 'image' && thumbUrl) ? `<img src="${thumbUrl}" style="width:56px;height:44px;object-fit:cover;border-radius:8px;border:1px solid rgba(212,175,55,0.22);" onerror="this.remove()"/>` :
+                    (kind === 'pdf') ? `<span style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:44px;border-radius:10px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.22);color:#E74C3C;"><i class="fas fa-file-pdf"></i></span>` :
+                    `<span style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:44px;border-radius:10px;background:rgba(212,175,55,0.10);border:1px solid rgba(212,175,55,0.22);color:var(--gold-primary);"><i class="fas fa-file"></i></span>`;
+
+                return `
+                    <div class="info-item" style="padding:14px;">
+                        <div style="display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;">
+                            <div style="display:flex;gap:12px;align-items:flex-start;">
+                                ${preview}
+                                <div>
+                                    <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;color:var(--gold-primary);">${name}</div>
+                                    <div style="color:var(--text-muted);font-size:12px;margin-top:4px;">${sizeKb} ${dateStr ? '· ' + dateStr : ''}</div>
+                                    ${d.mimeType ? `<div style="color:var(--text-muted);font-size:12px;">${escapeHtml(d.mimeType)}</div>` : ''}
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                <button type="button" class="admin-btn admin-btn-primary" style="margin:0;" onclick="replaceDocByIdUI('${escapeAttr(d.id)}', ${countryId})"><i class="fas fa-sync-alt"></i> Actualizar</button>
+                                <button type="button" class="admin-btn" style="margin:0;" onclick="downloadDocById('${escapeAttr(d.id)}', ${countryId})"><i class="fas fa-download"></i> Descargar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+function getDocById(countryId, docId) {
+    const docs = loadDocsForCountry(countryId);
+    return docs.find(d => String(d.id) === String(docId)) || null;
+}
+
+function dataUrlToText(dataUrl) {
+    try {
+        const parts = String(dataUrl || '').split(',');
+        if (parts.length < 2) return '';
+        const meta = parts[0];
+        const data = parts.slice(1).join(',');
+        if (meta.includes(';base64')) return atob(data);
+        return decodeURIComponent(data);
+    } catch (e) {
+        return '';
+    }
+}
+
+function buildDocPreviewBlock(d, countryId) {
+    const kind = d.kind || inferFileKind(d.mimeType, d.name);
+    const name = escapeHtml(d.name || 'Documento');
+    const previewUrl = getDocPreviewUrl(d);
+    const sizeKb = d.sizeBytes ? `${(Number(d.sizeBytes) / 1024).toFixed(1)} KB` : '';
+    const dateStr = d.uploadedAt ? escapeHtml(d.uploadedAt) : '';
+    let preview = '';
+
+    if (!previewUrl) {
+        preview = `<div style="text-align:center;padding:24px;color:var(--text-muted);">Documento no disponible.</div>`;
+    } else if (kind === 'image') {
+        preview = `<div style="text-align:center;background:#111;border-radius:12px;padding:12px;"><img src="${previewUrl}" alt="${name}" style="max-width:100%;max-height:420px;object-fit:contain;border-radius:8px;" /></div>`;
+    } else if (kind === 'pdf') {
+        preview = `<iframe src="${previewUrl}" title="${name}" style="width:100%;height:480px;border:none;border-radius:12px;background:#fff;"></iframe>`;
+    } else if (kind === 'text') {
+        const text = escapeHtml(d.textPreview || dataUrlToText(d.dataUrl || '') || 'No se pudo leer el contenido.');
+        preview = `<pre style="max-height:420px;overflow:auto;background:var(--bg-input);padding:14px;border-radius:12px;font-size:12px;white-space:pre-wrap;word-break:break-word;color:var(--text-main);">${text || 'Archivo vacío.'}</pre>`;
+    } else {
+        preview = `<div style="text-align:center;padding:28px;color:var(--text-muted);"><i class="fas fa-file" style="font-size:40px;color:var(--gold-primary);margin-bottom:12px;display:block;"></i><p style="margin-bottom:12px;">Vista previa no disponible para este formato (Word, Excel, etc.).</p><button type="button" class="admin-btn" onclick="openDocInNewTab('${escapeAttr(d.id)}', ${countryId})"><i class="fas fa-external-link-alt"></i> Abrir en nueva pestaña</button></div>`;
+    }
+
+    return `
+        <div class="docs-viewer-item" id="doc-preview-${escapeAttr(d.id)}" style="border:1px solid rgba(212,175,55,0.2);border-radius:14px;padding:16px;margin-bottom:16px;background:var(--bg-card);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+                <div>
+                    <div style="font-family:'Space Grotesk',sans-serif;font-weight:800;color:var(--gold-primary);">${name}</div>
+                    <div style="color:var(--text-muted);font-size:12px;margin-top:4px;">${sizeKb}${dateStr ? ' · ' + dateStr : ''}</div>
+                </div>
+                <button type="button" class="admin-btn admin-btn-primary" style="margin:0;" onclick="downloadDocById('${escapeAttr(d.id)}', ${countryId})"><i class="fas fa-download"></i> Descargar</button>
+            </div>
+            ${preview}
+        </div>
+    `;
+}
+
+function closeDocsViewerModal() {
+    const modal = document.getElementById('docsViewerModal');
+    if (modal) modal.remove();
+}
+
+async function openDocsViewerModal(countryId, focusDocId = null) {
+    closeDocsViewerModal();
+    const docs = await ensureDocsLoaded(countryId);
+    const sorted = [...docs].sort((a, b) => Number(b.lastModified || 0) - Number(a.lastModified || 0));
+    if (!sorted.length) {
+        showToast('No hay documentos para visualizar', 'info');
+        return;
+    }
+
+    for (const d of sorted) {
+        if ((d.kind || inferFileKind(d.mimeType, d.name)) === 'text' && !d.textPreview) {
+            const blob = getDocBlob(d);
+            if (blob && blob.size < 512000) {
+                try { d.textPreview = await blob.text(); } catch (e) { }
+            }
+        }
+    }
+
+    const p = paisesDB.find(x => Number(x.id) === Number(countryId));
+    const title = p ? `Documentos — ${p.nombre}` : 'Documentos del país';
+
+    const modal = document.createElement('div');
+    modal.id = 'docsViewerModal';
+    modal.className = 'download-modal show';
+    modal.style.zIndex = '4100';
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeDocsViewerModal(); });
+    modal.innerHTML = `
+        <div class="download-content" style="width:min(920px,96%);">
+            <div class="download-header">
+                <h2><i class="fas fa-eye"></i> ${escapeHtml(title)}</h2>
+                <button class="modal-close" type="button" onclick="closeDocsViewerModal()" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="download-body" style="max-height:75vh;overflow-y:auto;">
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px;">Revisa todos los documentos antes de descargarlos o eliminarlos.</p>
+                ${sorted.map(d => buildDocPreviewBlock(d, countryId)).join('')}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    if (focusDocId) {
+        const el = document.getElementById(`doc-preview-${focusDocId}`);
+        if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    }
+
+    try { registerAudit('Docs - Visualizar', `countryId=${countryId}, count=${sorted.length}`); } catch (e) { }
+}
+
+async function openDocInNewTab(docId, countryId) {
+    await ensureDocsLoaded(countryId);
+    const d = getDocById(countryId, docId);
+    const url = getDocPreviewUrl(d);
+    if (!url) {
+        alert('Documento no disponible.');
+        return;
+    }
+    openDataUrlInNewTab(url, d.name);
+}
+
+function viewDocDataUrl(docId, countryId) {
+    openDocsViewerModal(countryId, docId);
+}
+
+async function downloadDocById(docId, countryId) {
+    await ensureDocsLoaded(countryId);
+    const d = getDocById(countryId, docId);
+    const url = getDocPreviewUrl(d);
+    if (!url) {
+        alert('Documento no disponible.');
+        return;
+    }
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = d.name || 'documento';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+}
+
+function replaceDocByIdUI(docId, countryId) {
+    const existing = getDocById(countryId, docId);
+    if (!existing) return;
+
+    const inputId = `replaceDocsInput_${countryId}_${docId}`.replace(/[^a-zA-Z0-9_]/g, '_');
+    let input = document.getElementById(inputId);
+    if (!input) {
+        input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '*/*';
+        input.multiple = false;
+        input.style.display = 'none';
+        input.id = inputId;
+        document.body.appendChild(input);
+    }
+
+    input.onchange = () => {
+        const f = input.files && input.files[0];
+        if (!f) return;
+        handleDocsReplaceSingleFile(countryId, docId, f).finally(() => {
+            input.value = '';
+        });
+    };
+    input.click();
+}
+
+async function handleDocsUploadInput(countryId, inputEl) {
+    const files = Array.from(inputEl?.files || []);
+    if (!files.length) return;
+
+    const docs = await ensureDocsLoaded(countryId);
+    let uploaded = 0, skipped = 0;
+
+    for (const f of files) {
+        if (f.size > MAX_DOC_FILE_SIZE) {
+            skipped++;
+            continue;
+        }
+        try {
+            const kind = inferFileKind(f.type, f.name);
+            const match = docs.find(d => (d.name || '').toLowerCase() === String(f.name || '').toLowerCase());
+            const record = createDocFromFile(f, match?.id);
+            if (kind === 'text' && f.size < 512000) {
+                try { record.textPreview = await f.text(); } catch (e) { }
+            }
+            if (match) {
+                revokeDocPreviewUrl(match);
+                Object.assign(match, record);
+            } else {
+                docs.push(record);
+            }
+            uploaded++;
+        } catch (e) {
+            skipped++;
+        }
+    }
+
+    if (!uploaded) {
+        showToast(skipped ? 'No se subieron archivos (máximo 25 MB por archivo)' : 'No se seleccionaron archivos', 'error');
+        if (inputEl) inputEl.value = '';
+        return;
+    }
+
+    const ok = await persistDocsForCountry(countryId, docs);
+    if (!ok) {
+        if (inputEl) inputEl.value = '';
+        return;
+    }
+    renderDocsListForCountry(countryId);
+    try { registerAudit('Docs - Subir/Actualizar', `countryId=${countryId}, files=${uploaded}`); } catch (e) { }
+    if (inputEl) inputEl.value = '';
+    showToast(`Documentos guardados: ${uploaded}${skipped ? ` · omitidos: ${skipped}` : ''}`, 'success');
+}
+
+async function handleDocsReplaceSingleFile(countryId, docId, file) {
+    if (file.size > MAX_DOC_FILE_SIZE) {
+        showToast('El archivo supera el máximo de 25 MB', 'error');
+        return;
+    }
+    const docs = await ensureDocsLoaded(countryId);
+    const idx = docs.findIndex(d => String(d.id) === String(docId));
+    if (idx < 0) return;
+
+    const kind = inferFileKind(file.type, file.name);
+    revokeDocPreviewUrl(docs[idx]);
+    const record = createDocFromFile(file, docId);
+    if (kind === 'text' && file.size < 512000) {
+        try { record.textPreview = await file.text(); } catch (e) { }
+    }
+    docs[idx] = record;
+
+    const ok = await persistDocsForCountry(countryId, docs);
+    if (!ok) return;
+    renderDocsListForCountry(countryId);
+    try { registerAudit('Docs - Reemplazar', `docId=${docId}, countryId=${countryId}`); } catch (e) { }
+    showToast('Documento actualizado', 'success');
+}
+
+function openDocsImportModal(countryId) {
+    const modalId = 'docsImportModal';
+    let modal = document.getElementById(modalId);
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = modalId;
+        modal.className = 'download-modal show';
+        modal.style.zIndex = '4000';
+        modal.innerHTML = `
+            <div class="download-content" style="width:min(900px,96%);">
+                <div class="download-header">
+                    <h2><i class="fas fa-file-import"></i> Importar documentos (JSON)</h2>
+                    <button class="modal-close" type="button" onclick="closeDocsImportModal()" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="download-body">
+                    <div style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">
+                        Pega un JSON con el formato generado por Exportar JSON. Se fusiona por <b>id</b> y se reemplaza si el <b>id</b> coincide.
+                    </div>
+                    <textarea id="docsImportTextarea" rows="8" style="width:100%;background:var(--bg-card);color:var(--text-main);border:1px solid rgba(212,175,55,0.16);border-radius:10px;padding:12px;" placeholder='{ "docs": [ { "id":"...", "name":"...", "mimeType":"...", "kind":"...", "sizeBytes":123, "lastModified":0, "uploadedAt":"...", "dataUrl":"data:..." } ] }'></textarea>
+                    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;justify-content:flex-end;">
+                        <button class="admin-btn" type="button" onclick="closeDocsImportModal()"><i class="fas fa-times"></i> Cancelar</button>
+                        <button class="admin-btn admin-btn-primary" type="button" onclick="importDocsFromTextarea(${countryId})"><i class="fas fa-upload"></i> Importar</button>
+                    </div>
+                    <div id="docsImportStatus" style="margin-top:10px;color:var(--text-muted);font-size:12px;">—</div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    } else {
+        modal.classList.add('show');
+        modal.style.display = 'flex';
+        modal.style.zIndex = '4000';
+    }
+
+    // Persist countryId in dataset
+    modal.dataset.countryId = String(countryId);
+    const txt = document.getElementById('docsImportTextarea');
+    if (txt) txt.value = '';
+    const st = document.getElementById('docsImportStatus');
+    if (st) st.textContent = '—';
+}
+
+function closeDocsImportModal() {
+    const modal = document.getElementById('docsImportModal');
+    if (!modal) return;
+    modal.classList.remove('show');
+    modal.remove();
+}
+
+function importDocsFromTextarea(countryId) {
+    const ta = document.getElementById('docsImportTextarea');
+    const st = document.getElementById('docsImportStatus');
+    if (!ta) return;
+
+    const raw = ta.value || '';
+    const parsed = safeJsonParse(raw, null);
+    if (!parsed) {
+        if (st) st.textContent = 'JSON inválido.';
+        return;
+    }
+
+    // allow either {docs:[...]} or directly [...]
+    const incoming = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.docs) ? parsed.docs : null);
+    if (!incoming) {
+        if (st) st.textContent = 'Formato inválido. Se esperaba {docs:[...]}.`';
+        return;
+    }
+
+    const current = loadDocsForCountry(countryId);
+    const mapById = new Map(current.map(d => [String(d.id), d]));
+
+    let replaced = 0, added = 0;
+    for (const doc of incoming) {
+        if (!doc || typeof doc !== 'object') continue;
+        if (!doc.id) doc.id = generateDocId();
+        const idKey = String(doc.id);
+        const kind = doc.kind || inferFileKind(doc.mimeType, doc.name);
+        const normalized = { ...doc, kind };
+        if (mapById.has(idKey)) { replaced++; mapById.set(idKey, normalized); }
+        else { added++; mapById.set(idKey, normalized); }
+    }
+
+    const merged = Array.from(mapById.values());
+    persistDocsForCountry(countryId, merged);
+    renderDocsListForCountry(countryId);
+
+    if (st) st.textContent = `Importación OK. Reemplazados: ${replaced}. Agregados: ${added}.`;
+    try { registerAudit('Docs - Importar JSON', `countryId=${countryId}, replaced=${replaced}, added=${added}`); } catch (e) {}
+}
+
+function exportDocsForCountryToJSON(countryId) {
+    const docs = loadDocsForCountry(countryId);
+    const payload = { countryId, docs };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `afridata_docs_${countryId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+    try { registerAudit('Docs - Exportar JSON', `countryId=${countryId}, count=${docs.length}`); } catch (e) {}
+}
+
 function loadPaisesTable() {
     const t = document.getElementById('paisesBody');
     if (!t) return;
@@ -1837,6 +2814,7 @@ function loadPaisesTable() {
         return `<tr><td style="color:var(--text-muted);font-size:11px;">${i + 1}</td><td><div class="flag-cell"><img src="${fu}" onerror="this.style.display='none'" alt="${p.nombre}"><strong>${p.nombre}</strong></div></td><td>${p.capital}</td><td><span style="color:${regionColors[p.region]};font-weight:600;">●</span> ${regionNames[p.region]}</td><td>${p.presidente}</td><td><span class="badge ${gb}">${p.gobierno.length > 28 ? p.gobierno.substring(0, 26) + '...' : p.gobierno}</span></td><td>${p.poblacion}</td><td><button class="popup-btn" onclick="openCountryModal(${p.id})" style="padding:5px 12px;font-size:10px;"><i class="fas fa-eye"></i> Ver</button></td></tr>`;
     }).join('');
 }
+
 function loadAutoridades() {
     const c = document.getElementById('autoridadesCards');
     const s = [...paisesDB].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
@@ -1867,9 +2845,12 @@ function loadAutoridades() {
         });
     });
 }
-function filterAuthorities() {
-    const s = document.getElementById('authoritySearch').value.toLowerCase();
+function applyAuthoritySearchFilter() {
+    const s = document.getElementById('authoritySearch')?.value.toLowerCase() || '';
     document.querySelectorAll('.authority-card').forEach(c => { c.style.display = c.textContent.toLowerCase().includes(s) ? 'block' : 'none'; });
+}
+function filterAuthorities() {
+    applyAuthoritySearchFilter();
 }
 function filterAuthorityRegion(r, btn) {
     document.querySelectorAll('.authority-filter-btn').forEach(b => b.classList.remove('active'));
@@ -2182,37 +3163,282 @@ function filterMultilateralOrg(o, btn) {
 }
 
 // ==================== ADMINISTRACIÓN, USUARIOS, REPORTES ====================
-function populateCountrySelect() {
-    const s = document.getElementById('editCountrySelect');
+function fillAdminCountrySelect(selectId) {
+    const s = document.getElementById(selectId);
     if (!s) return;
+    const current = s.value;
     s.innerHTML = '<option value="">-- Seleccionar --</option>';
     paisesDB.forEach(p => { s.innerHTML += `<option value="${p.id}">${p.bandera} ${p.nombre}</option>`; });
+    if (current) s.value = current;
+}
+function populateCountrySelect() {
+    fillAdminCountrySelect('editCountrySelect');
+    fillAdminCountrySelect('adminEfemeridesCountry');
+    fillAdminCountrySelect('adminBilateralCountry');
+}
+function initAdminPanel() {
+    populateCountrySelect();
+    renderAdminEfemeridesList();
+    loadAdminBilateralForm();
+    renderAdminHitosList();
 }
 function loadCountryForEdit() {
     const id = parseInt(document.getElementById('editCountrySelect').value);
     if (!id) return;
     const p = paisesDB.find(x => x.id === id);
     if (!p) return;
-    document.getElementById('editPresident').value = p.presidente;
-    document.getElementById('editGovernment').value = p.gobierno;
-    document.getElementById('editEmbassy').value = p.embajada;
-    document.getElementById('editRelations').value = p.relacionesVenezuela;
-    document.getElementById('editEconomy').value = p.economia;
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+    set('editOficial', p.oficial);
+    set('editCapital', p.capital);
+    set('editPresident', p.presidente);
+    set('editPresidentAnterior', p.presidente_anterior);
+    set('editGovernment', p.gobierno);
+    set('editFoto', p.foto);
+    set('editIdioma', p.idioma);
+    set('editMoneda', p.moneda);
+    set('editIndustrias', p.industrias);
+    set('editRecursos', p.recursos);
+    set('editEmbassy', p.embajada);
+    set('editRelations', p.relacionesVenezuela);
+    set('editEconomy', p.economia);
+    set('editCultura', p.cultura);
+    set('editTradicion', p.tradicion);
 }
 function saveCountryEdit() {
+    if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
     const id = parseInt(document.getElementById('editCountrySelect').value);
     if (!id) { showToast('Selecciona un país', 'error'); return; }
     const p = paisesDB.find(x => x.id === id);
     if (!p) return;
-    p.presidente = document.getElementById('editPresident').value;
-    p.gobierno = document.getElementById('editGovernment').value;
-    p.embajada = document.getElementById('editEmbassy').value;
-    p.relacionesVenezuela = document.getElementById('editRelations').value;
-    p.economia = document.getElementById('editEconomy').value;
+    const get = id => document.getElementById(id)?.value ?? '';
+    p.oficial = get('editOficial');
+    p.capital = get('editCapital');
+    p.presidente = get('editPresident');
+    p.presidente_anterior = get('editPresidentAnterior');
+    p.gobierno = get('editGovernment');
+    p.foto = get('editFoto');
+    p.idioma = get('editIdioma');
+    p.moneda = get('editMoneda');
+    p.industrias = get('editIndustrias');
+    p.recursos = get('editRecursos');
+    p.embajada = get('editEmbassy');
+    p.relacionesVenezuela = get('editRelations');
+    p.economia = get('editEconomy');
+    p.cultura = get('editCultura');
+    p.tradicion = get('editTradicion');
+    if (p.foto) authorityPhotoCache[String(p.id)] = p.foto;
+    syncPaisesOverrideForCountry(p);
+    persistAuthorityPhotoCache();
     registerAudit('Edición de país', `${p.nombre} editado`);
     loadPaisesTable();
     loadAutoridades();
+    if (typeof renderBilateralContent === 'function') renderBilateralContent();
     showToast('País actualizado', 'success');
+}
+function renderAdminEfemeridesList() {
+    const list = document.getElementById('adminEfemeridesList');
+    const countryId = document.getElementById('adminEfemeridesCountry')?.value;
+    if (!list) return;
+    if (!countryId) { list.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Seleccione un país.</p>'; return; }
+    const items = efemeridesDB[String(countryId)] || [];
+    if (!items.length) {
+        list.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Sin efemérides. Use el formulario de arriba para agregar.</p>';
+        return;
+    }
+    list.innerHTML = items.map((e, idx) => `
+        <div class="admin-list-item">
+            <div class="item-body">
+                <div style="font-weight:700;color:var(--gold-primary);">${escapeHtml(e.fecha)} — ${escapeHtml(e.titulo)}</div>
+                <div style="color:var(--text-muted);font-size:13px;margin-top:4px;">${escapeHtml(e.desc || '')}</div>
+            </div>
+            <div class="item-actions">
+                <button class="admin-btn admin-btn-danger" type="button" style="margin:0;padding:8px 12px;font-size:12px;" onclick="deleteAdminEfemeride(${countryId},${idx})"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+function addAdminEfemeride() {
+    if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
+    const countryId = document.getElementById('adminEfemeridesCountry')?.value;
+    const fecha = document.getElementById('adminEfemerideFecha')?.value.trim();
+    const titulo = document.getElementById('adminEfemerideTitulo')?.value.trim();
+    const desc = document.getElementById('adminEfemerideDesc')?.value.trim();
+    if (!countryId) { showToast('Selecciona un país', 'error'); return; }
+    if (!fecha || !titulo) { showToast('Fecha y título son obligatorios', 'error'); return; }
+    if (!efemeridesDB[String(countryId)]) efemeridesDB[String(countryId)] = [];
+    efemeridesDB[String(countryId)].push({ fecha, titulo, desc });
+    persistEfemerides();
+    document.getElementById('adminEfemerideFecha').value = '';
+    document.getElementById('adminEfemerideTitulo').value = '';
+    document.getElementById('adminEfemerideDesc').value = '';
+    const st = document.getElementById('efemeridesImportStatus');
+    if (st) st.textContent = 'Efeméride guardada.';
+    renderAdminEfemeridesList();
+    registerAudit('Efeméride agregada', `País ID ${countryId}: ${titulo}`);
+    showToast('Efeméride agregada', 'success');
+}
+function deleteAdminEfemeride(countryId, idx) {
+    if (currentUser?.role !== 'admin') return;
+    const key = String(countryId);
+    if (!efemeridesDB[key]) return;
+    efemeridesDB[key].splice(idx, 1);
+    persistEfemerides();
+    renderAdminEfemeridesList();
+    registerAudit('Efeméride eliminada', `País ID ${countryId}`);
+    showToast('Efeméride eliminada', 'success');
+}
+function getAdminBilateralEntry(countryId) {
+    const id = Number(countryId);
+    if (!bilateralData[id]) {
+        ensureBilateralDefaults();
+    }
+    if (!bilateralData[id]) {
+        bilateralData[id] = { status: 'none', hasEmbassy: false, strategicLevel: 'media', date: '', agreements: [], coopAreas: [] };
+    }
+    if (!Array.isArray(bilateralData[id].agreements)) bilateralData[id].agreements = [];
+    return bilateralData[id];
+}
+function loadAdminBilateralForm() {
+    const countryId = document.getElementById('adminBilateralCountry')?.value;
+    if (!countryId) {
+        const list = document.getElementById('adminBilateralAgreementsList');
+        if (list) list.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Seleccione un país.</p>';
+        return;
+    }
+    const bd = getAdminBilateralEntry(countryId);
+    document.getElementById('adminBilateralStatus').value = bd.status || 'none';
+    document.getElementById('adminBilateralDate').value = bd.date || '';
+    document.getElementById('adminBilateralLevel').value = bd.strategicLevel || 'media';
+    document.getElementById('adminBilateralEmbassy').checked = !!bd.hasEmbassy;
+    document.getElementById('adminBilateralCoop').value = (bd.coopAreas || []).join(', ');
+    renderAdminBilateralAgreementsList(countryId);
+}
+function saveAdminBilateralForm() {
+    if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
+    const countryId = document.getElementById('adminBilateralCountry')?.value;
+    if (!countryId) { showToast('Selecciona un país', 'error'); return; }
+    const bd = getAdminBilateralEntry(countryId);
+    bd.status = document.getElementById('adminBilateralStatus').value;
+    bd.date = document.getElementById('adminBilateralDate').value.trim();
+    bd.strategicLevel = document.getElementById('adminBilateralLevel').value;
+    bd.hasEmbassy = document.getElementById('adminBilateralEmbassy').checked;
+    bd.coopAreas = document.getElementById('adminBilateralCoop').value.split(',').map(s => s.trim()).filter(Boolean);
+    persistBilateral();
+    const st = document.getElementById('bilateralImportStatus');
+    if (st) st.textContent = 'Datos bilaterales guardados.';
+    renderBilateralContent();
+    registerAudit('Edición bilateral', `País ID ${countryId}`);
+    showToast('Bilateral guardado', 'success');
+}
+function renderAdminBilateralAgreementsList(countryId) {
+    const list = document.getElementById('adminBilateralAgreementsList');
+    if (!list || !countryId) return;
+    const agreements = getAdminBilateralEntry(countryId).agreements || [];
+    if (!agreements.length) {
+        list.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Sin acuerdos registrados.</p>';
+        return;
+    }
+    list.innerHTML = agreements.map((ag, idx) => `
+        <div class="admin-list-item">
+            <div class="item-body">
+                <div style="font-weight:700;color:var(--gold-primary);">${escapeHtml(ag.title)} <span style="font-size:11px;color:var(--text-muted);">(${escapeHtml(ag.tipo || 'General')})</span></div>
+                <div style="color:var(--text-muted);font-size:13px;margin-top:4px;">${escapeHtml(ag.desc || '')}</div>
+                <div style="color:var(--text-muted);font-size:12px;margin-top:4px;">${escapeHtml(ag.date || '')} · ${escapeHtml(ag.status || '')}</div>
+            </div>
+            <div class="item-actions">
+                <button class="admin-btn admin-btn-danger" type="button" style="margin:0;padding:8px 12px;font-size:12px;" onclick="deleteAdminBilateralAgreement(${countryId},${idx})"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+function addAdminBilateralAgreement() {
+    if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
+    const countryId = document.getElementById('adminBilateralCountry')?.value;
+    const title = document.getElementById('adminAgreementTitle')?.value.trim();
+    if (!countryId) { showToast('Selecciona un país', 'error'); return; }
+    if (!title) { showToast('El título del acuerdo es obligatorio', 'error'); return; }
+    const bd = getAdminBilateralEntry(countryId);
+    bd.agreements.push({
+        title,
+        desc: document.getElementById('adminAgreementDesc')?.value.trim() || '',
+        date: document.getElementById('adminAgreementDate')?.value.trim() || '',
+        status: document.getElementById('adminAgreementStatus')?.value || 'Vigente',
+        tipo: document.getElementById('adminAgreementTipo')?.value.trim() || 'General'
+    });
+    persistBilateral();
+    document.getElementById('adminAgreementTitle').value = '';
+    document.getElementById('adminAgreementDesc').value = '';
+    document.getElementById('adminAgreementDate').value = '';
+    document.getElementById('adminAgreementTipo').value = '';
+    renderAdminBilateralAgreementsList(countryId);
+    renderBilateralContent();
+    registerAudit('Acuerdo bilateral agregado', `País ID ${countryId}: ${title}`);
+    showToast('Acuerdo agregado', 'success');
+}
+function deleteAdminBilateralAgreement(countryId, idx) {
+    if (currentUser?.role !== 'admin') return;
+    const bd = getAdminBilateralEntry(countryId);
+    bd.agreements.splice(idx, 1);
+    persistBilateral();
+    renderAdminBilateralAgreementsList(countryId);
+    renderBilateralContent();
+    showToast('Acuerdo eliminado', 'success');
+}
+function renderAdminHitosList() {
+    const list = document.getElementById('adminHitosList');
+    if (!list) return;
+    if (!hitosData.length) {
+        list.innerHTML = '<p style="color:var(--text-muted);font-size:13px;">Sin hitos registrados.</p>';
+        return;
+    }
+    list.innerHTML = hitosData.map((h, idx) => {
+        const cat = hitosCategorias[h.categoria] || hitosCategorias.diplomatico;
+        return `
+        <div class="admin-list-item">
+            <div class="item-body">
+                <div style="font-weight:700;color:var(--gold-primary);">${escapeHtml(h.fecha)} — ${escapeHtml(h.titulo)}</div>
+                <div style="color:var(--text-muted);font-size:12px;margin-top:4px;"><span class="badge" style="background:${cat.color}20;color:${cat.color};">${escapeHtml(cat.label)}</span></div>
+                <div style="color:var(--text-muted);font-size:13px;margin-top:6px;">${escapeHtml(h.desc || '')}</div>
+            </div>
+            <div class="item-actions">
+                <button class="admin-btn admin-btn-danger" type="button" style="margin:0;padding:8px 12px;font-size:12px;" onclick="deleteAdminHito(${idx})"><i class="fas fa-trash"></i></button>
+            </div>
+        </div>`;
+    }).join('');
+}
+function addAdminHito() {
+    if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
+    const fecha = document.getElementById('adminHitoFecha')?.value.trim();
+    const titulo = document.getElementById('adminHitoTitulo')?.value.trim();
+    const desc = document.getElementById('adminHitoDesc')?.value.trim();
+    const categoria = document.getElementById('adminHitoCategoria')?.value || 'diplomatico';
+    const paisesRaw = document.getElementById('adminHitoPaises')?.value.trim();
+    if (!fecha || !titulo) { showToast('Fecha y título son obligatorios', 'error'); return; }
+    const hito = { fecha, titulo, desc, categoria, icono: (hitosCategorias[categoria]?.icon || 'fa-handshake').replace('fa-', '') };
+    if (paisesRaw) {
+        hito.paisIds = paisesRaw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !Number.isNaN(n));
+    }
+    hitosData.push(hito);
+    hitosData.sort((a, b) => String(a.fecha).localeCompare(String(b.fecha)));
+    persistHitosData();
+    document.getElementById('adminHitoFecha').value = '';
+    document.getElementById('adminHitoTitulo').value = '';
+    document.getElementById('adminHitoDesc').value = '';
+    document.getElementById('adminHitoPaises').value = '';
+    renderAdminHitosList();
+    loadHitos();
+    registerAudit('Hito agregado', titulo);
+    showToast('Hito agregado', 'success');
+}
+function deleteAdminHito(idx) {
+    if (currentUser?.role !== 'admin') return;
+    if (!confirm('¿Eliminar este hito?')) return;
+    const removed = hitosData.splice(idx, 1)[0];
+    persistHitosData();
+    renderAdminHitosList();
+    loadHitos();
+    registerAudit('Hito eliminado', removed?.titulo || '');
+    showToast('Hito eliminado', 'success');
 }
 function createUser() {
     const n = document.getElementById('newUserName').value.trim();
@@ -2276,8 +3502,8 @@ function generateReport(type) {
         paisesDB.forEach(p => { const bd = bilateralData[p.id]; if (bd?.agreements) bd.agreements.forEach(ag => d.push([p.nombre, ag.title, ag.status, ag.date])); });
         doc.autoTable({ startY: 50, head: [['País', 'Acuerdo', 'Estado', 'Fecha']], body: d.slice(0, 50), theme: 'grid', headStyles: { fillColor: [26, 82, 118] }, styles: { fontSize: 8 } });
     } else if (type === 'auditoria') {
-        const d = auditLog.slice(0, 250).map(i => [i.fecha, i.hora, i.usuario, i.accion, i.cambio || '-']);
-        doc.autoTable({ startY: 50, head: [['Fecha', 'Hora', 'Usuario', 'Acción', 'Detalle']], body: d.length ? d : [['-', '-', '-', 'Sin registros', '-']], theme: 'grid', headStyles: { fillColor: [26, 82, 118] }, styles: { fontSize: 7 } });
+        const d = auditLog.slice(0, 250).map(i => [i.fecha, i.hora, i.usuario, i.ip || '-', i.accion, i.cambio || '-']);
+        doc.autoTable({ startY: 50, head: [['Fecha', 'Hora', 'Usuario', 'IP', 'Acción', 'Detalle']], body: d.length ? d : [['-', '-', '-', '-', 'Sin registros', '-']], theme: 'grid', headStyles: { fillColor: [26, 82, 118] }, styles: { fontSize: 7 } });
     }
     doc.save(`AFRIDATA_${type}_${new Date().toISOString().split('T')[0]}.pdf`);
     registerAudit('Generación de reporte', `Reporte ${type} PDF`);
@@ -2300,8 +3526,8 @@ function exportExcel() {
 function exportCSV() { exportExcel(); }
 function exportAuditCSV() {
     closeDownloadModal();
-    let csv = 'Fecha,Hora,Usuario,Accion,Detalle\n';
-    auditLog.forEach(i => { const safe = v => `"${String(v ?? '').replace(/"/g, '""')}"`; csv += `${safe(i.fecha)},${safe(i.hora)},${safe(i.usuario)},${safe(i.accion)},${safe(i.cambio || '-')}\n`; });
+    let csv = 'Fecha,Hora,Usuario,IP,Accion,Detalle\n';
+    auditLog.forEach(i => { const safe = v => `"${String(v ?? '').replace(/"/g, '""')}"`; csv += `${safe(i.fecha)},${safe(i.hora)},${safe(i.usuario)},${safe(i.ip || '-')},${safe(i.accion)},${safe(i.cambio || '-')}\n`; });
     const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
@@ -2354,54 +3580,14 @@ function openEfemeridesEditor() {
     if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
     const id = getActiveCountryId();
     if (!id) { showToast('Abre la ficha de un país primero', 'info'); return; }
-    const existing = JSON.stringify(efemeridesDB[String(id)] || [], null, 2);
-    document.getElementById('efemeridesJsonInput').value = existing;
-    showToast('Pega/edita efemérides y pulsa Importar', 'info');
+    showModule('admin');
+    const sel = document.getElementById('adminEfemeridesCountry');
+    if (sel) sel.value = String(id);
+    renderAdminEfemeridesList();
+    const section = document.getElementById('adminEfemeridesSection');
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('Edite las efemérides del país seleccionado', 'info');
 }
-function importEfemeridesFromTextarea() {
-    try {
-        const raw = document.getElementById('efemeridesJsonInput').value.trim();
-        if (!raw) { showToast('Pega un JSON válido', 'error'); return; }
-        const parsed = JSON.parse(raw);
-        if (typeof parsed !== 'object') { showToast('JSON inválido', 'error'); return; }
-        if (Array.isArray(parsed)) {
-            const id = getActiveCountryId();
-            if (!id) { showToast('Abre la ficha del país objetivo antes de importar un array', 'error'); return; }
-            efemeridesDB[String(id)] = parsed;
-        } else {
-            Object.keys(parsed).forEach(k => { efemeridesDB[String(k)] = parsed[k]; });
-        }
-        persistEfemerides();
-        document.getElementById('efemeridesImportStatus').textContent = 'Importación guardada.';
-        renderEfemeridesForCountry(getActiveCountryId());
-        registerAudit('Importación efemérides', 'Importadas efemérides por JSON');
-        showToast('Efemérides importadas', 'success');
-    } catch (e) { console.error(e); showToast('Error al procesar JSON', 'error'); }
-}
-function exportEfemeridesToClipboard() {
-    const payload = JSON.stringify(efemeridesDB, null, 2);
-    navigator.clipboard?.writeText(payload).then(() => { showToast('JSON copiado al portapapeles', 'success'); }).catch(() => { const a = document.createElement('a'); const blob = new Blob([payload], { type: 'application/json' }); a.href = URL.createObjectURL(blob); a.download = 'efemerides_afridata.json'; document.body.appendChild(a); a.click(); a.remove(); showToast('Descargando JSON', 'info'); });
-}
-function importBilateralFromTextarea() {
-    try {
-        if (currentUser?.role !== 'admin') { showToast('Acceso denegado', 'error'); return; }
-        const raw = document.getElementById('bilateralJsonInput').value.trim();
-        if (!raw) { showToast('Pega un JSON válido', 'error'); return; }
-        const parsed = JSON.parse(raw);
-        if (typeof parsed !== 'object') { showToast('JSON inválido', 'error'); return; }
-        Object.keys(parsed).forEach(k => { bilateralData[k] = parsed[k]; });
-        persistBilateral();
-        document.getElementById('bilateralImportStatus').textContent = 'Importación guardada.';
-        renderBilateralContent();
-        registerAudit('Importación bilaterales', 'Importados datos bilaterales JSON');
-        showToast('Bilaterales importados', 'success');
-    } catch (e) { console.error(e); showToast('Error al procesar JSON', 'error'); }
-}
-function exportBilateralToClipboard() {
-    const payload = JSON.stringify(bilateralData, null, 2);
-    navigator.clipboard?.writeText(payload).then(() => { showToast('JSON copiado al portapapeles', 'success'); }).catch(() => { const a = document.createElement('a'); const blob = new Blob([payload], { type: 'application/json' }); a.href = URL.createObjectURL(blob); a.download = 'bilaterales_afridata.json'; document.body.appendChild(a); a.click(); a.remove(); showToast('Descargando JSON', 'info'); });
-}
-function getActiveCountryId() { const modal = document.getElementById('countryModal'); return modal?.dataset?.countryId ? parseInt(modal.dataset.countryId, 10) : null; }
 function printCountryModal() {
     const id = getActiveCountryId();
     if (!id) return;
@@ -2450,7 +3636,7 @@ function doLogin() {
     const user = users.find(user => user.login === u && user.password === p);
     if (user) {
         currentUser = user;
-        registerAudit('Inicio de sesión', 'Acceso correcto al sistema');
+        fetchClientIp().finally(() => registerAudit('Inicio de sesión', `Acceso correcto al sistema · IP: ${getClientIp()}`));
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('appPage').style.display = 'block';
         document.getElementById('headerUsername').textContent = user.name;
@@ -2463,7 +3649,7 @@ function doLogin() {
             loadAutoridades();
             loadEmbajadas();
             loadEmbajadasEnVzla();    // ← nueva tabla
-            populateCountrySelect();
+            initAdminPanel();
             loadUsers();
             loadHitos();
             // Cargar y asegurar datos bilaterales para los 55 países
@@ -2476,7 +3662,7 @@ function doLogin() {
         }, 300);
     } else {
         if (le) { le.style.display = 'block'; le.textContent = translations[currentLanguage].loginError; }
-        registerAudit('Acceso fallido', `Usuario: ${u}`);
+        fetchClientIp().finally(() => registerAudit('Acceso fallido', `Usuario: ${u} · IP: ${getClientIp()}`));
     }
 }
 function doLogout() {
@@ -2534,7 +3720,10 @@ function updateAdminAccess() {
     const is = currentUser?.role === 'admin';
     document.getElementById('adminContent').style.display = is ? 'block' : 'none';
     document.getElementById('viewerMessage').style.display = is ? 'none' : 'block';
-    if (is) document.getElementById('adminEditSection').style.display = 'block';
+    if (is) {
+        document.getElementById('adminEditSection').style.display = 'block';
+        initAdminPanel();
+    }
 }
 function showModule(mod) {
     closeMobileMenu();
@@ -2600,11 +3789,16 @@ window.saveCountryEdit = saveCountryEdit;
 window.triggerAuthorityPhotoImport = triggerAuthorityPhotoImport;
 window.importAuthorityPhotosFromInput = importAuthorityPhotosFromInput;
 window.handleAuthorityImageError = handleAuthorityImageError;
-window.importEfemeridesFromTextarea = importEfemeridesFromTextarea;
-window.exportEfemeridesToClipboard = exportEfemeridesToClipboard;
 window.openEfemeridesEditor = openEfemeridesEditor;
-window.importBilateralFromTextarea = importBilateralFromTextarea;
-window.exportBilateralToClipboard = exportBilateralToClipboard;
+window.addAdminEfemeride = addAdminEfemeride;
+window.deleteAdminEfemeride = deleteAdminEfemeride;
+window.renderAdminEfemeridesList = renderAdminEfemeridesList;
+window.loadAdminBilateralForm = loadAdminBilateralForm;
+window.saveAdminBilateralForm = saveAdminBilateralForm;
+window.addAdminBilateralAgreement = addAdminBilateralAgreement;
+window.deleteAdminBilateralAgreement = deleteAdminBilateralAgreement;
+window.addAdminHito = addAdminHito;
+window.deleteAdminHito = deleteAdminHito;
 window.setLanguageFromSelect = setLanguageFromSelect;
 
 document.getElementById('countryModal').addEventListener('click', function (e) { if (e.target === this) closeModal(); });
@@ -2614,10 +3808,13 @@ document.addEventListener('keypress', function (e) { if (e.key === 'Enter' && do
 
 window.addEventListener('load', function () {
     const savedLang = localStorage.getItem('afridata_language') || 'es';
+    loadPaisesOverrides();
     setLanguage(savedLang);
+    fetchClientIp();
     loadUsersFromStorage();
     loadAuditLog();
     loadAuthorityPhotoCache();
+    loadHitosData();
     loadBilateral();
     loadEfemerides();
     renderAuditLog();
@@ -2636,6 +3833,7 @@ document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
         try { closeModal(); } catch (er) { }
         try { closeDownloadModal(); } catch (er) { }
+        try { closeDocsViewerModal(); } catch (er) { }
     }
 });
 
@@ -2646,7 +3844,7 @@ document.addEventListener('keydown', function (e) {
  */
 let __renderBilateralDebounced = debounce(() => renderBilateralContent(), 280);
 let __renderMultilateralDebounced = debounce(() => renderMultilateralContent(), 280);
-let __filterAuthoritiesDebounced = debounce(() => filterAuthorities(), 250);
+let __filterAuthoritiesDebounced = debounce(applyAuthoritySearchFilter, 250);
 
 try {
     const bs = document.getElementById('bilateralSearch'); if (bs) bs.addEventListener('input', () => __renderBilateralDebounced());

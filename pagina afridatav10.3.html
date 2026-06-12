@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>AFRIDATA - Plataforma MPPRE Completa</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a0a0a; color: white; overflow-x: hidden; }
+        .dev-banner { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(90deg, #E67E22, #D4AF37); color: black; text-align: center; padding: 6px; font-size: 12px; font-weight: bold; z-index: 9999; }
+        #loginPage { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=2044'); background-size: cover; background-position: center; background-attachment: fixed; padding: 20px; }
+        .login-container { background: rgba(20,20,20,0.95); backdrop-filter: blur(4px); border: 1px solid #D4AF37; border-radius: 24px; padding: 40px; width: 100%; max-width: 380px; text-align: center; margin: auto; }
+        .login-logo { width: 80px; height: 80px; background: linear-gradient(135deg, #D4AF37, #E67E22); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 36px; color: black; }
+        .login-container h1 { color: #D4AF37; font-size: 1.8rem; }
+        .login-field { margin: 15px 0; position: relative; }
+        .login-field input { width: 100%; padding: 12px 12px 12px 40px; background: #2a2a2a; border: 1px solid #444; border-radius: 12px; color: white; font-size: 1rem; }
+        .login-field i { position: absolute; left: 12px; top: 14px; color: #D4AF37; }
+        .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #D4AF37, #E67E22); border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .login-error { color: #f97316; margin-top: 10px; display: none; }
+        #appPage { display: none; min-height: 100vh; }
+        .app-header { background: #141414; border-bottom: 1px solid #D4AF37; padding: 0 16px; height: 60px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+        .logo-area { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #D4AF37, #E67E22); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: black; }
+        .app-header h2 { font-size: 1.2rem; }
+        .header-right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .header-btn { background: transparent; border: 1px solid #AA771C; color: #D4AF37; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-size: 11px; transition: 0.2s; white-space: nowrap; }
+        .header-btn:hover { background: #AA771C; color: black; }
+        .role-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; background: rgba(212,175,55,0.2); }
+        .lang-selector { display: flex; align-items: center; gap: 4px; background: #1f1f1f; border-radius: 20px; padding: 4px 8px; border: 1px solid #AA771C; }
+        .lang-selector span { cursor: pointer; padding: 4px 8px; border-radius: 16px; font-size: 11px; font-weight: bold; }
+        .lang-selector span.active { background: #D4AF37; color: black; }
+        .module-nav { display: flex; gap: 6px; padding: 10px 16px; background: #111; overflow-x: auto; border-bottom: 1px solid #222; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+        .module-btn { padding: 6px 14px; background: #1f1f1f; border: 1px solid #333; border-radius: 30px; cursor: pointer; color: #aaa; font-size: 11px; white-space: nowrap; transition: all 0.2s ease; }
+        .module-btn.active { background: linear-gradient(135deg, #D4AF37, #E67E22); color: black; border: none; }
+        .app-layout { display: flex; height: calc(100vh - 110px); flex-direction: row; overflow: hidden; }
+        .sidebar { width: 260px; background: #111; border-right: 1px solid #D4AF37; padding: 15px; overflow-y: auto; transition: transform 0.3s ease; flex-shrink: 0; }
+        .search-box { width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #333; border-radius: 10px; color: white; margin-bottom: 15px; font-size: 12px; }
+        .filter-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; background: #1f1f1f; border: 1px solid #333; border-radius: 10px; margin-bottom: 6px; cursor: pointer; color: #aaa; font-size: 12px; transition: all 0.2s; }
+        .filter-btn.active { border-color: #D4AF37; background: rgba(212,175,55,0.1); color: #D4AF37; }
+        .filter-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .stat-card { background: #1f1f1f; border-radius: 12px; padding: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; font-size: 12px; }
+        .map-area { flex: 1; position: relative; background: #0a0a0a; background-image: url('https://i.imgur.com/shgm9Wm.png'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 300px; }
+        #map { width: 100%; height: 100%; background: transparent; }
+        .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.45) contrast(1.5) saturate(0.6); opacity: 0.9; }
+        .leaflet-container { background: transparent !important; }
+        .leaflet-popup-content-wrapper { background: #1f1f1f !important; border: 1px solid #D4AF37 !important; color: white !important; border-radius: 12px !important; }
+        .leaflet-tooltip { background: rgba(0,0,0,0.85); border: 1px solid #D4AF37; color: white; font-size: 11px; font-weight: bold; border-radius: 6px; padding: 4px 10px; }
+        .module-content { padding: 16px; display: none; overflow-y: auto; height: 100%; }
+        .module-panel { display: none; }
+        .module-panel.active { display: block; }
+        .data-table { width: 100%; border-collapse: collapse; background: #1f1f1f; border-radius: 12px; overflow-x: auto; display: block; }
+        .data-table thead, .data-table tbody { display: table; width: 100%; }
+        .data-table th, .data-table td { padding: 8px; text-align: left; border-bottom: 1px solid #333; font-size: 11px; white-space: nowrap; }
+        .data-table th { background: linear-gradient(135deg, #AA771C, #D4AF37); color: black; }
+        .flag-img { width: 24px; height: 16px; border-radius: 3px; object-fit: cover; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 15px; }
+        .country-card, .authority-card { background: #1f1f1f; border: 1px solid #333; border-radius: 16px; padding: 12px; cursor: pointer; transition: 0.2s; }
+        .country-card:hover, .authority-card:hover { border-color: #D4AF37; transform: translateY(-2px); }
+        .timeline { border-left: 3px solid #D4AF37; padding-left: 16px; margin: 20px 0; }
+        .timeline-item { margin-bottom: 20px; }
+        .timeline-date { color: #D4AF37; font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+        .timeline-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+        .timeline-desc { font-size: 12px; color: #ccc; line-height: 1.4; }
+        .admin-section { background: #1f1f1f; border-radius: 16px; padding: 16px; margin-bottom: 20px; }
+        .admin-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+        .admin-btn { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-right: 8px; margin-bottom: 8px; font-size: 11px; }
+        .admin-btn-primary { background: linear-gradient(135deg, #D4AF37, #E67E22); color: black; }
+        .admin-btn-success { background: #10b981; color: white; }
+        .audit-table { width: 100%; border-collapse: collapse; margin-top: 10px; display: block; overflow-x: auto; }
+        .audit-table th, .audit-table td { border: 1px solid #333; padding: 6px; font-size: 10px; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f1f1f; border-left: 4px solid #D4AF37; padding: 10px 16px; border-radius: 8px; z-index: 10000; font-size: 12px; }
+        .bilateral-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .summary-card { background: #1f1f1f; border-radius: 12px; padding: 12px; text-align: center; }
+        .summary-number { font-size: 24px; font-weight: bold; color: #D4AF37; }
+        .modal-tabs { display: flex; gap: 4px; margin-bottom: 15px; border-bottom: 1px solid #D4AF37; overflow-x: auto; }
+        .modal-tab { padding: 6px 12px; background: #2a2a2a; border: none; border-radius: 8px 8px 0 0; color: #aaa; cursor: pointer; font-size: 11px; transition: all 0.2s; }
+        .modal-tab.active { background: #D4AF37; color: black; font-weight: bold; }
+        .tab-pane { display: none; padding: 12px 0; }
+        .tab-pane.active { display: block; }
+        .leader-photo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #D4AF37; margin-bottom: 12px; }
+        .bilateral-item { background: #1f1f1f; border: 1px solid #333; border-radius: 16px; margin-bottom: 12px; overflow: hidden; }
+        .bilateral-header { display: flex; align-items: center; gap: 10px; padding: 12px; cursor: pointer; background: #1a1a1a; transition: background 0.2s; }
+        .bilateral-header:hover { background: #252525; }
+        .bilateral-header img { width: 32px; height: 22px; border-radius: 4px; }
+        .bilateral-header .country-name { font-size: 14px; font-weight: bold; color: #D4AF37; flex: 1; }
+        .bilateral-content { display: none; padding: 12px; border-top: 1px solid #333; background: #0f0f0f; font-size: 12px; }
+        .bilateral-content.open { display: block; }
+        .agreement-item { background: #2a2a2a; border-radius: 12px; padding: 8px; margin-top: 8px; }
+        .mobile-sidebar-toggle { display: none; position: fixed; bottom: 20px; left: 20px; background: #D4AF37; color: black; width: 44px; height: 44px; border-radius: 50%; align-items: center; justify-content: center; cursor: pointer; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.3); font-size: 20px; }
+        .leaflet-control-attribution { font-size: 8px; }
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; left: -260px; top: 110px; bottom: 0; z-index: 1100; transition: left 0.3s; background: #111; border-right: 1px solid #D4AF37; }
+            .sidebar.open { left: 0; }
+            .mobile-sidebar-toggle { display: flex; }
+            .app-layout { flex-direction: column; height: auto; }
+            .map-area { min-height: 300px; height: 300px; }
+            .module-content { padding: 12px; }
+            .card-grid { grid-template-columns: 1fr; }
+            .data-table th, .data-table td { font-size: 10px; white-space: normal; word-break: break-word; }
+            .header-right { justify-content: flex-end; }
+            .app-header { height: auto; padding: 8px 12px; }
+            .module-nav { padding: 8px 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="dev-banner">🔐 AFRIDATA v22.0 - RÁPIDA, PDF REALES, FOTOS DE 55 PRESIDENTES</div>
+
+<div id="loginPage">
+    <div class="login-container">
+        <div class="login-logo"><i class="fas fa-chart-line"></i></div>
+        <h1>AFRIDATA</h1>
+        <p style="margin-bottom:20px; font-size:14px;">Ministerio del Poder Popular para Relaciones Exteriores</p>
+        <div class="login-field"><i class="fas fa-user"></i><input type="text" id="loginUser" placeholder="Usuario" value="admin"></div>
+        <div class="login-field"><i class="fas fa-lock"></i><input type="password" id="loginPass" placeholder="Contraseña" value="admin"></div>
+        <button class="login-btn" id="loginBtn">Acceder</button>
+        <div class="login-error" id="loginError">Credenciales inválidas. Use admin/admin</div>
+        <div style="margin-top:15px; font-size:11px; color:#555;">demo: admin / admin</div>
+    </div>
+</div>
+
+<div id="appPage">
+    <div class="app-header">
+        <div class="logo-area"><div class="logo-icon"><i class="fas fa-globe-africa"></i></div><h2 style="color:#D4AF37;">AFRIDATA · MPPRE</h2></div>
+        <div class="header-right">
+            <div class="lang-selector">
+                <span data-lang="es" class="active">🇪🇸 ES</span>
+                <span data-lang="en">🇬🇧 EN</span>
+                <span data-lang="fr">🇫🇷 FR</span>
+            </div>
+            <span id="userRoleBadge" class="role-badge">ADMIN</span>
+            <button class="header-btn" id="btnReportes"><i class="fas fa-chart-bar"></i> <span data-i18n="reportes">Reportes</span></button>
+            <button class="header-btn" id="btnAdmin"><i class="fas fa-cog"></i> <span data-i18n="admin">Admin</span></button>
+            <button class="header-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> <span data-i18n="logout">Salir</span></button>
+        </div>
+    </div>
+
+    <div class="module-nav" id="moduleNav">
+        <button class="module-btn active" data-module="mapa"><i class="fas fa-map-marked-alt"></i> <span data-i18n="mapa">Mapa</span></button>
+        <button class="module-btn" data-module="paises"><i class="fas fa-list"></i> <span data-i18n="paises">Países</span></button>
+        <button class="module-btn" data-module="autoridades"><i class="fas fa-user-tie"></i> <span data-i18n="autoridades">Autoridades</span></button>
+        <button class="module-btn" data-module="bilateral"><i class="fas fa-handshake"></i> <span data-i18n="bilateral">Bilaterales</span></button>
+        <button class="module-btn" data-module="multilateral"><i class="fas fa-globe"></i> <span data-i18n="multilateral">Multilateral</span></button>
+        <button class="module-btn" data-module="hitos"><i class="fas fa-history"></i> <span data-i18n="hitos">Hitos</span></button>
+        <button class="module-btn" data-module="embajadas"><i class="fas fa-building"></i> <span data-i18n="embajadas">Embajadas</span></button>
+        <button class="module-btn" data-module="reportes"><i class="fas fa-file-pdf"></i> <span data-i18n="reportes">Reportes</span></button>
+        <button class="module-btn" data-module="admin"><i class="fas fa-cog"></i> <span data-i18n="admin">Admin</span></button>
+    </div>
+
+    <div class="app-layout" id="appLayout">
+        <div class="sidebar" id="sidebar">
+            <input type="text" id="searchBox" class="search-box" data-i18n-placeholder="buscar" placeholder="🔍 Buscar país...">
+            <div id="regionFilters"></div>
+            <div class="stat-card"><i class="fas fa-flag fa-2x"></i><div><span id="totalCountries">55</span><br><small data-i18n="total_paises">Países</small></div></div>
+            <div class="stat-card"><i class="fas fa-handshake fa-2x"></i><div><span id="totalRelations">0</span><br><small data-i18n="relaciones_activas">Relaciones activas</small></div></div>
+        </div>
+        <div class="mobile-sidebar-toggle" id="mobileSidebarToggle"><i class="fas fa-filter"></i></div>
+        <div class="map-area"><div id="map"></div></div>
+    </div>
+
+    <div class="module-content" id="modulesContainer" style="display:none;">
+        <!-- Países -->
+        <div class="module-panel" id="panel-paises">
+            <h2><i class="fas fa-list"></i> <span data-i18n="paises">Lista de Países Africanos</span></h2>
+            <div style="overflow-x:auto;"><table class="data-table" id="paisesTable"><thead><tr><th>#</th><th data-i18n="pais">País</th><th data-i18n="capital">Capital</th><th data-i18n="presidente">Presidente</th><th data-i18n="region">Región</th><th data-i18n="poblacion">Población (M)</th></tr></thead><tbody id="paisesBody"></tbody></table></div>
+        </div>
+        <!-- Autoridades -->
+        <div class="module-panel" id="panel-autoridades">
+            <h2><i class="fas fa-user-tie"></i> <span data-i18n="autoridades">Autoridades Africanas</span></h2>
+            <div id="autoridadesGrid" class="card-grid"></div>
+        </div>
+        <!-- Bilaterales -->
+        <div class="module-panel" id="panel-bilateral">
+            <h2><i class="fas fa-handshake"></i> <span data-i18n="bilateral">Relaciones Bilaterales</span></h2>
+            <div class="bilateral-summary" id="bilateralSummary"></div>
+            <div id="bilateralContainer" class="card-grid"></div>
+        </div>
+        <!-- Multilateral (extendido) -->
+        <div class="module-panel" id="panel-multilateral">
+            <h2><i class="fas fa-globe"></i> <span data-i18n="multilateral">Participación Multilateral</span></h2>
+            <div id="multilateralContent" class="admin-section"></div>
+        </div>
+        <!-- Hitos (extendido) -->
+        <div class="module-panel" id="panel-hitos">
+            <h2><i class="fas fa-history"></i> <span data-i18n="hitos">Hitos Históricos</span></h2>
+            <div id="timelineContent" class="timeline"></div>
+        </div>
+        <!-- Embajadas -->
+        <div class="module-panel" id="panel-embajadas">
+            <h2><i class="fas fa-building"></i> <span data-i18n="embajadas">Embajadas de Venezuela en África</span></h2>
+            <div style="overflow-x:auto;"><table class="data-table" id="embajadasTable"><thead><tr><th data-i18n="pais">País</th><th data-i18n="ciudad">Ciudad</th><th data-i18n="embajador">Embajador</th></tr></thead><tbody id="embajadasBody"></tbody></table></div>
+        </div>
+        <!-- Reportes -->
+        <div class="module-panel" id="panel-reportes">
+            <h2><i class="fas fa-file-pdf"></i> <span data-i18n="reportes">Reportes y Auditoría</span></h2>
+            <div class="admin-form" style="margin-bottom:20px; gap:8px; flex-wrap:wrap;">
+                <button class="admin-btn admin-btn-primary" id="reporte55Btn"><span data-i18n="reporte55">📄 Reporte 55 países PDF</span></button>
+                <button class="admin-btn admin-btn-primary" id="reporteResumenBtn"><span data-i18n="reporteResumen">📊 Resumen Ejecutivo</span></button>
+                <button class="admin-btn admin-btn-primary" id="reporteBilateralBtn"><span data-i18n="reporteBilateral">🤝 Reporte Bilateral</span></button>
+                <button class="admin-btn admin-btn-primary" id="reporteMultilateralBtn"><span data-i18n="reporteMultilateral">🌍 Reporte Multilateral</span></button>
+                <button class="admin-btn admin-btn-primary" id="exportAuditBtn"><span data-i18n="exportAudit">📋 Auditoría PDF</span></button>
+                <button class="admin-btn admin-btn-success" id="exportCsvBtn"><span data-i18n="exportCSV">📊 Exportar CSV</span></button>
+            </div>
+            <div id="reportOutput"></div>
+        </div>
+        <!-- Admin -->
+        <div class="module-panel" id="panel-admin">
+            <h2><i class="fas fa-cog"></i> <span data-i18n="admin">Administración</span></h2>
+            <div id="adminPanel"></div>
+        </div>
+    </div>
+</div>
+
+<div id="countryModal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:10000; align-items:center; justify-content:center; padding:12px;">
+    <div style="background:#141414; border:1px solid #D4AF37; border-radius:20px; width:100%; max-width:650px; max-height:90%; overflow-y:auto; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div style="display:flex; align-items:center; gap:12px;"><img id="modalFlag" src="" style="width:40px; height:27px; border-radius:6px; border:1px solid #D4AF37;"><h2 id="modalTitle" style="font-size:1.4rem;"></h2></div>
+            <button onclick="closeModal()" style="background:none; border:none; color:white; font-size:24px;">&times;</button>
+        </div>
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-tab="general"><span data-i18n="tab_general">General</span></button>
+            <button class="modal-tab" data-tab="gobierno"><span data-i18n="tab_gobierno">Gobierno</span></button>
+            <button class="modal-tab" data-tab="economia"><span data-i18n="tab_economia">Economía</span></button>
+            <button class="modal-tab" data-tab="cultura"><span data-i18n="tab_cultura">Cultura</span></button>
+            <button class="modal-tab" data-tab="venezuela"><span data-i18n="tab_venezuela">Venezuela</span></button>
+        </div>
+        <div id="tab-general" class="tab-pane active"></div>
+        <div id="tab-gobierno" class="tab-pane"></div>
+        <div id="tab-economia" class="tab-pane"></div>
+        <div id="tab-cultura" class="tab-pane"></div>
+        <div id="tab-venezuela" class="tab-pane"></div>
+    </div>
+</div>
+
+<script>
+// ======================== 1. BASE DE DATOS (55 PAÍSES) ========================
+const regionesCod = ["norte","occidental","central","oriental","austral"];
+const regionNombre = { norte:"África del Norte", occidental:"África Occidental", central:"África Central", oriental:"África Oriental", austral:"África Austral" };
+const regionColor = { norte:"#ef4444", occidental:"#3b82f6", central:"#10b981", oriental:"#f59e0b", austral:"#8b5cf6" };
+
+const paises = [ /* Mismo array de 55 países del código original, completo */ 
+    {id:1,nombre:"Argelia",capital:"Argel",presidente:"Abdelmadjid Tebboune",region:"norte",poblacion:47.1,bandera:"dz",lat:28.0339,lng:1.6596,relaciones:"1963",embajada:"Argel",gobierno:"República Semipresidencial",economia:"Petróleo, gas",cultura:"Bereber, árabe"},
+    {id:2,nombre:"Egipto",capital:"El Cairo",presidente:"Abdelfatah El-Sisi",region:"norte",poblacion:114.5,bandera:"eg",lat:26.8206,lng:30.8025,relaciones:"1949",embajada:"El Cairo",gobierno:"República Semipresidencial",economia:"Turismo, Canal de Suez",cultura:"Faraónica, musulmana"},
+    {id:3,nombre:"Libia",capital:"Trípoli",presidente:"Mohamed al-Menfi",region:"norte",poblacion:7.0,bandera:"ly",lat:26.3351,lng:17.2283,relaciones:"1973",embajada:"Trípoli",gobierno:"Gobierno Interino",economia:"Petróleo",cultura:"Bereber, árabe"},
+    {id:4,nombre:"Marruecos",capital:"Rabat",presidente:"Mohammed VI",region:"norte",poblacion:38.3,bandera:"ma",lat:31.7917,lng:-7.0926,relaciones:"1960",embajada:"Rabat",gobierno:"Monarquía Parlamentaria",economia:"Fosfatos, turismo",cultura:"Árabe-bereber"},
+    {id:5,nombre:"Sudán",capital:"Jartum",presidente:"Abdel Fattah al-Burhan",region:"norte",poblacion:49.3,bandera:"sd",lat:12.8628,lng:30.2176,relaciones:"1962",embajada:"N/A",gobierno:"Militar",economia:"Petróleo, oro",cultura:"Nubia, islámica"},
+    {id:6,nombre:"Túnez",capital:"Túnez",presidente:"Kais Saied",region:"norte",poblacion:12.6,bandera:"tn",lat:33.8869,lng:9.5375,relaciones:"1960",embajada:"Túnez",gobierno:"República Presidencial",economia:"Turismo, textil",cultura:"Cartaginesa, mediterránea"},
+    {id:7,nombre:"Sahara Occidental",capital:"El Aaiún",presidente:"Brahim Ghali",region:"norte",poblacion:0.6,bandera:"eh",lat:24.2155,lng:-12.8858,relaciones:"Reconoce",embajada:"N/D",gobierno:"Territorio en disputa",economia:"Pesca, fosfatos",cultura:"Saharaui, beduina"},
+    {id:8,nombre:"Benín",capital:"Porto-Novo",presidente:"Patrice Talon",region:"occidental",poblacion:14.1,bandera:"bj",lat:9.3077,lng:2.3158,relaciones:"1960",embajada:"Cotonú",gobierno:"República Presidencial",economia:"Algodón",cultura:"Vudú, dahomey"},
+    {id:9,nombre:"Burkina Faso",capital:"Uagadugú",presidente:"Ibrahim Traoré",region:"occidental",poblacion:23.9,bandera:"bf",lat:12.2383,lng:-1.5616,relaciones:"1976",embajada:"N/A",gobierno:"Transición Militar",economia:"Oro, algodón",cultura:"Mossi, máscaras"},
+    {id:10,nombre:"Cabo Verde",capital:"Praia",presidente:"José Maria Neves",region:"occidental",poblacion:0.6,bandera:"cv",lat:15.1201,lng:-23.605,relaciones:"1975",embajada:"N/A",gobierno:"República Parlamentaria",economia:"Turismo, servicios",cultura:"Criolla, morna"},
+    {id:11,nombre:"Costa de Marfil",capital:"Yamusukro",presidente:"Alassane Ouattara",region:"occidental",poblacion:30.6,bandera:"ci",lat:7.5400,lng:-5.5471,relaciones:"1960",embajada:"N/A",gobierno:"República Presidencial",economia:"Cacao, café",cultura:"Baoulé, máscaras"},
+    {id:12,nombre:"Gambia",capital:"Banjul",presidente:"Adama Barrow",region:"occidental",poblacion:2.7,bandera:"gm",lat:13.4432,lng:-15.3101,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Turismo, maní",cultura:"Griot, kora"},
+    {id:13,nombre:"Ghana",capital:"Accra",presidente:"Nana Akufo-Addo",region:"occidental",poblacion:34.7,bandera:"gh",lat:7.9465,lng:-1.0232,relaciones:"1960",embajada:"N/A",gobierno:"República Presidencial",economia:"Oro, cacao, petróleo",cultura:"Ashanti, kente"},
+    {id:14,nombre:"Guinea",capital:"Conakri",presidente:"Mamady Doumbouya",region:"occidental",poblacion:14.7,bandera:"gn",lat:9.9456,lng:-9.6966,relaciones:"N/A",embajada:"N/A",gobierno:"Transición Militar",economia:"Bauxita, oro",cultura:"Fulani, djembe"},
+    {id:15,nombre:"Guinea-Bisáu",capital:"Bisáu",presidente:"Umaro Sissoco Embaló",region:"occidental",poblacion:2.2,bandera:"gw",lat:11.8037,lng:-15.1804,relaciones:"N/A",embajada:"Bisáu",gobierno:"República Semipresidencial",economia:"Cajú, pesca",cultura:"Criolla, portuguesa"},
+    {id:16,nombre:"Liberia",capital:"Monrovia",presidente:"Joseph Boakai",region:"occidental",poblacion:5.5,bandera:"lr",lat:6.4281,lng:-9.4295,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Hierro, goma",cultura:"Américo-liberiana"},
+    {id:17,nombre:"Malí",capital:"Bamako",presidente:"Assimi Goïta",region:"occidental",poblacion:24.0,bandera:"ml",lat:17.5707,lng:-3.9962,relaciones:"1960",embajada:"Bamako",gobierno:"Transición Militar",economia:"Oro, algodón",cultura:"Imperio de Malí, manuscritos"},
+    {id:18,nombre:"Mauritania",capital:"Nuakchot",presidente:"Mohamed Ould Ghazouani",region:"occidental",poblacion:5.0,bandera:"mr",lat:21.0079,lng:-10.9408,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Hierro, pesca",cultura:"Moro, nómada"},
+    {id:19,nombre:"Níger",capital:"Niamey",presidente:"Abdourahamane Tiani",region:"occidental",poblacion:28.5,bandera:"ne",lat:17.6078,lng:8.0817,relaciones:"N/A",embajada:"N/A",gobierno:"Transición Militar",economia:"Uranio, ganadería",cultura:"Tuareg, hausa"},
+    {id:20,nombre:"Nigeria",capital:"Abuya",presidente:"Bola Tinubu",region:"occidental",poblacion:230.9,bandera:"ng",lat:9.0820,lng:8.6753,relaciones:"1960",embajada:"Abuya",gobierno:"República Federal Presidencial",economia:"Petróleo, gas, servicios",cultura:"Nollywood, afrobeats"},
+    {id:21,nombre:"Senegal",capital:"Dakar",presidente:"Bassirou Diomaye Faye",region:"occidental",poblacion:18.2,bandera:"sn",lat:14.4974,lng:-14.4524,relaciones:"1962",embajada:"Dakar",gobierno:"República Semipresidencial",economia:"Pesca, fosfatos",cultura:"Teranga, mbalax"},
+    {id:22,nombre:"Sierra Leona",capital:"Freetown",presidente:"Julius Maada Bio",region:"occidental",poblacion:8.9,bandera:"sl",lat:8.4606,lng:-11.7799,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Diamantes, titanio",cultura:"Krio, sociedades secretas"},
+    {id:23,nombre:"Togo",capital:"Lomé",presidente:"Faure Gnassingbé",region:"occidental",poblacion:9.4,bandera:"tg",lat:8.6195,lng:0.8248,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Fosfatos, cacao",cultura:"Vudú, festivales"},
+    {id:24,nombre:"Camerún",capital:"Yaundé",presidente:"Paul Biya",region:"central",poblacion:29.3,bandera:"cm",lat:7.3697,lng:12.3547,relaciones:"1961",embajada:"N/A",gobierno:"República Presidencial",economia:"Petróleo, cacao",cultura:"Bamiléké, bikutsi"},
+    {id:25,nombre:"Chad",capital:"Yamena",presidente:"Mahamat Déby",region:"central",poblacion:19.3,bandera:"td",lat:15.4542,lng:18.7322,relaciones:"N/A",embajada:"N/A",gobierno:"Transición Militar",economia:"Petróleo, algodón",cultura:"Sahel, lago Chad"},
+    {id:26,nombre:"Gabón",capital:"Libreville",presidente:"Brice Oligui Nguema",region:"central",poblacion:2.5,bandera:"ga",lat:-0.8037,lng:11.6094,relaciones:"N/A",embajada:"N/A",gobierno:"Transición Militar",economia:"Petróleo, manganeso",cultura:"Bwiti, máscaras"},
+    {id:27,nombre:"Guinea Ecuatorial",capital:"Malabo",presidente:"Teodoro Obiang",region:"central",poblacion:1.8,bandera:"gq",lat:1.6508,lng:10.2679,relaciones:"1979",embajada:"Malabo",gobierno:"República Presidencial",economia:"Petróleo, gas",cultura:"Bubi, hispanófona"},
+    {id:28,nombre:"República Centroafricana",capital:"Bangui",presidente:"Faustin-Archange Touadéra",region:"central",poblacion:5.6,bandera:"cf",lat:6.6111,lng:20.9394,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Diamantes, madera",cultura:"Pigmeos, selva tropical"},
+    {id:29,nombre:"República Democrática del Congo",capital:"Kinshasa",presidente:"Félix Tshisekedi",region:"central",poblacion:105.0,bandera:"cd",lat:-4.0383,lng:21.7587,relaciones:"1960",embajada:"N/A",gobierno:"República Semipresidencial",economia:"Cobalto, cobre, diamantes",cultura:"Soukous, rumba"},
+    {id:30,nombre:"República del Congo",capital:"Brazzaville",presidente:"Denis Sassou Nguesso",region:"central",poblacion:6.2,bandera:"cg",lat:-0.2280,lng:15.8277,relaciones:"N/A",embajada:"Brazzaville",gobierno:"República Presidencial",economia:"Petróleo, madera",cultura:"Kongo, música congoleña"},
+    {id:31,nombre:"Santo Tomé y Príncipe",capital:"Santo Tomé",presidente:"Carlos Vila Nova",region:"central",poblacion:0.2,bandera:"st",lat:0.1864,lng:6.6131,relaciones:"N/A",embajada:"N/A",gobierno:"República Semipresidencial",economia:"Cacao, turismo",cultura:"Forró, criolla"},
+    {id:32,nombre:"Burundi",capital:"Gitega",presidente:"Évariste Ndayishimiye",region:"oriental",poblacion:13.6,bandera:"bi",lat:-3.3731,lng:29.9189,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Café, té",cultura:"Tambores sagrados"},
+    {id:33,nombre:"Comoras",capital:"Moroni",presidente:"Azali Assoumani",region:"oriental",poblacion:0.9,bandera:"km",lat:-11.6455,lng:43.3333,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial Federal",economia:"Vainilla, clavo",cultura:"Suajili, árabe"},
+    {id:34,nombre:"Yibuti",capital:"Yibuti",presidente:"Ismail Omar Guelleh",region:"oriental",poblacion:1.1,bandera:"dj",lat:11.8251,lng:42.5903,relaciones:"N/A",embajada:"N/A",gobierno:"República Semipresidencial",economia:"Servicios portuarios",cultura:"Afar, issa"},
+    {id:35,nombre:"Eritrea",capital:"Asmara",presidente:"Isaias Afwerki",region:"oriental",poblacion:3.8,bandera:"er",lat:15.1794,lng:39.7823,relaciones:"N/A",embajada:"N/A",gobierno:"Unipartidista",economia:"Minería, sal",cultura:"Tigrinya, copta"},
+    {id:36,nombre:"Etiopía",capital:"Adís Abeba",presidente:"Sahle-Work Zewde",region:"oriental",poblacion:129.7,bandera:"et",lat:9.1450,lng:40.4897,relaciones:"1948",embajada:"Adís Abeba",gobierno:"República Federal Parlamentaria",economia:"Café, manufactura",cultura:"Ortodoxa, origen del café"},
+    {id:37,nombre:"Kenia",capital:"Nairobi",presidente:"William Ruto",region:"oriental",poblacion:56.6,bandera:"ke",lat:-0.0236,lng:37.9062,relaciones:"1971",embajada:"Nairobi",gobierno:"República Presidencial",economia:"Turismo, té, tecnología",cultura:"Maasai, safari"},
+    {id:38,nombre:"Madagascar",capital:"Antananarivo",presidente:"Andry Rajoelina",region:"oriental",poblacion:31.7,bandera:"mg",lat:-18.7669,lng:46.8691,relaciones:"N/A",embajada:"N/A",gobierno:"República Semipresidencial",economia:"Vainilla, minería",cultura:"Lémures, baobabs"},
+    {id:39,nombre:"Malaui",capital:"Lilongüe",presidente:"Lazarus Chakwera",region:"oriental",poblacion:21.6,bandera:"mw",lat:-13.2543,lng:34.3015,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Tabaco, té",cultura:"Lago Malaui, danza"},
+    {id:40,nombre:"Mauricio",capital:"Port Louis",presidente:"Prithvirajsing Roopun",region:"oriental",poblacion:1.3,bandera:"mu",lat:-20.3484,lng:57.5522,relaciones:"N/A",embajada:"N/A",gobierno:"República Parlamentaria",economia:"Turismo, servicios financieros",cultura:"India, africana, china"},
+    {id:41,nombre:"Mozambique",capital:"Maputo",presidente:"Filipe Nyusi",region:"oriental",poblacion:34.6,bandera:"mz",lat:-18.6657,lng:35.5296,relaciones:"N/A",embajada:"Maputo",gobierno:"República Presidencial",economia:"Gas natural, carbón",cultura:"Marimba, islas Quirimbas"},
+    {id:42,nombre:"Ruanda",capital:"Kigali",presidente:"Paul Kagame",region:"oriental",poblacion:14.5,bandera:"rw",lat:-1.9403,lng:29.8739,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Café, té, turismo",cultura:"Gorilas, danza Intore"},
+    {id:43,nombre:"Seychelles",capital:"Victoria",presidente:"Wavel Ramkalawan",region:"oriental",poblacion:0.1,bandera:"sc",lat:-4.6796,lng:55.4920,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Turismo, pesca",cultura:"Criolla, tortugas gigantes"},
+    {id:44,nombre:"Somalia",capital:"Mogadiscio",presidente:"Hassan Sheikh Mohamud",region:"oriental",poblacion:18.7,bandera:"so",lat:5.1521,lng:46.1996,relaciones:"N/A",embajada:"N/A",gobierno:"República Federal",economia:"Ganadería, remesas",cultura:"Poesía, nómada"},
+    {id:45,nombre:"Sudán del Sur",capital:"Yuba",presidente:"Salva Kiir",region:"oriental",poblacion:11.6,bandera:"ss",lat:6.8770,lng:31.3070,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Petróleo, agricultura",cultura:"Dinka, nuer"},
+    {id:46,nombre:"Tanzania",capital:"Dodoma",presidente:"Samia Suluhu Hassan",region:"oriental",poblacion:69.4,bandera:"tz",lat:-6.3690,lng:34.8888,relaciones:"N/A",embajada:"N/A",gobierno:"República Semipresidencial",economia:"Oro, turismo, gas",cultura:"Serengeti, Kilimanjaro"},
+    {id:47,nombre:"Uganda",capital:"Kampala",presidente:"Yoweri Museveni",region:"oriental",poblacion:49.9,bandera:"ug",lat:1.3733,lng:32.2903,relaciones:"N/A",embajada:"Kampala",gobierno:"República Presidencial",economia:"Café, petróleo",cultura:"Gorilas, reino Buganda"},
+    {id:48,nombre:"Angola",capital:"Luanda",presidente:"João Lourenço",region:"austral",poblacion:37.8,bandera:"ao",lat:-11.2027,lng:17.8739,relaciones:"1976",embajada:"Luanda",gobierno:"República Presidencial",economia:"Petróleo, diamantes",cultura:"Semba, kizomba"},
+    {id:49,nombre:"Botsuana",capital:"Gaborone",presidente:"Mokgweetsi Masisi",region:"austral",poblacion:2.7,bandera:"bw",lat:-22.3285,lng:24.6849,relaciones:"N/A",embajada:"N/A",gobierno:"República Parlamentaria",economia:"Diamantes, turismo",cultura:"San, delta del Okavango"},
+    {id:50,nombre:"Esuatini",capital:"Mbabane",presidente:"Mswati III",region:"austral",poblacion:1.2,bandera:"sz",lat:-26.5225,lng:31.4659,relaciones:"N/A",embajada:"N/A",gobierno:"Monarquía Absoluta",economia:"Azúcar, textiles",cultura:"Reed Dance, Incwala"},
+    {id:51,nombre:"Lesoto",capital:"Maseru",presidente:"Letsie III",region:"austral",poblacion:2.3,bandera:"ls",lat:-29.6099,lng:28.2336,relaciones:"N/A",embajada:"N/A",gobierno:"Monarquía Parlamentaria",economia:"Textil, agua",cultura:"Basotho, blankets"},
+    {id:52,nombre:"Namibia",capital:"Windhoek",presidente:"Nangolo Mbumba",region:"austral",poblacion:2.8,bandera:"na",lat:-22.9576,lng:18.4904,relaciones:"1990",embajada:"Windhoek",gobierno:"República Semipresidencial",economia:"Diamantes, uranio",cultura:"Himba, desierto del Namib"},
+    {id:53,nombre:"Sudáfrica",capital:"Pretoria",presidente:"Cyril Ramaphosa",region:"austral",poblacion:61.9,bandera:"za",lat:-30.5595,lng:22.9375,relaciones:"1994",embajada:"Pretoria",gobierno:"República Parlamentaria",economia:"Oro, platino, finanzas",cultura:"Arcoíris, Nelson Mandela"},
+    {id:54,nombre:"Zambia",capital:"Lusaka",presidente:"Hakainde Hichilema",region:"austral",poblacion:21.6,bandera:"zm",lat:-13.1339,lng:27.8493,relaciones:"N/A",embajada:"N/A",gobierno:"República Presidencial",economia:"Cobre, agricultura",cultura:"Cataratas Victoria, tribu Tonga"},
+    {id:55,nombre:"Zimbabue",capital:"Harare",presidente:"Emmerson Mnangagwa",region:"austral",poblacion:17.5,bandera:"zw",lat:-19.0154,lng:29.1549,relaciones:"N/A",embajada:"N/A",gobierno:"República Semipresidencial",economia:"Oro, platino, tabaco",cultura:"Gran Zimbabue, escultura Shona"}
+];
+
+const embajadas = [
+    {pais:"Argelia",ciudad:"Argel",embajador:"José De Jesús Sojo Reyes"},
+    {pais:"Egipto",ciudad:"El Cairo",embajador:"Wilmer Omar Barrientos Fernández"},
+    {pais:"Nigeria",ciudad:"Abuya",embajador:"David Nieves Velásquez"},
+    {pais:"Marruecos",ciudad:"Rabat",embajador:"Dana María Casanova Cuícas"},
+    {pais:"Angola",ciudad:"Luanda",embajador:"Marlón José Peña Labrador"},
+    {pais:"Sudáfrica",ciudad:"Pretoria",embajador:"Marín Josefina Moreno Mérida"},
+    {pais:"Senegal",ciudad:"Dakar",embajador:"Alejandro Israel Correa Ortega"},
+    {pais:"Kenia",ciudad:"Nairobi",embajador:"José Gregorio Ávila Torres"},
+    {pais:"Túnez",ciudad:"Túnez",embajador:"Carlos Federico Feo Acevedo"},
+    {pais:"Mozambique",ciudad:"Maputo",embajador:"Juan Carlos Fernández Juárez"},
+    {pais:"Namibia",ciudad:"Windhoek",embajador:"Omar Ernesto Berroteran Paredes"},
+    {pais:"Etiopía",ciudad:"Adís Abeba",embajador:"Modesto Antonio Ruiz Espinoza"},
+    {pais:"Uganda",ciudad:"Kampala",embajador:"Fátima Fernández"},
+    {pais:"Guinea Ecuatorial",ciudad:"Malabo",embajador:"Nelson Javier Ortega Bonilla"},
+    {pais:"Malí",ciudad:"Bamako",embajador:"Oscar Ernesto Romero Vallenilla"},
+    {pais:"República del Congo",ciudad:"Brazzaville",embajador:"Aníbal José Márquez Muñoz"},
+    {pais:"Benín",ciudad:"Cotonú",embajador:"Alejandro Israel Correa Ortega"}
+];
+
+// FOTOS REALES DE LOS 55 PRESIDENTES (actualizadas a 2025)
+const fotosLideres = {
+    1:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Abdelmadjid_Tebboune_2021.jpg/250px-Abdelmadjid_Tebboune_2021.jpg",
+    2:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Abdel_Fattah_el-Sisi_%282020%29.jpg/250px-Abdel_Fattah_el-Sisi_%282020%29.jpg",
+    3:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Mohammed_al-Menfi_2023.jpg/250px-Mohammed_al-Menfi_2023.jpg",
+    4:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/King_Mohammed_VI_of_Morocco.jpg/250px-King_Mohammed_VI_of_Morocco.jpg",
+    5:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Abdel_Fattah_al-Burhan.jpg/250px-Abdel_Fattah_al-Burhan.jpg",
+    6:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Kais_Saied_%28cropped%29.jpg/250px-Kais_Saied_%28cropped%29.jpg",
+    7:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Brahim_Ghali_2019.jpg/250px-Brahim_Ghali_2019.jpg",
+    8:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Patrice_Talon_%282023%29.jpg/250px-Patrice_Talon_%282023%29.jpg",
+    9:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Captain_Ibrahim_Traore.jpg/250px-Captain_Ibrahim_Traore.jpg",
+    10:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Jos%C3%A9_Maria_Neves_2017.jpg/250px-Jos%C3%A9_Maria_Neves_2017.jpg",
+    11:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Alassane_Ouattara_2023.jpg/250px-Alassane_Ouattara_2023.jpg",
+    12:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Adama_Barrow_2017.jpg/250px-Adama_Barrow_2017.jpg",
+    13:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Nana_Akufo-Addo_2022.jpg/250px-Nana_Akufo-Addo_2022.jpg",
+    14:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Mamady_Doumbouya_2021.jpg/250px-Mamady_Doumbouya_2021.jpg",
+    15:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Umaro_Sissoco_Embal%C3%B3_2020.jpg/250px-Umaro_Sissoco_Embal%C3%B3_2020.jpg",
+    16:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Joseph_Boakai_2024.jpg/250px-Joseph_Boakai_2024.jpg",
+    17:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Assimi_Go%C3%AFta_2021.jpg/250px-Assimi_Go%C3%AFta_2021.jpg",
+    18:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Mohamed_Ould_Ghazouani_2023.jpg/250px-Mohamed_Ould_Ghazouani_2023.jpg",
+    19:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Abdourahamane_Tchiani_2023.jpg/250px-Abdourahamane_Tchiani_2023.jpg",
+    20:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Bola_Ahmed_Tinubu_2023.jpg/250px-Bola_Ahmed_Tinubu_2023.jpg",
+    21:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Bassirou_Diomaye_Faye_2024.jpg/250px-Bassirou_Diomaye_Faye_2024.jpg",
+    22:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Julius_Maada_Bio_2023.jpg/250px-Julius_Maada_Bio_2023.jpg",
+    23:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Faure_Gnassingb%C3%A9_2020.jpg/250px-Faure_Gnassingb%C3%A9_2020.jpg",
+    24:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Paul_Biya_%282024%29.jpg/250px-Paul_Biya_%282024%29.jpg",
+    25:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Mahamat_Idriss_D%C3%A9by_2021.jpg/250px-Mahamat_Idriss_D%C3%A9by_2021.jpg",
+    26:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Brice_Oligui_Nguema_2023.jpg/250px-Brice_Oligui_Nguema_2023.jpg",
+    27:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Teodoro_Obiang_Nguema_Mbasogo_2022.jpg/250px-Teodoro_Obiang_Nguema_Mbasogo_2022.jpg",
+    28:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Faustin-Archange_Touad%C3%A9ra_2023.jpg/250px-Faustin-Archange_Touad%C3%A9ra_2023.jpg",
+    29:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/F%C3%A9lix_Tshisekedi_2023.jpg/250px-F%C3%A9lix_Tshisekedi_2023.jpg",
+    30:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Denis_Sassou_Nguesso_2023.jpg/250px-Denis_Sassou_Nguesso_2023.jpg",
+    31:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Carlos_Vila_Nova_2021.jpg/250px-Carlos_Vila_Nova_2021.jpg",
+    32:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/%C3%89variste_Ndayishimiye_2020.jpg/250px-%C3%89variste_Ndayishimiye_2020.jpg",
+    33:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Azali_Assoumani_2023.jpg/250px-Azali_Assoumani_2023.jpg",
+    34:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Isma%C3%AFl_Omar_Guelleh_2021.jpg/250px-Isma%C3%AFl_Omar_Guelleh_2021.jpg",
+    35:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Isaias_Afwerki_2023.jpg/250px-Isaias_Afwerki_2023.jpg",
+    36:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Abiy_Ahmed_Ali_2023.jpg/250px-Abiy_Ahmed_Ali_2023.jpg",
+    37:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/William_Ruto_2022.jpg/250px-William_Ruto_2022.jpg",
+    38:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Andry_Rajoelina_2023.jpg/250px-Andry_Rajoelina_2023.jpg",
+    39:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Lazarus_Chakwera_2020.jpg/250px-Lazarus_Chakwera_2020.jpg",
+    40:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Prithvirajsing_Roopun_2019.jpg/250px-Prithvirajsing_Roopun_2019.jpg",
+    41:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Filipe_Nyusi_2023.jpg/250px-Filipe_Nyusi_2023.jpg",
+    42:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Paul_Kagame_2023.jpg/250px-Paul_Kagame_2023.jpg",
+    43:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Wavel_Ramkalawan_2020.jpg/250px-Wavel_Ramkalawan_2020.jpg",
+    44:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Hassan_Sheikh_Mohamud_2022.jpg/250px-Hassan_Sheikh_Mohamud_2022.jpg",
+    45:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Salva_Kiir_Mayardit_2023.jpg/250px-Salva_Kiir_Mayardit_2023.jpg",
+    46:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Samia_Suluhu_Hassan_2023.jpg/250px-Samia_Suluhu_Hassan_2023.jpg",
+    47:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Yoweri_Museveni_2023.jpg/250px-Yoweri_Museveni_2023.jpg",
+    48:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Jo%C3%A3o_Louren%C3%A7o_2022.jpg/250px-Jo%C3%A3o_Louren%C3%A7o_2022.jpg",
+    49:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Mokgweetsi_Masisi_2023.jpg/250px-Mokgweetsi_Masisi_2023.jpg",
+    50:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Mswati_III_2023.jpg/250px-Mswati_III_2023.jpg",
+    51:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Letsie_III_2023.jpg/250px-Letsie_III_2023.jpg",
+    52:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Nangolo_Mbumba_2024.jpg/250px-Nangolo_Mbumba_2024.jpg",
+    53:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Cyril_Ramaphosa_2023.jpg/250px-Cyril_Ramaphosa_2023.jpg",
+    54:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Hakainde_Hichilema_2021.jpg/250px-Hakainde_Hichilema_2021.jpg",
+    55:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Emmerson_Mnangagwa_2023.jpg/250px-Emmerson_Mnangagwa_2023.jpg"
+};
+function getLeaderPhoto(id) { return fotosLideres[id] || "https://via.placeholder.com/100?text=Sin+foto"; }
+function getBiografia(id) { return "Líder en el cargo actual. Biografía próximamente."; }
+
+// ======================== 2. TRADUCCIONES COMPLETAS (ES, EN, FR) ========================
+const translations = {
+    es: { mapa:"Mapa", paises:"Países", autoridades:"Autoridades", bilateral:"Bilaterales", multilateral:"Multilateral", hitos:"Hitos", embajadas:"Embajadas", reportes:"Reportes", admin:"Admin", logout:"Salir", buscar:"🔍 Buscar país...", total_paises:"Países", relaciones_activas:"Relaciones activas", pais:"País", capital:"Capital", presidente:"Presidente", region:"Región", poblacion:"Población (M)", ciudad:"Ciudad", embajador:"Embajador", reporte55:"📄 Reporte 55 países PDF", reporteResumen:"📊 Resumen Ejecutivo", reporteBilateral:"🤝 Reporte Bilateral", reporteMultilateral:"🌍 Reporte Multilateral", exportAudit:"📋 Auditoría PDF", exportCSV:"📊 Exportar CSV", tab_general:"General", tab_gobierno:"Gobierno", tab_economia:"Economía", tab_cultura:"Cultura", tab_venezuela:"Venezuela", ver_ficha:"Ver ficha", todos:"Todos", relaciones_desde:"Relaciones desde", embajada:"Embajada", no_establecidas:"No establecidas", no_residente:"No residente", cooperacion_energetica:"Cooperación energética", convenio_educativo:"Convenio educativo", acuerdo_desc1:"Intercambio técnico y comercial en petróleo y gas.", acuerdo_desc2:"Becas y programas de intercambio académico.", moneda:"Moneda", cultura_trad:"Cultura", biografia_presidente:"📖 Biografía del Presidente", tipo_gobierno:"Tipo de gobierno", principales_sectores:"Principales sectores", opep:"OPEP", union_africana:"Unión Africana (UA)", g77:"G77 + China", onu:"Naciones Unidas (ONU)", opep_desc:"Venezuela y países africanos: Argelia, Nigeria, Angola, Libia, Guinea Ecuatorial, Congo, Gabón.", ua_desc:"Venezuela es observador desde 2009. Los 55 países africanos son miembros (incluyendo la RASD).", g77_desc:"Coordinación de 134 países en desarrollo.", onu_desc:"Venezuela y 54 países africanos soberanos son miembros plenos.", region_norte:"África del Norte", region_occidental:"África Occidental", region_central:"África Central", region_oriental:"África Oriental", region_austral:"África Austral", multilateral_adicional1:"🤝 Movimiento de Países No Alineados (MNOAL): Venezuela participa activamente desde 1961, coordinando posiciones con naciones africanas.", multilateral_adicional2:"🌱 Foro de Diálogo India-África (FOCAC): Venezuela asiste como observador en temas de cooperación Sur-Sur.", multilateral_adicional3:"📅 Agenda 2063 de la UA: Marco estratégico para el desarrollo continental, alineado con los objetivos de Venezuela.", hitos_1:"Independencia de Argelia, Nigeria, Ghana y otros países africanos tras décadas de colonización.", hitos_2:"Venezuela establece sus primeras embajadas en África: Nigeria, Argelia y Egipto.", hitos_3:"Reconocimiento oficial de la República Árabe Saharaui Democrática (RASD).", hitos_4:"Creación de la Unión Africana (UA), sucesora de la Organización de la Unidad Africana (OUA).", hitos_5:"Venezuela obtiene estatus de observador en la Unión Africana.", hitos_6:"Lanzamiento de la Zona de Libre Comercio Continental Africana (AfCFTA).", hitos_7:"Cumbre Venezuela-África (Caracas, 2025): Se firman 15 acuerdos en energía, salud y educación.", hitos_8:"Incorporación de la RASD como miembro de pleno derecho de la UA.", hitos_9:"Primera cumbre de jefes de Estado de América del Sur-África (ASA).", hitos_10:"Firma del acuerdo de cooperación energética entre PDVSA y Sonangol." },
+    en: { mapa:"Map", paises:"Countries", autoridades:"Authorities", bilateral:"Bilateral", multilateral:"Multilateral", hitos:"Milestones", embajadas:"Embassies", reportes:"Reports", admin:"Admin", logout:"Logout", buscar:"🔍 Search country...", total_paises:"Countries", relaciones_activas:"Active relations", pais:"Country", capital:"Capital", presidente:"President", region:"Region", poblacion:"Population (M)", ciudad:"City", embajador:"Ambassador", reporte55:"📄 55 Countries Report PDF", reporteResumen:"📊 Executive Summary", reporteBilateral:"🤝 Bilateral Report", reporteMultilateral:"🌍 Multilateral Report", exportAudit:"📋 Audit PDF", exportCSV:"📊 Export CSV", tab_general:"General", tab_gobierno:"Government", tab_economia:"Economy", tab_cultura:"Culture", tab_venezuela:"Venezuela", ver_ficha:"View profile", todos:"All", relaciones_desde:"Relations since", embajada:"Embassy", no_establecidas:"Not established", no_residente:"Non-resident", cooperacion_energetica:"Energy cooperation", convenio_educativo:"Educational agreement", acuerdo_desc1:"Technical and commercial exchange in oil and gas.", acuerdo_desc2:"Scholarships and academic exchange programs.", moneda:"Currency", cultura_trad:"Culture", biografia_presidente:"📖 President's Biography", tipo_gobierno:"Government type", principales_sectores:"Main sectors", opep:"OPEC", union_africana:"African Union (AU)", g77:"G77 + China", onu:"United Nations (UN)", opep_desc:"Venezuela and African countries: Algeria, Nigeria, Angola, Libya, Equatorial Guinea, Congo, Gabon.", ua_desc:"Venezuela has been an observer since 2009. All 55 African countries are members (including SADR).", g77_desc:"Coordination of 134 developing countries.", onu_desc:"Venezuela and 54 sovereign African countries are full members.", region_norte:"North Africa", region_occidental:"West Africa", region_central:"Central Africa", region_oriental:"East Africa", region_austral:"Southern Africa", multilateral_adicional1:"🤝 Non-Aligned Movement (NAM): Venezuela since 1961, coordinating with African nations.", multilateral_adicional2:"🌱 India-Africa Forum Summit (FOCAC): Venezuela as observer in South-South cooperation.", multilateral_adicional3:"📅 AU's Agenda 2063: Strategic framework aligned with Venezuela's objectives.", hitos_1:"Independence of Algeria, Nigeria, Ghana and other African countries after decades of colonization.", hitos_2:"Venezuela establishes its first embassies in Africa: Nigeria, Algeria and Egypt.", hitos_3:"Official recognition of the Sahrawi Arab Democratic Republic (SADR).", hitos_4:"Creation of the African Union (AU), successor of the Organization of African Unity (OAU).", hitos_5:"Venezuela obtains observer status at the African Union.", hitos_6:"Launch of the African Continental Free Trade Area (AfCFTA).", hitos_7:"Venezuela-Africa Summit (Caracas, 2025): 15 agreements signed in energy, health and education.", hitos_8:"SADR becomes a full member of the AU.", hitos_9:"First South America-Africa Heads of State Summit (ASA).", hitos_10:"Energy cooperation agreement between PDVSA and Sonangol." },
+    fr: { mapa:"Carte", paises:"Pays", autoridades:"Autorités", bilateral:"Bilatéral", multilateral:"Multilatéral", hitos:"Jalons", embajadas:"Ambassades", reportes:"Rapports", admin:"Admin", logout:"Sortir", buscar:"🔍 Rechercher un pays...", total_paises:"Pays", relaciones_activas:"Relations actives", pais:"Pays", capital:"Capitale", presidente:"Président", region:"Région", poblacion:"Population (M)", ciudad:"Ville", embajador:"Ambassadeur", reporte55:"📄 Rapport 55 pays PDF", reporteResumen:"📊 Résumé Exécutif", reporteBilateral:"🤝 Rapport Bilatéral", reporteMultilateral:"🌍 Rapport Multilatéral", exportAudit:"📋 Audit PDF", exportCSV:"📊 Exporter CSV", tab_general:"Général", tab_gobierno:"Gouvernement", tab_economia:"Économie", tab_cultura:"Culture", tab_venezuela:"Venezuela", ver_ficha:"Voir la fiche", todos:"Tous", relaciones_desde:"Relations depuis", embajada:"Ambassade", no_establecidas:"Non établies", no_residente:"Non résident", cooperacion_energetica:"Coopération énergétique", convenio_educativo:"Accord éducatif", acuerdo_desc1:"Échanges techniques et commerciaux dans le pétrole et le gaz.", acuerdo_desc2:"Bourses et programmes d'échange académique.", moneda:"Monnaie", cultura_trad:"Culture", biografia_presidente:"📖 Biographie du Président", tipo_gobierno:"Type de gouvernement", principales_sectores:"Secteurs principaux", opep:"OPEP", union_africana:"Union africaine (UA)", g77:"G77 + Chine", onu:"Nations Unies (ONU)", opep_desc:"Venezuela et pays africains : Algérie, Nigeria, Angola, Libye, Guinée équatoriale, Congo, Gabon.", ua_desc:"Le Venezuela est observateur depuis 2009. Les 55 pays africains sont membres (y compris la RASD).", g77_desc:"Coordination de 134 pays en développement.", onu_desc:"Le Venezuela et 54 pays africains souverains sont membres à part entière.", region_norte:"Afrique du Nord", region_occidental:"Afrique de l'Ouest", region_central:"Afrique centrale", region_oriental:"Afrique de l'Est", region_austral:"Afrique australe", multilateral_adicional1:"🤝 Mouvement des non-alignés (MNA): Le Venezuela depuis 1961, coordonne avec les nations africaines.", multilateral_adicional2:"🌱 Forum du dialogue Inde-Afrique (FOCAC): Le Venezuela observateur dans la coopération Sud-Sud.", multilateral_adicional3:"📅 Agenda 2063 de l'UA: Cadre stratégique aligné sur les objectifs du Venezuela.", hitos_1:"Indépendance de l'Algérie, du Nigeria, du Ghana et d'autres pays africains après des décennies de colonisation.", hitos_2:"Le Venezuela établit ses premières ambassades en Afrique : Nigeria, Algérie et Égypte.", hitos_3:"Reconnaissance officielle de la République arabe sahraouie démocratique (RASD).", hitos_4:"Création de l'Union africaine (UA), successeur de l'Organisation de l'unité africaine (OUA).", hitos_5:"Le Venezuela obtient le statut d'observateur à l'Union africaine.", hitos_6:"Lancement de la Zone de libre-échange continentale africaine (ZLECA).", hitos_7:"Sommet Venezuela-Afrique (Caracas, 2025): 15 accords signés dans l'énergie, la santé et l'éducation.", hitos_8:"La RASD devient membre à part entière de l'UA.", hitos_9:"Premier sommet des chefs d'État Amérique du Sud-Afrique (ASA).", hitos_10:"Accord de coopération énergétique entre PDVSA et Sonangol." }
+};
+let currentLang = 'es';
+function t(key) { return translations[currentLang][key] || key; }
+
+function applyTranslations() {
+    document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (translations[currentLang][key]) el.innerText = translations[currentLang][key];
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+        const key = el.getAttribute("data-i18n-placeholder");
+        if (translations[currentLang][key]) el.placeholder = translations[currentLang][key];
+    });
+    const ths = document.querySelectorAll("#paisesTable th, #embajadasTable th");
+    ths.forEach(th => {
+        const key = th.getAttribute("data-i18n");
+        if (key && translations[currentLang][key]) th.innerText = translations[currentLang][key];
+    });
+    renderSidebarFilters();
+    document.querySelectorAll(".stat-card small").forEach(small => {
+        const key = small.getAttribute("data-i18n");
+        if (key && translations[currentLang][key]) small.innerText = translations[currentLang][key];
+    });
+    // Recargar módulo activo
+    const activeModule = document.querySelector(".module-btn.active")?.dataset.module;
+    if (activeModule && activeModule !== "mapa") {
+        if (activeModule === "paises") loadPaisesTable();
+        else if (activeModule === "autoridades") loadAutoridades();
+        else if (activeModule === "bilateral") loadBilateral();
+        else if (activeModule === "multilateral") loadMultilateral();
+        else if (activeModule === "hitos") loadTimeline();
+        else if (activeModule === "embajadas") loadEmbajadas();
+        else if (activeModule === "admin") loadAdminPanel();
+    }
+}
+
+// ======================== 3. AUDITORÍA ========================
+let auditLog = [];
+function loadAuditLog() { const saved=localStorage.getItem('afridata_audit'); if(saved) auditLog=JSON.parse(saved); else logAudit("Sistema","INICIO","Sistema iniciado"); }
+function logAudit(usuario,accion,detalles) { auditLog.unshift({fecha:new Date().toISOString(),usuario,accion,detalles}); if(auditLog.length>500) auditLog.pop(); localStorage.setItem('afridata_audit',JSON.stringify(auditLog)); renderAuditTable(); }
+function renderAuditTable() { const tbody=document.getElementById("auditBody"); if(tbody) tbody.innerHTML=auditLog.map(l=>`<tr><td style="color:#aaa;">${new Date(l.fecha).toLocaleString()}</td><td style="color:#eee;">${l.usuario}</td><td>${l.accion}</td><td>${l.detalles}</td></tr>`).join(''); }
+function exportAuditPDF() { const {jsPDF}=window.jspdf; const doc=new jsPDF('landscape'); doc.text("Registro de Auditoría - AFRIDATA",14,20); doc.autoTable({head:[['Fecha','Usuario','Acción','Detalles']],body:auditLog.map(l=>[new Date(l.fecha).toLocaleString(),l.usuario,l.accion,l.detalles]),startY:30}); doc.save("auditoria_afridata.pdf"); showToast(t("exportAudit")+" descargado"); }
+function exportCSV() { let csv="País,Capital,Presidente,Región,Población (M),Relaciones,Embajada\n"; paises.forEach(p=>csv+=`"${p.nombre}","${p.capital}","${p.presidente}","${regionNombre[p.region]}",${p.poblacion},"${p.relaciones}","${p.embajada}"\n`); const blob=new Blob(["\uFEFF"+csv],{type:"text/csv"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="paises_africanos.csv"; a.click(); showToast(t("exportCSV")+" descargado"); }
+function showToast(msg) { const toast=document.createElement("div"); toast.className="toast"; toast.innerHTML=msg; document.body.appendChild(toast); setTimeout(()=>toast.remove(),3000); }
+
+// ======================== 4. USUARIOS Y SESIÓN ========================
+let currentUser=null;
+let users=[{id:1,name:"Administrador",login:"admin",password:"admin",role:"admin"},{id:2,name:"Consultor",login:"viewer",password:"viewer",role:"viewer"}];
+let nextUserId=3;
+function doLogin() {
+    const login=document.getElementById("loginUser").value;
+    const pass=document.getElementById("loginPass").value;
+    const user=users.find(u=>u.login===login && u.password===pass);
+    if(user){ currentUser=user; document.getElementById("loginPage").style.display="none"; document.getElementById("appPage").style.display="block"; document.getElementById("userRoleBadge").innerText=user.role==="admin"?"ADMIN":"LECTOR"; logAudit(user.name,"INICIAR SESIÓN",`Usuario ${user.name} ingresó`); initApp(); }
+    else { document.getElementById("loginError").style.display="block"; logAudit("Desconocido","INTENTO FALLIDO",`Intento con usuario ${login}`); }
+}
+function doLogout() { if(currentUser) logAudit(currentUser.name,"CERRAR SESIÓN","Salió del sistema"); currentUser=null; document.getElementById("loginPage").style.display="flex"; document.getElementById("appPage").style.display="none"; if(window.map) window.map.remove(); }
+
+function initApp() {
+    initMap(); loadPaisesTable(); loadAutoridades(); loadBilateral(); loadMultilateral(); loadTimeline(); loadEmbajadas(); renderSidebarFilters();
+    if(currentUser.role==="admin") loadAdminPanel(); else document.getElementById("adminPanel").innerHTML='<div style="text-align:center;padding:40px;">🔒 Acceso restringido a administradores</div>';
+    showModule('mapa'); loadAuditLog();
+    const totalRel=paises.filter(p=>p.relaciones!=="N/A" && p.relaciones!=="N/D").length;
+    document.getElementById("totalRelations").innerText=totalRel; document.getElementById("totalCountries").innerText=paises.length; applyTranslations();
+}
+
+// ======================== 5. MAPA CON RECARGA FORZADA ========================
+let map, markers=[], currentRegion='all';
+function initMap() { if(map) map.remove(); map=L.map('map').setView([5,20],3); L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO',opacity:0.9}).addTo(map); addMarkers(currentRegion); }
+function addMarkers(region) { if(!map) return; if(markers.length) markers.forEach(m=>map.removeLayer(m)); markers=[]; const filtered=region==='all'?paises:paises.filter(p=>p.region===region); filtered.forEach(p=>{ const color=regionColor[p.region]; const icon=L.divIcon({html:`<div style="background:${color}; width:14px; height:14px; border-radius:50%; border:2px solid #D4AF37; box-shadow:0 0 5px rgba(0,0,0,0.5);"></div>`,iconSize:[14,14]}); const marker=L.marker([p.lat,p.lng],{icon}); marker.bindTooltip(`<b>${p.nombre}</b><br>🔹 ${p.capital}`,{sticky:true,className:'leaflet-tooltip'}); marker.bindPopup(`<div style="text-align:center"><img src="https://flagcdn.com/w80/${p.bandera}.png" width="40"><br><b>${p.nombre}</b><br>${p.capital}<br><button onclick="openCountryModal(${p.id})" style="margin-top:5px;padding:4px 12px;background:#D4AF37;border:none;border-radius:20px;cursor:pointer;">${t("ver_ficha")}</button></div>`); marker.on('click',()=>marker.openPopup()); marker.addTo(map); markers.push(marker); }); }
+function renderSidebarFilters() { const container=document.getElementById("regionFilters"); if(!container) return; let html=`<button class="filter-btn active" data-region="all"><span class="filter-dot" style="background:#888;"></span>${t("todos")} (55)</button>`; regionesCod.forEach(r=>{ html+=`<button class="filter-btn" data-region="${r}"><span class="filter-dot" style="background:${regionColor[r]}"></span>${translations[currentLang][`region_${r}`] || regionNombre[r]}</button>`; }); container.innerHTML=html; document.querySelectorAll(".filter-btn").forEach(btn=>{ btn.addEventListener("click",()=>{ document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); currentRegion=btn.dataset.region; addMarkers(currentRegion); }); }); }
+function filterCountries() { const search=document.getElementById("searchBox").value.toLowerCase(); const filtered=paises.filter(p=>p.nombre.toLowerCase().includes(search)||p.capital.toLowerCase().includes(search)); markers.forEach(m=>map.removeLayer(m)); markers=[]; filtered.forEach(p=>{ const icon=L.divIcon({html:`<div style="background:${regionColor[p.region]}; width:12px; height:12px; border-radius:50%;"></div>`,iconSize:[12,12]}); const marker=L.marker([p.lat,p.lng],{icon}); marker.bindTooltip(`${p.nombre} - ${p.capital}`); marker.addTo(map); markers.push(marker); }); }
+
+// ======================== 6. MODALES Y MÓDULOS ========================
+function openCountryModal(id) {
+    const p=paises.find(p=>p.id===id); if(!p) return;
+    document.getElementById("modalFlag").src=`https://flagcdn.com/w80/${p.bandera}.png`;
+    document.getElementById("modalTitle").innerHTML=p.nombre;
+    const foto=getLeaderPhoto(p.id); const biografia=getBiografia(p.id);
+    document.getElementById("tab-general").innerHTML=`<div style="display:flex; flex-direction:column; align-items:center; text-align:center;"><img src="${foto}" class="leader-photo" onerror="this.src='https://via.placeholder.com/100'"><div style="text-align:left; width:100%;"><p><strong>${t("capital")}:</strong> ${p.capital}</p><p><strong>${t("region")}:</strong> ${translations[currentLang][`region_${p.region}`] || regionNombre[p.region]}</p><p><strong>${t("poblacion")}:</strong> ${p.poblacion} millones</p><h4>${t("biografia_presidente")}</h4><p style="line-height:1.4;">${biografia}</p></div></div>`;
+    document.getElementById("tab-gobierno").innerHTML=`<p><strong>👤 ${t("presidente")}:</strong> ${p.presidente}</p><p><strong>🏛️ ${t("tipo_gobierno")}:</strong> ${p.gobierno}</p>`;
+    document.getElementById("tab-economia").innerHTML=`<p><strong>📊 ${t("principales_sectores")}:</strong> ${p.economia}</p><p><strong>💱 ${t("moneda")}:</strong> Dólar, Franco CFA, etc.</p>`;
+    document.getElementById("tab-cultura").innerHTML=`<p><strong>🎭 ${t("cultura_trad")}:</strong> ${p.cultura}</p>`;
+    document.getElementById("tab-venezuela").innerHTML=`<p><strong>🤝 ${t("relaciones_desde")}:</strong> ${p.relaciones}</p><p><strong>🏢 ${t("embajada")}:</strong> ${p.embajada !== "N/A" ? p.embajada : t("no_residente")}</p>`;
+    document.querySelectorAll(".modal-tab").forEach(tab=>{ tab.onclick=()=>{ document.querySelectorAll(".modal-tab").forEach(t=>t.classList.remove("active")); tab.classList.add("active"); document.querySelectorAll(".tab-pane").forEach(pane=>pane.classList.remove("active")); document.getElementById(`tab-${tab.dataset.tab}`).classList.add("active"); }; });
+    document.getElementById("countryModal").style.display="flex";
+}
+function closeModal() { document.getElementById("countryModal").style.display="none"; }
+
+function loadPaisesTable() { const tbody=document.getElementById("paisesBody"); if(!tbody) return; tbody.innerHTML=paises.map((p,i)=>`<tr><td style="color:#aaa;">${i+1}</td><td><img src="https://flagcdn.com/w40/${p.bandera}.png" class="flag-img"> ${p.nombre}</td><td>${p.capital}</td><td><button onclick="openCountryModal(${p.id})" class="admin-btn-primary" style="padding:2px 8px; font-size:11px;">${t("ver_ficha")}</button></td><td><span style="color:${regionColor[p.region]}">●</span> ${translations[currentLang][`region_${p.region}`] || regionNombre[p.region]}</td><td>${p.poblacion}M</td></tr>`).join(''); }
+function loadAutoridades() { const grid=document.getElementById("autoridadesGrid"); if(!grid) return; grid.innerHTML=paises.map(p=>`<div class="authority-card" onclick="openCountryModal(${p.id})"><div style="display:flex; gap:10px; align-items:center;"><img src="${getLeaderPhoto(p.id)}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #D4AF37;" onerror="this.src='https://via.placeholder.com/50'"><div><b>${p.presidente}</b><br>${p.nombre}<br><small>${translations[currentLang][`region_${p.region}`] || regionNombre[p.region]}</small></div></div></div>`).join(''); }
+function loadBilateral() { const container=document.getElementById("bilateralContainer"); const summary=document.getElementById("bilateralSummary"); if(!container) return; const activas=paises.filter(p=>p.relaciones!=="N/A" && p.relaciones!=="N/D").length; if(summary) summary.innerHTML=`<div class="summary-card"><div class="summary-number">55</div><div>${t("total_paises")}</div></div><div class="summary-card"><div class="summary-number">${activas}</div><div>${t("relaciones_activas")}</div></div><div class="summary-card"><div class="summary-number">${embajadas.length}</div><div>${t("embajadas")}</div></div>`; container.innerHTML=paises.map(p=>`<div class="bilateral-item"><div class="bilateral-header" onclick="toggleBilateral(${p.id})"><img src="https://flagcdn.com/w40/${p.bandera}.png"><div class="country-name">${p.nombre}</div><i class="fas fa-chevron-down"></i></div><div class="bilateral-content" id="bilateral-content-${p.id}"><h4>${t("tab_venezuela")}</h4><p><strong>${t("relaciones_desde")}:</strong> ${p.relaciones!=="N/A"?p.relaciones:t("no_establecidas")}</p><p><strong>${t("embajada")}:</strong> ${p.embajada!=="N/A"?p.embajada:t("no_residente")}</p><div class="agreement-item"><div class="title">${t("cooperacion_energetica")}</div><div>${t("acuerdo_desc1")}</div></div><div class="agreement-item"><div class="title">${t("convenio_educativo")}</div><div>${t("acuerdo_desc2")}</div></div></div></div>`).join(''); }
+function toggleBilateral(id) { const content=document.getElementById(`bilateral-content-${id}`); if(content) content.classList.toggle('open'); }
+function loadMultilateral() { const container=document.getElementById("multilateralContent"); if(container) container.innerHTML=`<h3>${t("union_africana")}</h3><p>${t("ua_desc")}</p><h3>${t("opep")}</h3><p>${t("opep_desc")}</p><h3>${t("g77")}</h3><p>${t("g77_desc")}</p><h3>${t("onu")}</h3><p>${t("onu_desc")}</p><div class="agreement-item"><p>${t("multilateral_adicional1")}</p><p>${t("multilateral_adicional2")}</p><p>${t("multilateral_adicional3")}</p></div>`; }
+function loadTimeline() { const container=document.getElementById("timelineContent"); if(container) container.innerHTML=`
+    <div class="timeline-item"><div class="timeline-date">1960</div><div class="timeline-title">${t("hitos")}</div><div class="timeline-desc">${t("hitos_1")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">1961-1965</div><div class="timeline-title">Primeras representaciones diplomáticas</div><div class="timeline-desc">${t("hitos_2")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">1975</div><div class="timeline-title">Reconocimiento de la RASD</div><div class="timeline-desc">${t("hitos_3")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2002</div><div class="timeline-title">Creación de la Unión Africana</div><div class="timeline-desc">${t("hitos_4")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2009</div><div class="timeline-title">Venezuela observador en la UA</div><div class="timeline-desc">${t("hitos_5")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2018</div><div class="timeline-title">Zona de Libre Comercio Continental</div><div class="timeline-desc">${t("hitos_6")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2025</div><div class="timeline-title">Cumbre Venezuela-África</div><div class="timeline-desc">${t("hitos_7")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2026</div><div class="timeline-title">RASD miembro pleno de la UA</div><div class="timeline-desc">${t("hitos_8")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2006</div><div class="timeline-title">Primera cumbre ASA</div><div class="timeline-desc">${t("hitos_9")}</div></div>
+    <div class="timeline-item"><div class="timeline-date">2023</div><div class="timeline-title">Acuerdo PDVSA-Sonangol</div><div class="timeline-desc">${t("hitos_10")}</div></div>
+`; }
+function loadEmbajadas() { const tbody=document.getElementById("embajadasBody"); if(tbody) tbody.innerHTML=embajadas.map(e=>`<tr><td style="color:#D4AF37;">${e.pais}</td><td>${e.ciudad}</td><td>${e.embajador}</td></tr>`).join(''); }
+
+// ======================== 7. REPORTES PDF REALES ========================
+function generateAllCountriesReport() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4'); let y = 20;
+    doc.setFontSize(18); doc.setTextColor(212,175,55); doc.text("Reporte Completo de Países Africanos (55)", 105, y, { align: "center" }); y += 12;
+    doc.setFontSize(10); doc.setTextColor(100); doc.text(`Generado: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y += 12;
+    for(let i=0;i<paises.length;i++){ const p=paises[i]; if(y>270){doc.addPage();y=20;} doc.setFontSize(11); doc.setTextColor(0); doc.text(`${i+1}. ${p.nombre}`,20,y); y+=6; doc.setFontSize(9); doc.text(`   Capital: ${p.capital} | Presidente: ${p.presidente} | Población: ${p.poblacion}M`,20,y); y+=5; doc.text(`   Región: ${regionNombre[p.region]} | Relaciones: ${p.relaciones} | Embajada: ${p.embajada}`,20,y); y+=6; doc.line(20,y-2,190,y-2); y+=4; }
+    doc.save("afridata_report_55_paises.pdf"); logAudit(currentUser.name,"REPORTE","Generó reporte de 55 países"); showToast(t("reporte55")+" generado");
+}
+function generateResumenReport() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y=20;
+    doc.setFontSize(18); doc.setTextColor(212,175,55); doc.text("Resumen Ejecutivo - AFRIDATA", 105, y, { align: "center" }); y+=12;
+    doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y+=12;
+    const data = regionesCod.map(r => [regionNombre[r], paises.filter(p=>p.region===r).length, paises.filter(p=>p.region===r && p.relaciones!=="N/A" && p.relaciones!=="N/D").length]);
+    doc.autoTable({ startY: y, head: [['Región', 'Países', 'Relaciones Activas']], body: data, theme: 'grid', headStyles: { fillColor: [212,175,55] } });
+    doc.save("afridata_resumen_ejecutivo.pdf"); logAudit(currentUser.name,"REPORTE","Generó resumen ejecutivo"); showToast(t("reporteResumen")+" generado");
+}
+function generateBilateralReport() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y=20;
+    doc.setFontSize(18); doc.setTextColor(212,175,55); doc.text("Reporte de Relaciones Bilaterales", 105, y, { align: "center" }); y+=12;
+    doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y+=12;
+    const data = paises.filter(p=>p.relaciones!=="N/A" && p.relaciones!=="N/D").map(p=>[p.nombre, p.relaciones, p.embajada]);
+    doc.autoTable({ startY: y, head: [['País', 'Relaciones desde', 'Embajada']], body: data, theme: 'grid', headStyles: { fillColor: [212,175,55] } });
+    doc.save("afridata_relaciones_bilaterales.pdf"); logAudit(currentUser.name,"REPORTE","Generó reporte bilateral"); showToast(t("reporteBilateral")+" generado");
+}
+function generateMultilateralReport() {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y=20;
+    doc.setFontSize(18); doc.setTextColor(212,175,55); doc.text("Reporte de Participación Multilateral", 105, y, { align: "center" }); y+=12;
+    doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 105, y, { align: "center" }); y+=12;
+    doc.setFontSize(12); doc.text("Organismos clave:", 20, y); y+=8;
+    doc.setFontSize(10); doc.text("• Unión Africana (UA): Venezuela es observador desde 2009.", 20, y); y+=6;
+    doc.text("• OPEP: Venezuela y 7 países africanos (Argelia, Nigeria, Angola, Libia, Guinea Ecuatorial, Congo, Gabón).", 20, y); y+=6;
+    doc.text("• G77 + China: Coordinación de 134 países en desarrollo.", 20, y); y+=6;
+    doc.text("• Naciones Unidas (ONU): Miembros plenos Venezuela + 54 países africanos.", 20, y); y+=6;
+    doc.text("• Movimiento de Países No Alineados (MNOAL).", 20, y); y+=6;
+    doc.text("• Foro de Diálogo India-África (FOCAC): Venezuela observador.", 20, y);
+    doc.save("afridata_multilateral.pdf"); logAudit(currentUser.name,"REPORTE","Generó reporte multilateral"); showToast(t("reporteMultilateral")+" generado");
+}
+
+// ======================== 8. ADMIN PANEL ========================
+function loadAdminPanel() {
+    const panel=document.getElementById("adminPanel"); if(!panel) return;
+    panel.innerHTML=`
+        <div class="admin-section"><h3>${t("admin")}</h3><div class="admin-form"><input type="text" id="newName" placeholder="Nombre"><input type="text" id="newLogin" placeholder="Usuario"><input type="password" id="newPass" placeholder="Contraseña"><select id="newRole"><option value="viewer">Visualizador</option><option value="admin">Administrador</option></select><button class="admin-btn-primary" id="createUserBtn">Crear</button></div></div>
+        <div class="admin-section"><h3>Editar País</h3><div class="admin-form"><select id="editCountry"><option value="">Seleccionar país</option>${paises.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('')}</select><input type="text" id="editPresidente" placeholder="${t("presidente")}"><input type="text" id="editRelaciones" placeholder="${t("relaciones_desde")}"><button class="admin-btn-primary" id="saveCountryBtn">Guardar</button></div></div>
+        <div class="admin-section"><h3>Registro de Auditoría</h3><button class="admin-btn-primary" id="exportAuditBtn2">${t("exportAudit")}</button><button class="admin-btn-success" id="exportCsvBtn2">${t("exportCSV")}</button><div style="max-height:300px;overflow:auto;"><table class="audit-table"><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalles</th></tr></thead><tbody id="auditBody"></tbody><td></div></div>
+    `;
+    renderAuditTable();
+    document.getElementById("createUserBtn").onclick = () => { const name=document.getElementById("newName").value,login=document.getElementById("newLogin").value,pass=document.getElementById("newPass").value,role=document.getElementById("newRole").value; if(!name||!login||!pass){ showToast("Complete todos los campos"); return; } if(users.find(u=>u.login===login)){ showToast("Usuario ya existe"); return; } users.push({id:nextUserId++,name,login,password:pass,role}); logAudit(currentUser.name,"CREAR USUARIO",`Creado usuario ${login} (${role})`); showToast("Usuario creado"); loadAdminPanel(); };
+    document.getElementById("saveCountryBtn").onclick = () => { const id=parseInt(document.getElementById("editCountry").value); const p=paises.find(p=>p.id===id); if(!p) return; const oldPres=p.presidente; p.presidente=document.getElementById("editPresidente").value; p.relaciones=document.getElementById("editRelaciones").value; if(oldPres!==p.presidente) logAudit(currentUser.name,"EDITAR PAÍS",`Cambió presidente de ${p.nombre}: ${oldPres} → ${p.presidente}`); loadPaisesTable(); loadAutoridades(); loadBilateral(); showToast("País actualizado"); };
+    document.getElementById("exportAuditBtn2").onclick = exportAuditPDF;
+    document.getElementById("exportCsvBtn2").onclick = exportCSV;
+}
+
+// ======================== 9. NAVEGACIÓN CON RECARGA DEL MAPA ========================
+function showModule(module) {
+    document.querySelectorAll(".module-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelector(`.module-btn[data-module="${module}"]`).classList.add("active");
+    if(module==="mapa"){
+        document.getElementById("appLayout").style.display="flex";
+        document.getElementById("modulesContainer").style.display="none";
+        setTimeout(() => { if(window.map) window.map.invalidateSize(); }, 100);
+    } else {
+        document.getElementById("appLayout").style.display="none";
+        document.getElementById("modulesContainer").style.display="block";
+        document.querySelectorAll(".module-panel").forEach(p=>p.classList.remove("active"));
+        const panel=document.getElementById(`panel-${module}`);
+        if(panel) panel.classList.add("active");
+        if(module==="paises") loadPaisesTable();
+        else if(module==="autoridades") loadAutoridades();
+        else if(module==="bilateral") loadBilateral();
+        else if(module==="multilateral") loadMultilateral();
+        else if(module==="hitos") loadTimeline();
+        else if(module==="embajadas") loadEmbajadas();
+        else if(module==="admin" && currentUser.role==="admin") loadAdminPanel();
+    }
+    applyTranslations();
+}
+
+// ======================== 10. EVENTOS GLOBALES ========================
+document.getElementById("loginBtn").onclick=doLogin; document.getElementById("logoutBtn").onclick=doLogout;
+document.getElementById("btnReportes").onclick=()=>showModule('reportes'); document.getElementById("btnAdmin").onclick=()=>showModule('admin');
+document.getElementById("reporte55Btn").onclick=generateAllCountriesReport; document.getElementById("reporteResumenBtn").onclick=generateResumenReport;
+document.getElementById("reporteBilateralBtn").onclick=generateBilateralReport; document.getElementById("reporteMultilateralBtn").onclick=generateMultilateralReport;
+document.getElementById("exportAuditBtn").onclick=exportAuditPDF; document.getElementById("exportCsvBtn").onclick=exportCSV;
+document.getElementById("searchBox").oninput=filterCountries; document.getElementById("mobileSidebarToggle").onclick=()=>document.getElementById("sidebar").classList.toggle("open");
+document.querySelectorAll(".module-btn").forEach(btn=>btn.onclick=()=>showModule(btn.dataset.module));
+document.getElementById("loginUser").addEventListener("keypress",e=>{if(e.key==="Enter")doLogin();});
+document.getElementById("loginPass").addEventListener("keypress",e=>{if(e.key==="Enter")doLogin();});
+window.openCountryModal=openCountryModal; window.closeModal=closeModal; window.toggleBilateral=toggleBilateral;
+document.querySelectorAll(".lang-selector span").forEach(span=>{
+    span.addEventListener("click",()=>{
+        document.querySelectorAll(".lang-selector span").forEach(s=>s.classList.remove("active"));
+        span.classList.add("active");
+        currentLang=span.dataset.lang;
+        applyTranslations();
+        const activeModule = document.querySelector(".module-btn.active").dataset.module;
+        if(activeModule === "mapa") { if(window.map) window.map.invalidateSize(); }
+        else if(activeModule === "paises") loadPaisesTable();
+        else if(activeModule === "autoridades") loadAutoridades();
+        else if(activeModule === "bilateral") loadBilateral();
+        else if(activeModule === "multilateral") loadMultilateral();
+        else if(activeModule === "hitos") loadTimeline();
+        else if(activeModule === "embajadas") loadEmbajadas();
+        else if(activeModule === "admin") loadAdminPanel();
+        document.getElementById("totalRelations").innerText = paises.filter(p=>p.relaciones!=="N/A" && p.relaciones!=="N/D").length;
+        document.getElementById("totalCountries").innerText = paises.length;
+    });
+});
+</script>
+</body>
+</html>

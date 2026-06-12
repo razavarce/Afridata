@@ -1,0 +1,615 @@
+[
+  {
+    "id": 1,
+    "country": "Argelia",
+    "efemerides": [
+      {"date": "1830", "title": "Colonización Francesa", "detail": "Francia inicia la colonización de Argelia"},
+      {"date": "1954-1962", "title": "Guerra de Independencia", "detail": "Guerra argelina: batalla por la independencia durante 8 años"},
+      {"date": "1962", "title": "Independencia de Argelia", "detail": "Argelia logra su independencia de Francia (5 de julio)"},
+      {"date": "1965", "title": "Golpe de Estado", "detail": "Huari Bumedián asume el poder derrocando a Ahmed Ben Bella"},
+      {"date": "1992", "title": "Cancelación de Elecciones", "detail": "Gobierno cancela elecciones ganadas por FIS, inicia guerra civil"},
+      {"date": "2000", "title": "Tregua en la Violencia", "detail": "El presidente Buteflika anuncia tregua en conflicto armado"},
+      {"date": "2019", "title": "Hirak y Revolución", "detail": "Movimiento popular Hirak fuerza renuncia del presidente Buteflika"}
+    ]
+  },
+  {
+    "id": 2,
+    "country": "Egipto",
+    "efemerides": [
+      {"date": "1952", "title": "Revolución de los Oficiales Libres", "detail": "Gamal Abdel Nasser derroca la monarquía del Rey Faruk"},
+      {"date": "1956", "title": "Crisis de Suez", "detail": "Nacionalización del Canal de Suez genera conflicto internacional"},
+      {"date": "1967", "title": "Guerra de los Seis Días", "detail": "Conflicto con Israel resulta en pérdida territorial significativa"},
+      {"date": "1973", "title": "Guerra de Yom Kipur", "detail": "Recuperación del Sinaí en guerra contra Israel"},
+      {"date": "1981", "title": "Asesinato de Anuar Sadat", "detail": "Sadat asesinado, Hosni Mubarak asume la presidencia"},
+      {"date": "2011", "title": "Revolución del 25 de Enero", "detail": "Caída de Hosni Mubarak tras 18 días de protestas (Primavera Árabe)"}
+    ]
+  },
+  {
+    "id": 3,
+    "country": "Libia",
+    "efemerides": [
+      {"date": "1951", "title": "Independencia de Libia", "detail": "Libia se independiza del protectorado italiano bajo la monarquía de Idris I"},
+      {"date": "1969", "title": "Revolución de Gadafi", "detail": "Muammar Gadafi derroca la monarquía en golpe de estado"},
+      {"date": "1977", "title": "Jamahiriya Árabe Libia", "detail": "Gadafi proclama la Jamahiriya (Estado de las Masas)"},
+      {"date": "2011", "title": "Rebelión contra Gadafi", "detail": "Guerra civil en Libia, intervención de la OTAN, caída de Gadafi"},
+      {"date": "2014", "title": "Guerra Civil Continúa", "detail": "Conflicto entre gobiernos rivales de Trípoli y Tobruk"},
+      {"date": "2020", "title": "Tregua en Conflicto", "detail": "Ceasefire entre facciones principales con presencia internacional"}
+    ]
+  },
+  {
+    "id": 4,
+    "country": "Marruecos",
+    "efemerides": [
+      {"date": "1956", "title": "Independencia de Marruecos", "detail": "Marruecos logra su independencia de Francia (2 de marzo)"},
+      {"date": "1961", "title": "Muerte del Rey Mohammed V", "detail": "Rey Hassán II asume el trono en sucesión"},
+      {"date": "1965", "title": "Disturbios de Casablanca", "detail": "Protestas estudiantiles contra el gobierno de Hassán II"},
+      {"date": "1971", "title": "Golpe de Estado Fallido", "detail": "Intento de golpe militar es sofocado por el gobierno"},
+      {"date": "1975", "title": "Marcha Verde", "detail": "Marruecos reclama el Sáhara Occidental con marcha de civiles"},
+      {"date": "1999", "title": "Muerte del Rey Hassán II", "detail": "Mohammed VI asume el trono, edad 36 años"},
+      {"date": "2020", "title": "Normalización con Israel", "detail": "Marruecos normaliza relaciones diplomáticas con Israel"}
+    ]
+  },
+  {
+    "id": 5,
+    "country": "Sudán",
+    "efemerides": [
+      {"date": "1956", "title": "Independencia de Sudán", "detail": "Sudán logra su independencia del condominio anglo-egipcio (1 de enero)"},
+      {"date": "1969", "title": "Golpe de Estado de al-Nimeiry", "detail": "Revolución derrocó la democracia parlamentaria"},
+      {"date": "1983", "title": "Imposición de Ley Islámica", "detail": "Al-Nimeiry instaura la Sharia causando conflictos religiosos"},
+      {"date": "1985", "title": "Revuelta Popular", "detail": "Caída de al-Nimeiry tras protestas masivas"},
+      {"date": "1989", "title": "Golpe de al-Bashir", "detail": "Omar al-Bashir asume poder en golpe militar"},
+      {"date": "2019", "title": "Revolución de Sudán", "detail": "Caída de al-Bashir tras protestas prolongadas en Primavera Árabe"},
+      {"date": "2023", "title": "Guerra Civil", "detail": "Conflicto entre SAF y RSF causa crisis humanitaria"}
+    ]
+  },
+  {
+    "id": 6,
+    "country": "Túnez",
+    "efemerides": [
+      {"date": "1956", "title": "Independencia de Túnez", "detail": "Túnez logra su independencia de Francia (20 de marzo)"},
+      {"date": "1957", "title": "Abolición de la Monarquía", "detail": "Habib Bourguiba proclama la república, destituye al bey"},
+      {"date": "1975", "title": "Constitución de 1975", "detail": "Nueva Constitución consolida poder presidencial"},
+      {"date": "1987", "title": "Golpe de Benali", "detail": "Zine El Abidine Ben Ali asume poder destronando a Bourguiba"},
+      {"date": "2010", "title": "Revolución de Túnez", "detail": "Primavera Árabe comienza en Túnez, caída de Ben Ali"},
+      {"date": "2014", "title": "Nueva Constitución Democrática", "detail": "Adopción de nueva constitución tras transición democrática"},
+      {"date": "2021", "title": "Golpe Presidencial", "detail": "Kais Saied suspende el parlamento consolidando poderes"}
+    ]
+  },
+  {
+    "id": 7,
+    "country": "Sáhara Occidental",
+    "efemerides": [
+      {"date": "1884", "title": "Colonización Española", "detail": "España establece presencia colonial en el Sáhara"},
+      {"date": "1973", "title": "Fundación del Polisario", "detail": "Nace el Frente Popular para la Liberación de Saguía el-Hamra"},
+      {"date": "1975", "title": "Marcha Verde", "detail": "Marruecos reclama el territorio con marcha de civiles"},
+      {"date": "1976", "title": "Proclamación de RASD", "detail": "Se proclama la República Árabe Saharaui Democrática"},
+      {"date": "1991", "title": "Alto al Fuego", "detail": "Naciones Unidas impone tregua en conflicto del Sáhara"},
+      {"date": "2020", "title": "Marruecos Reanuda Control", "detail": "Marruecos reanuda actividades en Sáhara bajo presión internacional"}
+    ]
+  },
+  {
+    "id": 8,
+    "country": "Benín",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia del Dahomey", "detail": "El Dahomey logra independencia de Francia (1 de agosto)"},
+      {"date": "1972", "title": "Revolución de Mathieu Kérékou", "detail": "Golpe militar establece régimen socialista revolucionario"},
+      {"date": "1989", "title": "Fin del Socialismo", "detail": "Cae el régimen socialista tras presiones"},
+      {"date": "1990", "title": "Conferencia Nacional Soberana", "detail": "Transición democrática con constitución nueva"},
+      {"date": "1991", "title": "Cambio de Nombre a Benín", "detail": "El Dahomey cambia oficialmente su nombre a Benín"}
+    ]
+  },
+  {
+    "id": 9,
+    "country": "Burkina Faso",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia del Alto Volta", "detail": "Alto Volta (nombre anterior) logra independencia de Francia"},
+      {"date": "1966", "title": "Golpe de Lamizana", "detail": "General Sangoulé Lamizana derroca al presidente"},
+      {"date": "1983", "title": "Revolución de Sankara", "detail": "Thomas Sankara y su revolución popular asumen poder"},
+      {"date": "1987", "title": "Golpe que mata a Sankara", "detail": "Henri Compaoré mata a Sankara en contrarrevolución"},
+      {"date": "1991", "title": "Multipartidismo", "detail": "Compaoré adopta sistema democrático multipartidista"},
+      {"date": "2015", "title": "Insurrección contra Compaoré", "detail": "Pueblos derriban al Presidente Compaoré tras 27 años"},
+      {"date": "2023", "title": "Golpe de Traoré", "detail": "Ibrahim Traoré asume poder destronando a transitorio"}
+    ]
+  },
+  {
+    "id": 10,
+    "country": "Cabo Verde",
+    "efemerides": [
+      {"date": "1975", "title": "Independencia de Cabo Verde", "detail": "Independencia de Portugal tras lucha de liberación (5 de julio)"},
+      {"date": "1980", "title": "Golpe de Fonseca", "detail": "António Mascarenhas Monteiro cambia forma de gobierno"},
+      {"date": "1991", "title": "Multipartidismo", "detail": "Cabo Verde adopta sistema democrático multipartidista"},
+      {"date": "2001", "title": "Alternancia de Poder", "detail": "Primera transferencia democrática de poder en África Occidental"}
+    ]
+  },
+  {
+    "id": 11,
+    "country": "Costa de Marfil",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Costa de Marfil", "detail": "Independencia de Francia bajo Félix Houphouet-Boigny"},
+      {"date": "2000", "title": "Golpe de Guéï", "detail": "Golpe militar derroca al presidente Konan Bédié"},
+      {"date": "2010", "title": "Crisis Post-Electoral", "detail": "Conflicto por resultados electorales entre Ouattara y Gbagbo"},
+      {"date": "2011", "title": "Fin de la Crisis", "detail": "Captura de Gbagbo tras intervención francesa, victoriaouattara"}
+    ]
+  },
+  {
+    "id": 12,
+    "country": "Gambia",
+    "efemerides": [
+      {"date": "1965", "title": "Independencia", "detail": "Gambia obtiene independencia del Reino Unido el 18 de febrero"},
+      {"date": "1970", "title": "República Declarada", "detail": "Gambia se convierte en república, Dawda Jawara es presidente"}
+    ]
+  },
+  {
+    "id": 13,
+    "country": "Ghana",
+    "efemerides": [
+      {"date": "1957", "title": "Independencia de Ghana", "detail": "Primer país africano en lograr independencia, Kwame Nkrumah"},
+      {"date": "1966", "title": "Golpe contra Nkrumah", "detail": "Golpe militar derroca al presidente Nkrumah"},
+      {"date": "1979", "title": "Ejecución de Acheampong", "detail": "Ejecución del general Acheampong tras golpe"},
+      {"date": "1992", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución democrática"},
+      {"date": "2000", "title": "Alternancia Democrática", "detail": "Primera transferencia pacífica de poder"}
+    ]
+  },
+  {
+    "id": 14,
+    "country": "Guinea",
+    "efemerides": [
+      {"date": "1958", "title": "Independencia de Guinea", "detail": "Primer país africano en rechazar Comunidad Francesa"},
+      {"date": "1984", "title": "Muerte de Touré", "detail": "Fallece Ahmed Sékou Touré, Lansana Conté asume poder"},
+      {"date": "2008", "title": "Golpe de Camara", "detail": "Golpe militar derroca al presidente Conté"},
+      {"date": "2010", "title": "Elecciones Democráticas", "detail": "Alpha Condé gana elecciones democráticas"},
+      {"date": "2021", "title": "Golpe de Doumbouya", "detail": "Golpe militar derroca al presidente Condé"}
+    ]
+  },
+  {
+    "id": 15,
+    "country": "Guinea-Bisáu",
+    "efemerides": [
+      {"date": "1973", "title": "Independencia de Guinea-Bisáu", "detail": "Independencia de Portugal tras guerra de liberación"},
+      {"date": "1980", "title": "Golpe de Vieira", "detail": "João Bernardo Vieira asume poder tras golpe"},
+      {"date": "1998", "title": "Guerra Civil", "detail": "Conflicto armado entre facciones políticas"},
+      {"date": "2003", "title": "Asesinato de Vieira", "detail": "Presidente Vieira es asesinado"},
+      {"date": "2012", "title": "Golpe Militar", "detail": "Golpe derroca al gobierno interino"}
+    ]
+  },
+  {
+    "id": 16,
+    "country": "Liberia",
+    "efemerides": [
+      {"date": "1847", "title": "Fundación de Liberia", "detail": "Fundada por esclavos liberados de Estados Unidos"},
+      {"date": "1980", "title": "Golpe de Doe", "detail": "Samuel Doe derroca al presidente Tolbert"},
+      {"date": "1989", "title": "Guerra Civil", "detail": "Inicio de la primera guerra civil liberiana"},
+      {"date": "2003", "title": "Acuerdos de Paz", "detail": "Fin de la segunda guerra civil con acuerdos de paz"},
+      {"date": "2005", "title": "Elecciones Democráticas", "detail": "Ellen Johnson Sirleaf gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 17,
+    "country": "Malí",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Malí", "detail": "Independencia de Francia, Modibo Keita presidente"},
+      {"date": "1968", "title": "Golpe de Traoré", "detail": "Golpe militar derroca al presidente Keita"},
+      {"date": "1991", "title": "Golpe Democrático", "detail": "Golpe derroca a Traoré, transición democrática"},
+      {"date": "2012", "title": "Golpe de Sanogo", "detail": "Golpe militar durante conflicto en el norte"},
+      {"date": "2020", "title": "Golpe de Goïta", "detail": "Assimi Goïta asume poder tras golpe"}
+    ]
+  },
+  {
+    "id": 18,
+    "country": "Mauritania",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Mauritania", "detail": "Independencia de Francia, Moktar Ould Daddah presidente"},
+      {"date": "1978", "title": "Golpe de Salek", "detail": "Golpe militar derroca al presidente Daddah"},
+      {"date": "1984", "title": "Anexión del Sáhara", "detail": "Mauritania anexa parte del Sáhara Occidental"},
+      {"date": "2005", "title": "Golpe de Aziz", "detail": "Ely Ould Mohamed Vall derroca al presidente"},
+      {"date": "2008", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución democrática"}
+    ]
+  },
+  {
+    "id": 19,
+    "country": "Níger",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia del Níger", "detail": "Independencia de Francia, Hamani Diori presidente"},
+      {"date": "1974", "title": "Golpe de Kountché", "detail": "Golpe militar derroca al presidente Diori"},
+      {"date": "1996", "title": "Golpe de Baré", "detail": "Golpe derroca al presidente Ousmane"},
+      {"date": "1999", "title": "Golpe de Wanké", "detail": "Golpe militar durante transición democrática"},
+      {"date": "2023", "title": "Golpe de Tchiani", "detail": "Abdourahamane Tchiani asume poder tras golpe"}
+    ]
+  },
+  {
+    "id": 20,
+    "country": "Nigeria",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Nigeria", "detail": "Independencia del Reino Unido, Abubakar Tafawa Balewa primer ministro"},
+      {"date": "1966", "title": "Golpe de Chukwuma", "detail": "Primer golpe militar, derroca al gobierno civil"},
+      {"date": "1967", "title": "Guerra Civil", "detail": "Guerra de Biafra, secesión del este"},
+      {"date": "1979", "title": "Retorno a Democracia", "detail": "Transición a democracia multipartidista"},
+      {"date": "1999", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución democrática"}
+    ]
+  },
+  {
+    "id": 21,
+    "country": "Senegal",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Senegal", "detail": "Independencia de Francia, Léopold Sédar Senghor presidente"},
+      {"date": "1980", "title": "Muerte de Senghor", "detail": "Abdou Diouf asume la presidencia"},
+      {"date": "2000", "title": "Golpe Fallido", "detail": "Intento de golpe militar es sofocado"},
+      {"date": "2012", "title": "Elecciones Democráticas", "detail": "Macky Sall gana elecciones presidenciales"},
+      {"date": "2024", "title": "Transición Democrática", "detail": "Bassirou Diomaye Faye gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 22,
+    "country": "Sierra Leona",
+    "efemerides": [
+      {"date": "1961", "title": "Independencia de Sierra Leona", "detail": "Independencia del Reino Unido, Milton Margai primer ministro"},
+      {"date": "1964", "title": "Muerte de Margai", "detail": "Albert Margai asume el poder"},
+      {"date": "1991", "title": "Guerra Civil", "detail": "Inicio de la guerra civil con el RUF"},
+      {"date": "2002", "title": "Fin de la Guerra", "detail": "Acuerdos de paz terminan el conflicto armado"},
+      {"date": "2018", "title": "Elecciones Democráticas", "detail": "Julius Maada Bio gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 23,
+    "country": "Togo",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Togo", "detail": "Independencia de Francia, Sylvanus Olympio presidente"},
+      {"date": "1963", "title": "Asesinato de Olympio", "detail": "Golpe militar asesina al presidente Olympio"},
+      {"date": "1967", "title": "Golpe de Eyadéma", "detail": "Gnassingbé Eyadéma asume poder tras golpe"},
+      {"date": "2005", "title": "Muerte de Eyadéma", "detail": "Faure Gnassingbé asume la presidencia"},
+      {"date": "2020", "title": "Reelección de Gnassingbé", "detail": "Faure Gnassingbé reelegido en elecciones controvertidas"}
+    ]
+  },
+  {
+    "id": 24,
+    "country": "Camerún",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Camerún", "detail": "Independencia de Francia, Ahmadou Ahidjo presidente"},
+      {"date": "1961", "title": "Unión con Camerún Británico", "detail": "Camerún del Sur se une formando República Federal"},
+      {"date": "1982", "title": "Muerte de Ahidjo", "detail": "Paul Biya asume la presidencia"},
+      {"date": "1990", "title": "Multipartidismo", "detail": "Transición a sistema multipartidista"},
+      {"date": "2018", "title": "Reelección de Biya", "detail": "Paul Biya reelegido por séptimo mandato"}
+    ]
+  },
+  {
+    "id": 25,
+    "country": "Chad",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Chad", "detail": "Independencia de Francia, François Tombalbaye presidente"},
+      {"date": "1975", "title": "Asesinato de Tombalbaye", "detail": "Golpe militar asesina al presidente Tombalbaye"},
+      {"date": "1982", "title": "Golpe de Habré", "detail": "Hissène Habré asume poder tras golpe"},
+      {"date": "1990", "title": "Golpe de Déby", "detail": "Idriss Déby derroca a Habré"},
+      {"date": "2021", "title": "Muerte de Déby", "detail": "Mahamat Déby asume poder tras muerte de su padre"}
+    ]
+  },
+  {
+    "id": 26,
+    "country": "Gabón",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Gabón", "detail": "Independencia de Francia, Léon M'ba presidente"},
+      {"date": "1964", "title": "Golpe Fallido", "detail": "Intento de golpe contra M'ba es sofocado"},
+      {"date": "1967", "title": "Muerte de M'ba", "detail": "Omar Bongo asume la presidencia"},
+      {"date": "2009", "title": "Muerte de Bongo", "detail": "Ali Bongo asume la presidencia"},
+      {"date": "2023", "title": "Golpe Militar", "detail": "Golpe derroca al presidente Ali Bongo"}
+    ]
+  },
+  {
+    "id": 27,
+    "country": "Guinea Ecuatorial",
+    "efemerides": [
+      {"date": "1968", "title": "Independencia de Guinea Ecuatorial", "detail": "Independencia de España, Francisco Macías Nguema presidente"},
+      {"date": "1979", "title": "Golpe contra Macías", "detail": "Teodoro Obiang derroca a Macías Nguema"},
+      {"date": "1996", "title": "Intento de Golpe", "detail": "Intento de golpe contra Obiang es sofocado"},
+      {"date": "2011", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución"},
+      {"date": "2022", "title": "Reelección de Obiang", "detail": "Teodoro Obiang reelegido en elecciones controvertidas"}
+    ]
+  },
+  {
+    "id": 28,
+    "country": "República Centroafricana",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de RCA", "detail": "Independencia de Francia, David Dacko presidente"},
+      {"date": "1966", "title": "Golpe de Bokassa", "detail": "Jean-Bédel Bokassa derroca a Dacko"},
+      {"date": "1976", "title": "Coronación de Bokassa", "detail": "Bokassa se corona emperador"},
+      {"date": "1979", "title": "Golpe contra Bokassa", "detail": "Golpe derroca al emperador Bokassa"},
+      {"date": "2013", "title": "Golpe de Djotodia", "detail": "Michel Djotodia asume poder tras golpe"}
+    ]
+  },
+  {
+    "id": 29,
+    "country": "República Democrática del Congo",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia del Congo", "detail": "Independencia de Bélgica, Patrice Lumumba primer ministro"},
+      {"date": "1961", "title": "Asesinato de Lumumba", "detail": "Patrice Lumumba es asesinado"},
+      {"date": "1965", "title": "Golpe de Mobutu", "detail": "Joseph Mobutu derroca al presidente Kasavubu"},
+      {"date": "1997", "title": "Caída de Mobutu", "detail": "Laurent-Désiré Kabila derroca a Mobutu"},
+      {"date": "2018", "title": "Elecciones Democráticas", "detail": "Félix Tshisekedi gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 30,
+    "country": "República del Congo",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia del Congo", "detail": "Independencia de Francia, Fulbert Youlou presidente"},
+      {"date": "1963", "title": "Golpe contra Youlou", "detail": "Golpe derroca al presidente Youlou"},
+      {"date": "1968", "title": "Golpe de Ngouabi", "detail": "Marien Ngouabi asume poder tras golpe"},
+      {"date": "1992", "title": "Multipartidismo", "detail": "Transición a democracia multipartidista"},
+      {"date": "2016", "title": "Reelección de Sassou", "detail": "Denis Sassou Nguesso reelegido en elecciones controvertidas"}
+    ]
+  },
+  {
+    "id": 31,
+    "country": "Santo Tomé y Príncipe",
+    "efemerides": [
+      {"date": "1975", "title": "Independencia de STP", "detail": "Independencia de Portugal, Manuel Pinto da Costa presidente"},
+      {"date": "1991", "title": "Multipartidismo", "detail": "Transición a sistema multipartidista"},
+      {"date": "2003", "title": "Golpe Fallido", "detail": "Intento de golpe militar es sofocado"},
+      {"date": "2011", "title": "Elecciones Democráticas", "detail": "Evaristo Carvalho gana elecciones presidenciales"},
+      {"date": "2021", "title": "Reelección de Carvalho", "detail": "Carlos Vila Nova gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 32,
+    "country": "Burundi",
+    "efemerides": [
+      {"date": "1962", "title": "Independencia de Burundi", "detail": "Independencia de Bélgica, Mwami Mwambutsa IV rey"},
+      {"date": "1966", "title": "Golpe de Micombero", "detail": "Golpe militar establece república"},
+      {"date": "1972", "title": "Genocidio Hutu", "detail": "Masacre de hutus por tutsis"},
+      {"date": "1993", "title": "Asesinato de Ndadaye", "detail": "Presidente Melchior Ndadaye asesinado"},
+      {"date": "2005", "title": "Elecciones Democráticas", "detail": "Pierre Nkurunziza gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 33,
+    "country": "Comoras",
+    "efemerides": [
+      {"date": "1975", "title": "Independencia de Comoras", "detail": "Independencia de Francia, Ahmed Abdallah presidente"},
+      {"date": "1978", "title": "Golpe de Abdallah", "detail": "Ahmed Abdallah asume poder tras golpe"},
+      {"date": "1989", "title": "Asesinato de Abdallah", "detail": "Presidente Abdallah es asesinado"},
+      {"date": "1995", "title": "Golpe de Taki", "detail": "Said Mohamed Djohar derroca al presidente"},
+      {"date": "2006", "title": "Elecciones Democráticas", "detail": "Ahmed Abdallah Mohamed gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 34,
+    "country": "Yibuti",
+    "efemerides": [
+      {"date": "1977", "title": "Independencia de Yibuti", "detail": "Independencia de Francia, Hassan Gouled Aptidon presidente"},
+      {"date": "1999", "title": "Muerte de Aptidon", "detail": "Ismaïl Omar Guelleh asume la presidencia"},
+      {"date": "2005", "title": "Reelección de Guelleh", "detail": "Guelleh reelegido en elecciones presidenciales"},
+      {"date": "2015", "title": "Reelección de Guelleh", "detail": "Guelleh reelegido por tercera vez"},
+      {"date": "2021", "title": "Reelección de Guelleh", "detail": "Guelleh reelegido por cuarta vez"}
+    ]
+  },
+  {
+    "id": 35,
+    "country": "Eritrea",
+    "efemerides": [
+      {"date": "1991", "title": "Liberación de Asmara", "detail": "Fuerzas eritreas liberan la capital Asmara"},
+      {"date": "1993", "title": "Independencia de Eritrea", "detail": "Referéndum confirma independencia de Etiopía"},
+      {"date": "1998", "title": "Guerra con Etiopía", "detail": "Conflicto fronterizo con Etiopía"},
+      {"date": "2000", "title": "Acuerdos de Paz", "detail": "Acuerdos de paz terminan guerra con Etiopía"},
+      {"date": "2018", "title": "Apertura Diplomática", "detail": "Eritrea reabre embajadas y normaliza relaciones"}
+    ]
+  },
+  {
+    "id": 36,
+    "country": "Etiopía",
+    "efemerides": [
+      {"date": "1948", "title": "Relaciones con Venezuela", "detail": "Venezuela establece relaciones diplomáticas con Etiopía"},
+      {"date": "1974", "title": "Revolución Etíope", "detail": "Derrocamiento del emperador Haile Selassie"},
+      {"date": "1977", "title": "Golpe de Mengistu", "detail": "Mengistu Haile Mariam asume poder"},
+      {"date": "1991", "title": "Caída de Mengistu", "detail": "Fuerzas rebeldes derrocan al régimen"},
+      {"date": "2018", "title": "Reformas de Abiy", "detail": "Abiy Ahmed inicia reformas políticas y económicas"}
+    ]
+  },
+  {
+    "id": 37,
+    "country": "Kenia",
+    "efemerides": [
+      {"date": "1963", "title": "Independencia de Kenia", "detail": "Independencia del Reino Unido, Jomo Kenyatta presidente"},
+      {"date": "1978", "title": "Muerte de Kenyatta", "detail": "Daniel arap Moi asume la presidencia"},
+      {"date": "2002", "title": "Elecciones Democráticas", "detail": "Mwai Kibaki gana elecciones presidenciales"},
+      {"date": "2007", "title": "Crisis Post-Electoral", "detail": "Violencia tras elecciones disputadas"},
+      {"date": "2010", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución democrática"}
+    ]
+  },
+  {
+    "id": 38,
+    "country": "Madagascar",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Madagascar", "detail": "Independencia de Francia, Philibert Tsiranana presidente"},
+      {"date": "1972", "title": "Revolución de 1972", "detail": "Protestas estudiantiles derrocan al presidente"},
+      {"date": "1975", "title": "Golpe de Ratsiraka", "detail": "Didier Ratsiraka asume poder tras golpe"},
+      {"date": "1991", "title": "Transición Democrática", "detail": "Transición a democracia multipartidista"},
+      {"date": "2009", "title": "Golpe de Rajoelina", "detail": "Andry Rajoelina derroca al presidente Ravalomanana"}
+    ]
+  },
+  {
+    "id": 39,
+    "country": "Malaui",
+    "efemerides": [
+      {"date": "1964", "title": "Independencia de Malaui", "detail": "Independencia del Reino Unido, Hastings Banda presidente"},
+      {"date": "1994", "title": "Multipartidismo", "detail": "Transición a sistema multipartidista"},
+      {"date": "1999", "title": "Muerte de Banda", "detail": "Bakili Muluzi asume la presidencia"},
+      {"date": "2012", "title": "Elecciones Democráticas", "detail": "Joyce Banda gana elecciones presidenciales"},
+      {"date": "2014", "title": "Elecciones de Mutharika", "detail": "Peter Mutharika gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 40,
+    "country": "Mauricio",
+    "efemerides": [
+      {"date": "1968", "title": "Independencia de Mauricio", "detail": "Independencia del Reino Unido, Seewoosagur Ramgoolam primer ministro"},
+      {"date": "1992", "title": "República de Mauricio", "detail": "Transición a república con presidente ceremonial"},
+      {"date": "2003", "title": "Elecciones Democráticas", "detail": "Paul Bérenger gana elecciones"},
+      {"date": "2010", "title": "Elecciones de Jugnauth", "detail": "Anerood Jugnauth gana elecciones presidenciales"},
+      {"date": "2019", "title": "Elecciones de Ramkalawan", "detail": "Prithvirajsing Roopun gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 41,
+    "country": "Mozambique",
+    "efemerides": [
+      {"date": "1975", "title": "Independencia de Mozambique", "detail": "Independencia de Portugal, Samora Machel presidente"},
+      {"date": "1986", "title": "Muerte de Machel", "detail": "Accidente aéreo mata al presidente Machel"},
+      {"date": "1990", "title": "Nueva Constitución", "detail": "Adopción de constitución democrática"},
+      {"date": "1994", "title": "Elecciones Democráticas", "detail": "Joaquim Chissano gana elecciones presidenciales"},
+      {"date": "2015", "title": "Elecciones de Nyusi", "detail": "Filipe Nyusi gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 42,
+    "country": "Ruanda",
+    "efemerides": [
+      {"date": "1962", "title": "Independencia de Ruanda", "detail": "Independencia de Bélgica, Grégoire Kayibanda presidente"},
+      {"date": "1973", "title": "Golpe de Habyarimana", "detail": "Juvénal Habyarimana derroca al presidente"},
+      {"date": "1994", "title": "Genocidio Ruandés", "detail": "Genocidio contra tutsis, muerte de Habyarimana"},
+      {"date": "1994", "title": "Liberación de Kigali", "detail": "FPR libera Kigali, fin del genocidio"},
+      {"date": "2003", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución democrática"}
+    ]
+  },
+  {
+    "id": 43,
+    "country": "Seychelles",
+    "efemerides": [
+      {"date": "1976", "title": "Independencia de Seychelles", "detail": "Independencia del Reino Unido, James Mancham presidente"},
+      {"date": "1977", "title": "Golpe de René", "detail": "France-Albert René derroca al presidente"},
+      {"date": "1991", "title": "Multipartidismo", "detail": "Transición a sistema multipartidista"},
+      {"date": "2004", "title": "Elecciones Democráticas", "detail": "James Michel gana elecciones presidenciales"},
+      {"date": "2016", "title": "Elecciones de Ramkalawan", "detail": "Danny Faure gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 44,
+    "country": "Somalia",
+    "efemerides": [
+      {"date": "1960", "title": "Independencia de Somalia", "detail": "Unificación de Somalilandia y Somalia Italiana"},
+      {"date": "1969", "title": "Golpe de Siad Barre", "detail": "Mohamed Siad Barre derroca al presidente"},
+      {"date": "1991", "title": "Caída de Siad Barre", "detail": "Clan Ali Mahdi declara república"},
+      {"date": "2000", "title": "Transición Federal", "detail": "Conferencia de Arta establece gobierno federal"},
+      {"date": "2012", "title": "Nueva Constitución", "detail": "Adopción de constitución federal"}
+    ]
+  },
+  {
+    "id": 45,
+    "country": "Sudán del Sur",
+    "efemerides": [
+      {"date": "2011", "title": "Independencia de Sudán del Sur", "detail": "Referéndum confirma independencia de Sudán"},
+      {"date": "2013", "title": "Conflicto Interno", "detail": "Lucha por poder entre Kiir y Machar"},
+      {"date": "2015", "title": "Acuerdos de Paz", "detail": "Acuerdos de paz entre facciones rivales"},
+      {"date": "2018", "title": "Formación de Gobierno", "detail": "Gobierno de unidad nacional formado"},
+      {"date": "2020", "title": "Elecciones Postergadas", "detail": "Elecciones presidenciales postergadas por conflicto"}
+    ]
+  },
+  {
+    "id": 46,
+    "country": "Tanzania",
+    "efemerides": [
+      {"date": "1961", "title": "Independencia de Tanganica", "detail": "Independencia del Reino Unido, Julius Nyerere presidente"},
+      {"date": "1964", "title": "Unión con Zanzíbar", "detail": "Tanganica y Zanzíbar se unen formando Tanzania"},
+      {"date": "1967", "title": "Declaración de Arusha", "detail": "Política de socialismo ujamaa"},
+      {"date": "1985", "title": "Muerte de Nyerere", "detail": "Ali Hassan Mwinyi asume la presidencia"},
+      {"date": "1995", "title": "Elecciones Democráticas", "detail": "Benjamin Mkapa gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 47,
+    "country": "Uganda",
+    "efemerides": [
+      {"date": "1962", "title": "Independencia de Uganda", "detail": "Independencia del Reino Unido, Milton Obote primer ministro"},
+      {"date": "1966", "title": "Golpe de Obote", "detail": "Obote derroca al rey Mutesa II"},
+      {"date": "1971", "title": "Golpe de Amin", "detail": "Idi Amin derroca a Obote"},
+      {"date": "1979", "title": "Caída de Amin", "detail": "Ejército tanzano derroca a Amin"},
+      {"date": "1986", "title": "Golpe de Museveni", "detail": "Yoweri Museveni asume poder tras guerra civil"}
+    ]
+  },
+  {
+    "id": 48,
+    "country": "Angola",
+    "efemerides": [
+      {"date": "1975", "title": "Independencia de Angola", "detail": "Independencia de Portugal tras guerra civil"},
+      {"date": "1979", "title": "Muerte de Neto", "detail": "José Eduardo dos Santos asume la presidencia"},
+      {"date": "1991", "title": "Acuerdos de Paz", "detail": "Fin de la guerra civil con acuerdos de Bicesse"},
+      {"date": "2002", "title": "Fin de la Guerra", "detail": "Fin definitivo de la guerra civil"},
+      {"date": "2017", "title": "Elecciones de Lourenço", "detail": "João Lourenço gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 49,
+    "country": "Botsuana",
+    "efemerides": [
+      {"date": "1966", "title": "Independencia de Botsuana", "detail": "Independencia del Reino Unido, Seretse Khama presidente"},
+      {"date": "1980", "title": "Muerte de Khama", "detail": "Quett Masire asume la presidencia"},
+      {"date": "1998", "title": "Elecciones Democráticas", "detail": "Festus Mogae gana elecciones presidenciales"},
+      {"date": "2008", "title": "Elecciones de Khama", "detail": "Ian Khama gana elecciones presidenciales"},
+      {"date": "2018", "title": "Elecciones de Masisi", "detail": "Mokgweetsi Masisi gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 50,
+    "country": "Esuatini",
+    "efemerides": [
+      {"date": "1968", "title": "Independencia de Suazilandia", "detail": "Independencia del Reino Unido, Sobhuza II rey"},
+      {"date": "1973", "title": "Suspensión de Constitución", "detail": "Rey Sobhuza suspende la constitución"},
+      {"date": "1986", "title": "Muerte de Sobhuza", "detail": "Mswati III asume el trono"},
+      {"date": "2005", "title": "Nueva Constitución", "detail": "Adopción de nueva constitución"},
+      {"date": "2018", "title": "Elecciones Parlamentarias", "detail": "Elecciones parlamentarias bajo monarquía absoluta"}
+    ]
+  },
+  {
+    "id": 51,
+    "country": "Lesoto",
+    "efemerides": [
+      {"date": "1966", "title": "Independencia de Lesoto", "detail": "Independencia del Reino Unido, Leabua Jonathan primer ministro"},
+      {"date": "1970", "title": "Golpe de Jonathan", "detail": "Jonathan derroca al rey Moshoeshoe II"},
+      {"date": "1986", "title": "Golpe Militar", "detail": "Golpe militar derroca al gobierno"},
+      {"date": "1993", "title": "Restauración Democrática", "detail": "Restauración de la monarquía constitucional"},
+      {"date": "2017", "title": "Elecciones de Thabane", "detail": "Thomas Thabane gana elecciones primarias"}
+    ]
+  },
+  {
+    "id": 52,
+    "country": "Namibia",
+    "efemerides": [
+      {"date": "1990", "title": "Independencia de Namibia", "detail": "Independencia de Sudáfrica, Sam Nujoma presidente"},
+      {"date": "2005", "title": "Muerte de Nujoma", "detail": "Hifikepunye Pohamba asume la presidencia"},
+      {"date": "2015", "title": "Elecciones de Geingob", "detail": "Hage Geingob gana elecciones presidenciales"},
+      {"date": "2017", "title": "Muerte de Geingob", "detail": "Hage Geingob muere en el cargo"},
+      {"date": "2024", "title": "Elecciones de Nandi-Ndaitwah", "detail": "Netumbo Nandi-Ndaitwah gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 53,
+    "country": "Sudáfrica",
+    "efemerides": [
+      {"date": "1994", "title": "Elecciones Democráticas", "detail": "Primeras elecciones multirraciales, Nelson Mandela presidente"},
+      {"date": "1999", "title": "Elecciones de Mbeki", "detail": "Thabo Mbeki gana elecciones presidenciales"},
+      {"date": "2008", "title": "Elecciones de Zuma", "detail": "Jacob Zuma gana elecciones presidenciales"},
+      {"date": "2018", "title": "Elecciones de Ramaphosa", "detail": "Cyril Ramaphosa gana elecciones presidenciales"},
+      {"date": "2024", "title": "Reelección de Ramaphosa", "detail": "Cyril Ramaphosa reelegido en elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 54,
+    "country": "Zambia",
+    "efemerides": [
+      {"date": "1964", "title": "Independencia de Zambia", "detail": "Independencia del Reino Unido, Kenneth Kaunda presidente"},
+      {"date": "1991", "title": "Multipartidismo", "detail": "Transición a sistema multipartidista"},
+      {"date": "2001", "title": "Elecciones de Mwanawasa", "detail": "Levy Mwanawasa gana elecciones presidenciales"},
+      {"date": "2011", "title": "Elecciones de Sata", "detail": "Michael Sata gana elecciones presidenciales"},
+      {"date": "2016", "title": "Elecciones de Lungu", "detail": "Edgar Lungu gana elecciones presidenciales"}
+    ]
+  },
+  {
+    "id": 55,
+    "country": "Zimbabue",
+    "efemerides": [
+      {"date": "1980", "title": "Independencia de Zimbabue", "detail": "Independencia del Reino Unido, Robert Mugabe primer ministro"},
+      {"date": "1987", "title": "Muerte de Muzorewa", "detail": "Mugabe asume presidencia tras muerte de Muzorewa"},
+      {"date": "2000", "title": "Reforma Agraria", "detail": "Inicio de reforma agraria controvertida"},
+      {"date": "2017", "title": "Golpe contra Mugabe", "detail": "Ejército derroca al presidente Mugabe"},
+      {"date": "2018", "title": "Elecciones de Mnangagwa", "detail": "Emmerson Mnangagwa gana elecciones presidenciales"}
+    ]
+  }
+]

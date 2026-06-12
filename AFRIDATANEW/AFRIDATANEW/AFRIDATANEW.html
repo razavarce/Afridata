@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afridata Consulting - Global Intelligence</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Map Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/datamaps/0.5.9/datamaps.world.min.js"></script>
+
+    <style>
+        :root {
+            --africa-accent: #CD7F32; 
+            --africa-bg-dark: #0a0a0a; 
+            --africa-gold-text: #E5C299; 
+            --africa-card-bg: rgba(10, 10, 10, 0.85); 
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--africa-bg-dark);
+            color: #f8f8f8;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .brand-title {
+            font-family: 'Syncopate', sans-serif;
+            letter-spacing: 0.3em;
+            background: linear-gradient(to right, #ffffff, var(--africa-gold-text));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dev-status-tag {
+            font-size: 9px;
+            letter-spacing: 0.2em;
+            padding: 2px 8px;
+            border: 1px solid rgba(205, 127, 50, 0.5);
+            color: var(--africa-accent);
+            text-transform: uppercase;
+            border-radius: 4px;
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; border-color: #ffffff; }
+            100% { opacity: 0.5; }
+        }
+
+        .glass-panel {
+            background: var(--africa-card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(229, 194, 153, 0.15);
+        }
+
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.8s cubic-bezier(0.87, 0, 0.13, 1);
+            overflow: hidden;
+        }
+
+        .login-bg-container {
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+        }
+
+        .login-bg-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4) saturate(0.8);
+            animation: kenburns 40s infinite alternate;
+        }
+
+        @keyframes kenburns {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        .login-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.0) 100%);
+        }
+
+        #login-screen.hidden-auth { transform: translateY(-100%); }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(229, 194, 153, 0.2);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            width: 100%;
+            outline: none;
+        }
+
+        .login-error {
+            display: none;
+            margin-top: 12px;
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            text-align: left;
+        }
+
+        .filter-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(205, 127, 50, 0.3);
+            color: #E5C299;
+            padding: 10px;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 11px;
+            text-transform: uppercase;
+            outline: none;
+        }
+
+        .lang-btn {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+        }
+
+        .lang-btn.active {
+            border-color: var(--africa-accent);
+            color: var(--africa-accent);
+            background: rgba(205, 127, 50, 0.1);
+        }
+
+        #main-map-area {
+            position: relative;
+            background-image: url('https://imgur.com/shgm9Wm.png');
+			background-color:#03FC46;
+            background-size: cover;
+            background-position: center;
+        }
+
+        #main-map-area::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+			/* CAMBIA EL COLOR DE LA CAPA (Amarillo con opacidad 0.30) */
+            background: rgba(0, 0, 0, 0.5); 
+            backdrop-filter: grayscale(0.5);
+            z-index: 1;
+        }
+
+        #africa-map-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+        }
+
+        /* Marcadores estables sin salto */
+        .flag-marker {
+            cursor: pointer;
+            transition: filter 0.2s ease-in-out;
+            pointer-events: all;
+        }
+
+        .flag-marker:hover { 
+            filter: brightness(1.4);
+            /* Eliminamos transform scale para evitar el salto */
+        }
+
+        .data-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--africa-accent);
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-section {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 0.75rem;
+        }
+
+        .info-text {
+            font-size: 0.85rem;
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+
+        .cultural-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .culture-thumb {
+            aspect-ratio: 1/1;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #111;
+        }
+
+        .culture-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.7;
+            transition: all 0.4s ease;
+        }
+
+        .culture-thumb:hover img {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .country-item {
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(205, 127, 50, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .country-item:hover {
+            background: rgba(205, 127, 50, 0.1);
+            border-color: rgba(205, 127, 50, 0.5);
+            transform: translateX(5px);
+        }
+
+        .country-item img {
+            width: 24px;
+            height: 18px;
+            border-radius: 2px;
+        }
+
+        .country-item-text {
+            flex: 1;
+            font-size: 0.8rem;
+        }
+
+        .country-item-name {
+            font-weight: 600;
+            color: white;
+        }
+
+        .country-item-code {
+            font-size: 0.7rem;
+            color: #CD7F32;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--africa-accent); border-radius: 10px; }
+        
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-bg-container">
+            <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=2044" class="login-bg-image">
+            <div class="login-overlay"></div>
+        </div>
+        <div class="glass-panel p-10 rounded-[2rem] w-full max-w-sm text-center shadow-2xl relative z-10">
+            <div class="dev-status-tag inline-block mb-6" data-i18n="devStatus">Página en Desarrollo</div>
+            <h1 class="brand-title text-3xl mb-8">AFRIDATA</h1>
+            <form id="login-form" class="space-y-4">
+                <input type="text" id="username" class="input-field" placeholder="Usuario" data-i18n-placeholder="userPlaceholder" required>
+                <input type="password" id="password" class="input-field" placeholder="Contraseña" data-i18n-placeholder="passPlaceholder" required>
+                <button type="submit" class="w-full py-3 bg-orange-700 text-white rounded-xl font-bold uppercase tracking-widest hover:bg-orange-600 transition-colors" data-i18n="enterBtn">Entrar</button>
+            </form>
+                <div id="loginError" class="login-error">
+                    <i data-feather="alert-circle" class="inline-block w-4 h-4 mr-2"></i> Usuario o contraseña incorrectos
+                </div>
+                <p class="text-xs text-white/50 mt-4">Credenciales de prueba: <strong>admin/admin</strong> o <strong>viewer/viewer</strong></p>
+        </div>
+    </div>
+
+    <!-- Main Header -->
+    <header class="bg-black border-b border-white/10 p-4 px-8 flex justify-between items-center z-50">
+        <div class="flex items-center space-x-4">
+            <h1 class="brand-title text-lg">AFRIDATA GLOBAL</h1>
+            <span class="dev-status-tag" data-i18n="devStatus">Página en Desarrollo</span>
+        </div>
+        
+        <div class="flex items-center space-x-6">
+            <div class="flex space-x-2 border-r border-white/10 pr-6">
+                <button onclick="setLanguage('es')" id="btn-es" class="lang-btn active">ES</button>
+                <button onclick="setLanguage('en')" id="btn-en" class="lang-btn">EN</button>
+                <button onclick="setLanguage('fr')" id="btn-fr" class="lang-btn">FR</button>
+            </div>
+            
+            <div id="user-info" class="text-[10px] uppercase tracking-widest text-orange-200"></div>
+            <button onclick="doLogout()" class="text-[10px] uppercase text-white/40 hover:text-white" data-i18n="exitBtn">Salir</button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-[1000px] border-r border-white/10 p-6 bg-black/50 overflow-y-auto z-10">
+            <div class="mb-6">
+                <span class="data-label text-white/40" data-i18n="intelligenceFilter">Filtro de Inteligencia</span>
+                <select id="region-filter" class="filter-select">
+                    <option value="all" data-i18n="regAll">Continente Completo (55)</option>
+                    <option value="North" data-i18n="regNorth">África del Norte</option>
+                    <option value="West" data-i18n="regWest">África Occidental</option>
+                    <option value="Central" data-i18n="regCentral">África Central</option>
+                    <option value="East" data-i18n="regEast">África Oriental</option>
+                    <option value="South" data-i18n="regSouth">África Austral</option>
+                </select>
+            </div>
+            <div class="mb-6">
+                <span class="data-label text-white/40">Buscar País</span>
+                <input id="search-input" class="input-field" type="text" placeholder="Buscar país, región o etiqueta..." oninput="filterCountries()">
+            </div>
+
+            <div id="selection-placeholder" class="py-20 text-center opacity-30">
+                <i data-feather="globe" class="mx-auto mb-4 w-12 h-12"></i>
+                <p class="text-xs uppercase tracking-[0.2em]" data-i18n="selectNode">Seleccione un nodo para desglosar datos</p>
+            </div>
+
+            <div id="selection-card" class="hidden animate-fadeIn">
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mb-4 gap-2">
+                    <button onclick="previousCountry()" class="flex-1 px-3 py-2 bg-orange-700/30 hover:bg-orange-700 border border-orange-500 text-white text-xs rounded-lg transition-all">
+                        <i data-feather="chevron-left" class="w-3 h-3 inline mr-1"></i>Anterior
+                    </button>
+                    <button onclick="toggleAllCountries()" class="flex-1 px-3 py-2 bg-blue-700/30 hover:bg-blue-700 border border-blue-500 text-white text-xs rounded-lg transition-all">
+                        <i data-feather="list" class="w-3 h-3 inline mr-1"></i>Lista
+                    </button>
+                    <button onclick="nextCountry()" class="flex-1 px-3 py-2 bg-orange-700/30 hover:bg-orange-700 border border-orange-500 text-white text-xs rounded-lg transition-all">
+                        Siguiente<i data-feather="chevron-right" class="w-3 h-3 inline ml-1"></i>
+                    </button>
+                </div>
+
+                <div class="mb-6">
+                    <h2 id="side-name" class="text-3xl font-bold text-white mb-1">País</h2>
+                    <p id="side-capital" class="text-blue-400 text-[10px] tracking-widest font-bold uppercase mb-2">CAPITAL</p>
+                    <p id="side-iso" class="text-orange-500 text-[10px] tracking-widest font-bold uppercase">IDENTIFICADOR</p>
+                </div>
+
+                <img id="side-flag" class="w-full h-40 object-cover rounded-2xl mb-6 border border-white/10 shadow-lg">
+                
+                <!-- Autoridades -->
+                <div class="mb-6">
+                    <span class="data-label"><i data-feather="users" class="w-3 h-3 mr-2"></i>Autoridades</span>
+                    <p id="side-autoridades" class="info-text bg-black/30 p-2 rounded text-[0.75rem]">-</p>
+                </div>
+
+                <!-- Embajada -->
+                <div class="mb-6">
+                    <span class="data-label"><i data-feather="map-pin" class="w-3 h-3 mr-2"></i>Embajada de Venezuela</span>
+                    <p id="side-embajada" class="info-text bg-black/30 p-2 rounded text-[0.75rem]">-</p>
+                </div>
+
+                <!-- Registros Fotográficos -->
+                <div class="mb-6">
+                    <span class="data-label"><i data-feather="camera" class="w-3 h-3 mr-2"></i><span>Registros Fotográficos</span></span>
+                    <div id="side-gallery" class="cultural-gallery"></div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="info-section"><span class="data-label">Idioma</span><p id="side-idioma" class="info-text text-[0.8rem]">-</p></div>
+                        <div class="info-section"><span class="data-label">Religión</span><p id="side-religion" class="info-text text-[0.8rem]">-</p></div>
+                    </div>
+                    
+                    <!-- Acuerdos Bilaterales -->
+                    <div class="info-section"><span class="data-label"><i data-feather="handshake" class="w-3 h-3 mr-1 inline"></i>Acuerdos Bilaterales</span><p id="side-bilaterales" class="info-text text-[0.75rem] mt-2">-</p></div>
+                    
+                    <!-- Acuerdos Multilaterales -->
+                    <div class="info-section"><span class="data-label"><i data-feather="globe" class="w-3 h-3 mr-1 inline"></i>Acuerdos Multilaterales</span><p id="side-acuerdos" class="info-text text-[0.75rem] mt-2">-</p></div>
+                    
+                    <!-- Hitos Históricos con Venezuela -->
+                    <div class="info-section"><span class="data-label"><i data-feather="award" class="w-3 h-3 mr-1 inline"></i>Hitos Históricos</span><p id="side-historia" class="info-text text-[0.75rem] mt-2">-</p></div>
+                    
+                    <!-- Relación con Venezuela -->
+                    <div class="info-section border-l-4 border-yellow-600 bg-yellow-600/5"><span class="data-label text-yellow-500"><i data-feather="heart" class="w-3 h-3 mr-1 inline"></i>Relación con Venezuela</span><p id="side-venezuela" class="info-text text-[0.75rem] mt-2">-</p></div>
+                    
+                    <!-- Recursos Principales -->
+                    <div class="info-section"><span class="data-label"><i data-feather="trending-up" class="w-3 h-3 mr-1 inline"></i>Recursos Principales</span><div id="side-recursos" class="flex flex-wrap gap-2 mt-2"></div></div>
+                </div>
+            </div>
+
+            <!-- Modal para lista de países -->
+            <div id="countries-modal" class="hidden fixed inset-0 bg-black/80 z-[10001] flex items-center justify-center p-4">
+                <div class="glass-panel rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                    <div class="sticky top-0 glass-panel p-4 flex justify-between items-center border-b border-white/10">
+                        <h3 class="text-lg font-bold text-white">55 Países Africanos</h3>
+                        <button onclick="toggleAllCountries()" class="text-white/50 hover:text-white">
+                            <i data-feather="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <div id="countries-list" class="p-4 grid grid-cols-1 gap-2"></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Map Main View -->
+        <main id="main-map-area" class="flex-1 relative overflow-hidden bg-black">
+            <div id="africa-map-container"></div>
+            <div class="absolute bottom-6 right-6 p-4 glass-panel rounded-xl z-10 pointer-events-none">
+                <p class="text-[10px] uppercase text-orange-400 font-bold mb-1" data-i18n="activeDb">Base de Datos Activa</p>
+                <p id="stats-counter" class="text-white text-xs">Sincronizando 55 Naciones</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const translations = {
+            es: {
+                devStatus: "Página en Desarrollo",
+                userPlaceholder: "Usuario",
+                passPlaceholder: "Contraseña",
+                enterBtn: "Entrar",
+                exitBtn: "Salir",
+                intelligenceFilter: "Filtro de Inteligencia",
+                regAll: "Continente Completo (55)",
+                regNorth: "África del Norte",
+                regWest: "África Occidental",
+                regCentral: "África Central",
+                regEast: "África Oriental",
+                regSouth: "África Austral",
+                selectNode: "Seleccione un nodo para desglosar datos",
+                photoRecords: "Registros Fotográficos",
+                labelLang: "Idioma",
+                labelRel: "Religión",
+                labelBil: "Compromisos Bilaterales",
+                labelEco: "Acuerdos Económicos/Culturales",
+                labelHist: "Reseña Histórica Presidencial",
+                labelVen: "Relación con Venezuela",
+                labelRes: "Recursos Principales",
+                activeDb: "Base de Datos Activa",
+                syncing: "Sincronizando {n} Naciones",
+                idLabel: "IDENTIFICADOR"
+            },
+            en: {
+                devStatus: "Page Under Development",
+                userPlaceholder: "Username",
+                passPlaceholder: "Password",
+                enterBtn: "Login",
+                exitBtn: "Logout",
+                intelligenceFilter: "Intelligence Filter",
+                regAll: "Entire Continent (55)",
+                regNorth: "North Africa",
+                regWest: "West Africa",
+                regCentral: "Central Africa",
+                regEast: "East Africa",
+                regSouth: "Southern Africa",
+                selectNode: "Select a node to break down data",
+                photoRecords: "Photographic Records",
+                labelLang: "Language",
+                labelRel: "Religion",
+                labelBil: "Bilateral Commitments",
+                labelEco: "Economic/Cultural Agreements",
+                labelHist: "Presidential Historical Overview",
+                labelVen: "Relationship with Venezuela",
+                labelRes: "Main Resources",
+                activeDb: "Active Database",
+                syncing: "Syncing {n} Nations",
+                idLabel: "IDENTIFIER"
+            },
+            fr: {
+                devStatus: "Page en Développement",
+                userPlaceholder: "Utilisateur",
+                passPlaceholder: "Mot de passe",
+                enterBtn: "Entrer",
+                exitBtn: "Quitter",
+                intelligenceFilter: "Filtre d'Intelligence",
+                regAll: "Continent Complet (55)",
+                regNorth: "Afrique du Nord",
+                regWest: "Afrique de l'Ouest",
+                regCentral: "Afrique Centrale",
+                regEast: "Afrique de l'Est",
+                regSouth: "Afrique Australe",
+                selectNode: "Sélectionnez un nœud pour afficher les données",
+                photoRecords: "Archives Photographiques",
+                labelLang: "Langue",
+                labelRel: "Religion",
+                labelBil: "Engagements Bilatéraux",
+                labelEco: "Accords Économiques/Culturels",
+                labelHist: "Aperçu Historique Présidentiel",
+                labelVen: "Relation avec le Venezuela",
+                labelRes: "Ressources Principales",
+                activeDb: "Base de Données Active",
+                syncing: "Synchronisation de {n} Nations",
+                idLabel: "IDENTIFICATEUR"
+            }
+        };
+
+        let currentLang = 'es';
+        let currentSelectedCountry = null;
+        let currentUser = null;
+        let currentSearch = '';
+        let filteredCountries = [];
+        let currentCountryIndex = 0;
+        const users = [
+            { login: 'admin', password: 'admin', name: 'Administrador', role: 'admin' },
+            { login: 'viewer', password: 'viewer', name: 'Usuario Lectura', role: 'viewer' }
+        ];
+
+        // FULL DATABASE: 55 NATIONS
+        const fullAfricaData = [
+            { id: 'DZA', flag: 'dz', reg: 'North', lat: 28, lon: 3, name: { es: 'Argelia', en: 'Algeria', fr: 'Algérie' }, capital: { es: 'Argel', en: 'Algiers', fr: 'Alger' }, idioma: { es: 'Árabe', en: 'Arabic', fr: 'Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Socio OPEP. Relaciones comerciales fuertes.', en: 'OPEC Partner. Strong trade relations.', fr: 'Partenaire OPEP. Relations commerciales fortes.' }, acuerdos: { es: 'Unión del Magreb Árabe. OPEP. UA.', en: 'Arab Maghreb Union. OPEC. AU.', fr: 'Union du Maghreb Arabe. OPEP. UA.' }, historia: { es: 'Independencia 1962. Guerra de liberación. Revolución FLN.', en: 'Independence 1962. War of liberation. FLN Revolution.', fr: 'Indépendance 1962. Guerre de libération. Révolution FLN.' }, venezuela: { es: 'Aliado estratégico ALBA. Acuerdos energéticos. Apoyo en foros internacionales.', en: 'ALBA strategic ally. Energy agreements. Support in international forums.', fr: 'Allié stratégique ALBA. Accords énergétiques. Soutien aux forums internationaux.' }, autoridades: { es: 'Presidente: Abdelmadjid Tebboune | Primer Ministro: Nadir Larbaoui', en: 'President: Abdelmadjid Tebboune | Prime Minister: Nadir Larbaoui', fr: 'Président: Abdelmadjid Tebboune | Premier Ministre: Nadir Larbaoui' }, embajada: { es: 'Embajada de Venezuela en Argel. Zona de El Biar.', en: 'Venezuelan Embassy in Algiers. El Biar area.', fr: 'Ambassade du Venezuela à Alger. Zone El Biar.' }, hitos: { es: '1962: Independencia. 1976: Adopción Carta Nacional. 2019: Movimiento Hirak.', en: '1962: Independence. 1976: National Charter adoption. 2019: Hirak Movement.', fr: '1962: Indépendance. 1976: Adoption de la Charte nationale. 2019: Mouvement Hirak.' }, rec: { es: ['Petróleo', 'Gas', 'Fosfatos'], en: ['Oil', 'Gas', 'Phosphates'], fr: ['Pétrole', 'Gaz', 'Phosphates'] }, tags: ['sahara', 'casbah', 'tlemcen'] },
+            { id: 'AGO', flag: 'ao', reg: 'South', lat: -12.5, lon: 18.5, name: { es: 'Angola', en: 'Angola', fr: 'Angola' }, capital: { es: 'Luanda', en: 'Luanda', fr: 'Luanda' }, idioma: { es: 'Portugués', en: 'Portuguese', fr: 'Portugais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Socio OPEP. Acuerdos petrolíferos. Intercambio comercial.', en: 'OPEC Partner. Oil agreements. Trade exchange.', fr: 'Partenaire OPEP. Accords pétroliers. Échange commercial.' }, acuerdos: { es: 'OPEP, SADC, UA', en: 'OPEC, SADC, AU', fr: 'OPEP, SADC, UA' }, historia: { es: 'Independencia 1975. Post-guerra civil 1992-2002.', en: 'Independence 1975. Post-civil war 1992-2002.', fr: 'Indépendance 1975. Post-guerre civile 1992-2002.' }, venezuela: { es: 'Cooperación energética y diplomática ALBA.', en: 'Energy and diplomatic cooperation ALBA.', fr: 'Coopération énergétique et diplomatique ALBA.' }, autoridades: { es: 'Presidente: João Lourenço | Primer Ministro: Adalberto Costa Júnior', en: 'President: João Lourenço | Prime Minister: Adalberto Costa Júnior', fr: 'Président: João Lourenço | Premier Ministre: Adalberto Costa Júnior' }, embajada: { es: 'Embajada de Venezuela en Luanda. Zona Talatona.', en: 'Venezuelan Embassy in Luanda. Talatona area.', fr: 'Ambassade du Venezuela à Luanda. Zone Talatona.' }, hitos: { es: '1975: Independencia de Portugal. 1992-2002: Conflicto civil.', en: '1975: Independence from Portugal. 1992-2002: Civil conflict.', fr: '1975: Indépendance du Portugal. 1992-2002: Conflit civil.' }, rec: { es: ['Petróleo', 'Diamantes', 'Gas'], en: ['Oil', 'Diamonds', 'Gas'], fr: ['Pétrole', 'Diamants', 'Gaz'] }, tags: ['luanda', 'coast', 'oil'] },
+            { id: 'BEN', flag: 'bj', reg: 'West', lat: 9.3, lon: 2.3, name: { es: 'Benín', en: 'Benin', fr: 'Bénin' }, capital: { es: 'Porto Novo', en: 'Porto-Novo', fr: 'Porto-Novo' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Vudú/Cristiano', en: 'Voodoo/Christian', fr: 'Vaudou/Chrétien' }, bilaterales: { es: 'Diplomacia Sur-Sur. Cooperación comercial.', en: 'South-South Diplomacy. Trade cooperation.', fr: 'Diplomatie Sud-Sud. Coopération commerciale.' }, acuerdos: { es: 'CEDEAO, UA, OIF', en: 'ECOWAS, AU, OIF', fr: 'CEDEAO, UA, OIF' }, historia: { es: 'Ex-Dahomey. Reino histórico. Independencia 1960.', en: 'Former Dahomey. Historic kingdom. Independence 1960.', fr: 'Ancien Dahomey. Royaume historique. Indépendance 1960.' }, venezuela: { es: 'Apoyo agrícola y cooperación educativa.', en: 'Agricultural support and educational cooperation.', fr: 'Soutien agricole et coopération éducative.' }, autoridades: { es: 'Presidente: Patrice Talon | Primer Ministro: Rosine Sossou', en: 'President: Patrice Talon | Prime Minister: Rosine Sossou', fr: 'Président: Patrice Talon | Premier Ministre: Rosine Sossou' }, embajada: { es: 'Representación de Venezuela en Cotononú.', en: 'Venezuelan representation in Cotonou.', fr: 'Représentation du Venezuela à Cotonou.' }, hitos: { es: '1960: Independencia. 1967-1991: Gobierno militar. 1991: Transición democrática.', en: '1960: Independence. 1967-1991: Military rule. 1991: Democratic transition.', fr: '1960: Indépendance. 1967-1991: Gouvernement militaire. 1991: Transition démocratique.' }, rec: { es: ['Algodón', 'Marañón'], en: ['Cotton', 'Cashew'], fr: ['Coton', 'Anacarde'] }, tags: ['cotonou', 'voodoo', 'palm'] },
+            { id: 'BWA', flag: 'bw', reg: 'South', lat: -22.3, lon: 24.6, name: { es: 'Botsuana', en: 'Botswana', fr: 'Botswana' }, capital: { es: 'Gaborone', en: 'Gaborone', fr: 'Gaborone' }, idioma: { es: 'Setsuana/Inglés', en: 'Setswana/English', fr: 'Setswana/Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Estabilidad política. Economía emergente.', en: 'Political stability. Emerging economy.', fr: 'Stabilité politique. Économie émergente.' }, acuerdos: { es: 'SADC, UA, COMESA', en: 'SADC, AU, COMESA', fr: 'SADC, UA, COMESA' }, historia: { es: 'Independencia 1966. Democracia estable.', en: 'Independence 1966. Stable democracy.', fr: 'Indépendance 1966. Démocratie stable.' }, venezuela: { es: 'Relaciones comerciales en minería.', en: 'Trade relations in mining.', fr: 'Relations commerciales dans les mines.' }, autoridades: { es: 'Presidente: Mokgweetsi Masisi | Vicepresidente: Slumber Tsogwane', en: 'President: Mokgweetsi Masisi | Vice President: Slumber Tsogwane', fr: 'Président: Mokgweetsi Masisi | Vice-Président: Slumber Tsogwane' }, embajada: { es: 'Embajada de Venezuela en Gaborone.', en: 'Venezuelan Embassy in Gaborone.', fr: 'Ambassade du Venezuela à Gaborone.' }, hitos: { es: '1966: Independencia de Reino Unido. 1969-1980: Seretse Khama.', en: '1966: Independence from UK. 1969-1980: Seretse Khama.', fr: '1966: Indépendance du Royaume-Uni. 1969-1980: Seretse Khama.' }, rec: { es: ['Diamantes', 'Turismo', 'Carbón'], en: ['Diamonds', 'Tourism', 'Coal'], fr: ['Diamants', 'Tourisme', 'Charbon'] }, tags: ['safari', 'okavango', 'diamonds'] },
+            { id: 'BFA', flag: 'bf', reg: 'West', lat: 12.2, lon: -1.5, name: { es: 'Burkina Faso', en: 'Burkina Faso', fr: 'Burkina Faso' }, capital: { es: 'Uagadugú', en: 'Ouagadougou', fr: 'Ouagadougou' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Islam/Tradicional', en: 'Islam/Traditional', fr: 'Islam/Traditionnel' }, bilaterales: { es: 'Seguridad regional. Lucha contra terrorismo.', en: 'Regional security. Anti-terrorism struggle.', fr: 'Sécurité régionale. Lutte antiterroriste.' }, acuerdos: { es: 'CEDEAO, UA, UEMOA', en: 'ECOWAS, AU, WAEMU', fr: 'CEDEAO, UA, UEMOA' }, historia: { es: 'Thomas Sankara (1983-87). Revolución sankarista.', en: 'Thomas Sankara (1983-87). Sankarist revolution.', fr: 'Thomas Sankara (1983-87). Révolution sankariste.' }, venezuela: { es: 'Solidaridad revolucionaria y cooperación.', en: 'Revolutionary solidarity and cooperation.', fr: 'Solidarité révolutionnaire et coopération.' }, autoridades: { es: 'Presidente: Ibrahim Traoré | Primer Ministro: Rimtalba Jean Emmanuel Ouedraogo', en: 'President: Ibrahim Traoré | Prime Minister: Rimtalba Jean Emmanuel Ouedraogo', fr: 'Président: Ibrahim Traoré | Premier Ministre: Rimtalba Jean Emmanuel Ouedraogo' }, embajada: { es: 'Embajada de Venezuela en Uagadugú.', en: 'Venezuelan Embassy in Ouagadougou.', fr: 'Ambassade du Venezuela à Ouagadougou.' }, hitos: { es: '1960: Independencia. 1983: Revolución de Sankara. 2014: Levantamiento popular.', en: '1960: Independence. 1983: Sankara Revolution. 2014: Popular uprising.', fr: '1960: Indépendance. 1983: Révolution de Sankara. 2014: Soulèvement populaire.' }, rec: { es: ['Oro', 'Algodón', 'Zinc'], en: ['Gold', 'Cotton', 'Zinc'], fr: ['Or', 'Coton', 'Zinc'] }, tags: ['ouagadougou', 'sahel', 'gold'] },
+            { id: 'BDI', flag: 'bi', reg: 'East', lat: -3.3, lon: 29.9, name: { es: 'Burundi', en: 'Burundi', fr: 'Burundi' }, capital: { es: 'Gitega', en: 'Gitega', fr: 'Gitega' }, idioma: { es: 'Kirundi/Francés', en: 'Kirundi/French', fr: 'Kirundi/Français' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Paz regional. Resolución de conflictos.', en: 'Regional peace. Conflict resolution.', fr: 'Paix régionale. Résolution des conflits.' }, acuerdos: { es: 'EAC, SADC, UA', en: 'EAC, SADC, AU', fr: 'EAC, SADC, UA' }, historia: { es: 'Reino antiguo. Independencia 1962. Conflictos étnicos.', en: 'Ancient kingdom. Independence 1962. Ethnic conflicts.', fr: 'Ancien royaume. Indépendance 1962. Conflits ethniques.' }, venezuela: { es: 'Intercambio humanitario y cooperación.', en: 'Humanitarian exchange and cooperation.', fr: 'Échange humanitaire et coopération.' }, autoridades: { es: 'Presidente: Évariste Ndayishimiye | Primer Ministro: Gérard Niyibigira', en: 'President: Évariste Ndayishimiye | Prime Minister: Gérard Niyibigira', fr: 'Président: Évariste Ndayishimiye | Premier Ministre: Gérard Niyibigira' }, embajada: { es: 'Oficina de Cooperación de Venezuela en Burundi.', en: 'Venezuelan Cooperation Office in Burundi.', fr: 'Bureau de coopération du Venezuela au Burundi.' }, hitos: { es: '1962: Independencia. 1965: Crisis política. 1993-2005: Conflicto civil.', en: '1962: Independence. 1965: Political crisis. 1993-2005: Civil conflict.', fr: '1962: Indépendance. 1965: Crise politique. 1993-2005: Conflit civil.' }, rec: { es: ['Café', 'Té', 'Algodón'], en: ['Coffee', 'Tea', 'Cotton'], fr: ['Café', 'Thé', 'Coton'] }, tags: ['lake', 'drummers', 'bujumbura'] },
+            { id: 'CPV', flag: 'cv', reg: 'West', lat: 16, lon: -24, name: { es: 'Cabo Verde', en: 'Cape Verde', fr: 'Cap-Vert' }, capital: { es: 'Praia', en: 'Praia', fr: 'Praia' }, idioma: { es: 'Portugués', en: 'Portuguese', fr: 'Portugais' }, religion: { es: 'Catolicismo', en: 'Catholicism', fr: 'Catholicisme' }, bilaterales: { es: 'Insularidad. Conexión aérea y marítima.', en: 'Insularity. Air and sea connections.', fr: 'Insularité. Connexions aérienne et maritime.' }, acuerdos: { es: 'CEDEAO, UA, CPLP', en: 'ECOWAS, AU, CPLP', fr: 'CEDEAO, UA, CPLP' }, historia: { es: 'Independencia 1975. Estabilidad política.', en: 'Independence 1975. Political stability.', fr: 'Indépendance 1975. Stabilité politique.' }, venezuela: { es: 'Cooperación aérea y marítima.', en: 'Air and maritime cooperation.', fr: 'Coopération aérienne et maritime.' }, autoridades: { es: 'Presidente: José Maria Neves | Primer Ministro: Ulisses Correia e Silva', en: 'President: José Maria Neves | Prime Minister: Ulisses Correia e Silva', fr: 'Président: José Maria Neves | Premier Ministre: Ulisses Correia e Silva' }, embajada: { es: 'Representación de Venezuela en Praia.', en: 'Venezuelan representation in Praia.', fr: 'Représentation du Venezuela à Praia.' }, hitos: { es: '1975: Independencia de Portugal. 1980: Golpe de estado. 1991: Transición democrática.', en: '1975: Independence from Portugal. 1980: Coup. 1991: Democratic transition.', fr: '1975: Indépendance du Portugal. 1980: Coup d\'état. 1991: Transition démocratique.' }, rec: { es: ['Pesca', 'Turismo', 'Servicios'], en: ['Fishing', 'Tourism', 'Services'], fr: ['Pêche', 'Tourisme', 'Services'] }, tags: ['praia', 'ocean', 'islands'] },
+            { id: 'CMR', flag: 'cm', reg: 'Central', lat: 7.3, lon: 12.3, name: { es: 'Camerún', en: 'Cameroon', fr: 'Cameroun' }, capital: { es: 'Yaundé', en: 'Yaoundé', fr: 'Yaoundé' }, idioma: { es: 'Francés/Inglés', en: 'French/English', fr: 'Français/Anglais' }, religion: { es: 'Cristianismo/Islam', en: 'Christianity/Islam', fr: 'Christianisme/Islam' }, bilaterales: { es: 'Estratégico regional. Potencia africana.', en: 'Regional strategic power. African power.', fr: 'Puissance stratégique régionale. Puissance africaine.' }, acuerdos: { es: 'CEMAC, UA, OPEP', en: 'CEMAC, AU, OPEC', fr: 'CEMAC, UA, OPEP' }, historia: { es: 'Independencia 1960/61. África en miniatura.', en: 'Independence 1960/61. Africa in miniature.', fr: 'Indépendance 1960/61. Afrique en miniature.' }, venezuela: { es: 'Cooperación energética y comercial.', en: 'Energy and trade cooperation.', fr: 'Coopération énergétique et commerciale.' }, autoridades: { es: 'Presidente: Paul Biya | Primer Ministro: Joseph Ngute', en: 'President: Paul Biya | Prime Minister: Joseph Ngute', fr: 'Président: Paul Biya | Premier Ministre: Joseph Ngute' }, embajada: { es: 'Embajada de Venezuela en Yaundé.', en: 'Venezuelan Embassy in Yaoundé.', fr: 'Ambassade du Venezuela à Yaoundé.' }, hitos: { es: '1960: Independencia francesa. 1961: Independencia británica. 1972: Unión federal.', en: '1960: French independence. 1961: British independence. 1972: Federal union.', fr: '1960: Indépendance française. 1961: Indépendance britannique. 1972: Union fédérale.' }, rec: { es: ['Petróleo', 'Madera', 'Cacao'], en: ['Oil', 'Wood', 'Cocoa'], fr: ['Pétrole', 'Bois', 'Cacao'] }, tags: ['yaounde', 'mount', 'sahel'] },
+            { id: 'CAF', flag: 'cf', reg: 'Central', lat: 6.6, lon: 20.9, name: { es: 'Rep. Centroafricana', en: 'Central African Rep.', fr: 'Rép. Centrafricaine' }, capital: { es: 'Bangui', en: 'Bangui', fr: 'Bangui' }, idioma: { es: 'Sango/Francés', en: 'Sango/French', fr: 'Sango/Français' }, religion: { es: 'Cristianismo/Islam', en: 'Christianity/Islam', fr: 'Christianisme/Islam' }, bilaterales: { es: 'Paz y seguridad. Estabilización.', en: 'Peace and security. Stabilization.', fr: 'Paix et sécurité. Stabilisation.' }, acuerdos: { es: 'CEMAC, UA', en: 'CEMAC, AU', fr: 'CEMAC, UA' }, historia: { es: 'Independencia 1960. Desafíos políticos.', en: 'Independence 1960. Political challenges.', fr: 'Indépendance 1960. Défis politiques.' }, venezuela: { es: 'Cooperación humanitaria.', en: 'Humanitarian cooperation.', fr: 'Coopération humanitaire.' }, autoridades: { es: 'Presidente: Faustin-Archange Touadéra | Primer Ministro: Félix Moloua', en: 'President: Faustin-Archange Touadéra | Prime Minister: Félix Moloua', fr: 'Président: Faustin-Archange Touadéra | Premier Ministre: Félix Moloua' }, embajada: { es: 'Oficina de Cooperación en Bangui.', en: 'Cooperation Office in Bangui.', fr: 'Bureau de coopération à Bangui.' }, hitos: { es: '1960: Independencia. 1976-1979: Imperio Centroafricano. 2013-presente: Conflicto civil.', en: '1960: Independence. 1976-1979: Central African Empire. 2013-present: Civil conflict.', fr: '1960: Indépendance. 1976-1979: Empire centrafricain. 2013-présent: Conflit civil.' }, rec: { es: ['Diamantes', 'Oro', 'Uranio'], en: ['Diamonds', 'Gold', 'Uranium'], fr: ['Diamants', 'Or', 'Uranium'] }, tags: ['bangui', 'wildlife', 'river'] },
+            { id: 'TCD', flag: 'td', reg: 'Central', lat: 15.4, lon: 18.7, name: { es: 'Chad', en: 'Chad', fr: 'Tchad' }, capital: { es: 'Yamena', en: "N'Djamena", fr: "N'Djaména" }, idioma: { es: 'Francés/Árabe', en: 'French/Arabic', fr: 'Français/Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Energía. Seguridad regional.', en: 'Energy. Regional security.', fr: 'Énergie. Sécurité régionale.' }, acuerdos: { es: 'CEMAC, UA, CEN-SAD', en: 'CEMAC, AU, CEN-SAD', fr: 'CEMAC, UA, CEN-SAD' }, historia: { es: 'Independencia 1960. Lucha sahel.', en: 'Independence 1960. Sahel struggle.', fr: 'Indépendance 1960. Lutte sahel.' }, venezuela: { es: 'Acercamiento diplomático.', en: 'Diplomatic rapprochement.', fr: 'Rapprochement diplomatique.' }, autoridades: { es: 'Presidente: Mahamat Idriss Deby | Primer Ministro: Ghalaye Saleh', en: 'President: Mahamat Idriss Deby | Prime Minister: Ghalaye Saleh', fr: 'Président: Mahamat Idriss Deby | Premier Ministre: Ghalaye Saleh' }, embajada: { es: 'Representación diplomática en Yamena.', en: 'Diplomatic representation in N\'Djamena.', fr: 'Représentation diplomatique à N\'Djaména.' }, hitos: { es: '1960: Independencia. 1965-1979: Guerra civil. 1990: Derrocamiento de Habré.', en: '1960: Independence. 1965-1979: Civil war. 1990: Overthrow of Habré.', fr: '1960: Indépendance. 1965-1979: Guerre civile. 1990: Renversement de Habré.' }, rec: { es: ['Petróleo', 'Algodón'], en: ['Oil', 'Cotton'], fr: ['Pétrole', 'Coton'] }, tags: ['lake-chad', 'desert', 'sahel'] },
+            { id: 'COM', flag: 'km', reg: 'East', lat: -11.6, lon: 43.3, name: { es: 'Comoras', en: 'Comoros', fr: 'Comores' }, capital: { es: 'Moroni', en: 'Moroni', fr: 'Moroni' }, idioma: { es: 'Comorense/Árabe', en: 'Comorian/Arabic', fr: 'Comorien/Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Insularidad. Océano Índico.', en: 'Insularity. Indian Ocean.', fr: 'Insularité. Océan Indien.' }, acuerdos: { es: 'UA, COMESA', en: 'AU, COMESA', fr: 'UA, COMESA' }, historia: { es: 'Islas de la Luna. Independencia 1975.', en: 'Moon Islands. Independence 1975.', fr: 'Îles de la Lune. Indépendance 1975.' }, venezuela: { es: 'Solidaridad.', en: 'Solidarity.', fr: 'Solidarité.' }, autoridades: { es: 'Presidente: Azali Assoumani | Primer Ministro: Noureddine Amir', en: 'President: Azali Assoumani | Prime Minister: Noureddine Amir', fr: 'Président: Azali Assoumani | Premier Ministre: Noureddine Amir' }, embajada: { es: 'Oficina de representación en Moroni.', en: 'Representation office in Moroni.', fr: 'Bureau de représentation à Moroni.' }, hitos: { es: '1975: Independencia de Francia. 1978: Golpe de estado. 1999: Acuerdo de Anjouan.', en: '1975: Independence from France. 1978: Coup. 1999: Anjouan Agreement.', fr: '1975: Indépendance de la France. 1978: Coup d\'état. 1999: Accord d\'Anjouan.' }, rec: { es: ['Vainilla', 'Ylang-ylang'], en: ['Vanilla', 'Ylang-ylang'], fr: ['Vanille', 'Ylang-ylang'] }, tags: ['moroni', 'ocean', 'island'] },
+            { id: 'COG', flag: 'cg', reg: 'Central', lat: -0.2, lon: 15.8, name: { es: 'Congo-Brazzaville', en: 'Congo-Brazzaville', fr: 'Congo-Brazzaville' }, capital: { es: 'Brazzaville', en: 'Brazzaville', fr: 'Brazzaville' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Petróleo. Socio OPEP.', en: 'Oil. OPEC Partner.', fr: 'Pétrole. Partenaire OPEP.' }, acuerdos: { es: 'OPEP, CEMAC, UA', en: 'OPEC, CEMAC, AU', fr: 'OPEP, CEMAC, UA' }, historia: { es: 'Independencia 1960. Estabilidad política.', en: 'Independence 1960. Political stability.', fr: 'Indépendance 1960. Stabilité politique.' }, venezuela: { es: 'Vínculo estratégico OPEP.', en: 'Strategic OPEC link.', fr: 'Lien stratégique OPEP.' }, autoridades: { es: 'Presidente: Denis Sassou Nguesso | Primer Ministro: Anatole Collinet Makosso', en: 'President: Denis Sassou Nguesso | Prime Minister: Anatole Collinet Makosso', fr: 'Président: Denis Sassou Nguesso | Premier Ministre: Anatole Collinet Makosso' }, embajada: { es: 'Embajada de Venezuela en Brazzaville.', en: 'Venezuelan Embassy in Brazzaville.', fr: 'Ambassade du Venezuela à Brazzaville.' }, hitos: { es: '1960: Independencia. 1963-1990: Marxismo. 1990-presente: Multipartidismo.', en: '1960: Independence. 1963-1990: Marxism. 1990-present: Multipartism.', fr: '1960: Indépendance. 1963-1990: Marxisme. 1990-présent: Multipartisme.' }, rec: { es: ['Petróleo', 'Madera'], en: ['Oil', 'Wood'], fr: ['Pétrole', 'Bois'] }, tags: ['brazzaville', 'river', 'congo'] },
+            { id: 'COD', flag: 'cd', reg: 'Central', lat: -4.0, lon: 21.7, name: { es: 'R.D. Congo', en: 'D.R. Congo', fr: 'R.D. Congo' }, capital: { es: 'Kinshasa', en: 'Kinshasa', fr: 'Kinshasa' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Minería. Potencia africana.', en: 'Mining. African power.', fr: 'Mines. Puissance africaine.' }, acuerdos: { es: 'SADC, COMESA, UA', en: 'SADC, COMESA, AU', fr: 'SADC, COMESA, UA' }, historia: { es: 'Independencia 1960. Corazón de África.', en: 'Independence 1960. Heart of Africa.', fr: 'Indépendance 1960. Cœur de l\'Afrique.' }, venezuela: { es: 'Convenios de cooperación.', en: 'Cooperation agreements.', fr: 'Conventions de coopération.' }, autoridades: { es: 'Presidente: Félix Tshisekedi | Primer Ministro: Jean-Michel Sama Lukonde', en: 'President: Félix Tshisekedi | Prime Minister: Jean-Michel Sama Lukonde', fr: 'Président: Félix Tshisekedi | Premier Ministre: Jean-Michel Sama Lukonde' }, embajada: { es: 'Embajada de Venezuela en Kinshasa.', en: 'Venezuelan Embassy in Kinshasa.', fr: 'Ambassade du Venezuela à Kinshasa.' }, hitos: { es: '1960: Independencia. 1971-1997: Zaire (Mobutu). 1998-2003: Segunda guerra congoleña.', en: '1960: Independence. 1971-1997: Zaire (Mobutu). 1998-2003: Second Congo War.', fr: '1960: Indépendance. 1971-1997: Zaïre (Mobutu). 1998-2003: Deuxième guerre du Congo.' }, rec: { es: ['Cobalto', 'Oro', 'Diamantes'], en: ['Cobalt', 'Gold', 'Diamonds'], fr: ['Cobalt', 'Or', 'Diamants'] }, tags: ['kinshasa', 'forest', 'congo'] },
+            { id: 'CIV', flag: 'ci', reg: 'West', lat: 7.5, lon: -5.5, name: { es: 'Costa de Marfil', en: 'Ivory Coast', fr: 'Côte d\'Ivoire' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Mixta', en: 'Mixed', fr: 'Mixte' }, bilaterales: { es: 'Liderazgo.', en: 'Leadership.', fr: 'Leadership.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Potencia económica.', en: 'Economic powerhouse.', fr: 'Puissance económica.' }, venezuela: { es: 'Energía.', en: 'Energy.', fr: 'Énergie.' }, rec: { es: ['Cacao'], en: ['Cocoa'], fr: ['Cacao'] }, tags: ['abidjan', 'cocoa'] },
+            { id: 'DJI', flag: 'dj', reg: 'East', lat: 11.8, lon: 42.5, name: { es: 'Yibuti', en: 'Djibouti', fr: 'Djibouti' }, idioma: { es: 'Árabe/Francés', en: 'Arabic/French', fr: 'Arabe/Français' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Logística.', en: 'Logistics.', fr: 'Logistique.' }, acuerdos: { es: 'COMESA.', en: 'COMESA.', fr: 'COMESA.' }, historia: { es: 'Puerta del Mar Rojo.', en: 'Gateway to Red Sea.', fr: 'Porte de la Mer Rouge.' }, venezuela: { es: 'Protocolo.', en: 'Protocol.', fr: 'Protocole.' }, rec: { es: ['Servicios Portuarios'], en: ['Port Services'], fr: ['Services Portuaires'] }, tags: ['port', 'red-sea'] },
+            { id: 'EGY', flag: 'eg', reg: 'North', lat: 26.8, lon: 30.8, name: { es: 'Egipto', en: 'Egypt', fr: 'Égypte' }, idioma: { es: 'Árabe', en: 'Arabic', fr: 'Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Comercial.', en: 'Trade.', fr: 'Commercial.' }, acuerdos: { es: 'COMESA.', en: 'COMESA.', fr: 'COMESA.' }, historia: { es: 'Cuna civilización.', en: 'Cradle of civilization.', fr: 'Berceau civilisation.' }, venezuela: { es: 'Vínculo histórico.', en: 'Historical link.', fr: 'Lien historique.' }, rec: { es: ['Gas', 'Turismo'], en: ['Gas', 'Tourism'], fr: ['Gaz', 'Tourisme'] }, tags: ['pyramids', 'nile'] },
+            { id: 'GNQ', flag: 'gq', reg: 'Central', lat: 1.6, lon: 10.2, name: { es: 'Guinea Ecuatorial', en: 'Equatorial Guinea', fr: 'Guinée Équatoriale' }, idioma: { es: 'Español', en: 'Spanish', fr: 'Espagnol' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Hermandad.', en: 'Brotherhood.', fr: 'Fraternité.' }, acuerdos: { es: 'OPEP.', en: 'OPEC.', fr: 'OPEP.' }, historia: { es: 'Independencia 1968.', en: 'Independence 1968.', fr: 'Indépendance 1968.' }, venezuela: { es: 'Aliado principal.', en: 'Main ally.', fr: 'Allié principal.' }, rec: { es: ['Petróleo'], en: ['Oil'], fr: ['Pétrole'] }, tags: ['malabo', 'island'] },
+            { id: 'ERI', flag: 'er', reg: 'East', lat: 15.1, lon: 39.7, name: { es: 'Eritrea', en: 'Eritrea', fr: 'Érythrée' }, idioma: { es: 'Tigriña/Árabe', en: 'Tigrinya/Arabic', fr: 'Tigrinya/Arabe' }, religion: { es: 'Mixta', en: 'Mixed', fr: 'Mixte' }, bilaterales: { es: 'Soberanía.', en: 'Sovereignty.', fr: 'Souveraineté.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Resistencia.', en: 'Resistance.', fr: 'Résistance.' }, venezuela: { es: 'Solidaridad.', en: 'Solidarity.', fr: 'Solidarité.' }, rec: { es: ['Cobre', 'Oro'], en: ['Copper', 'Gold'], fr: ['Cuivre', 'Or'] }, tags: ['asmara', 'coast'] },
+            { id: 'ETH', flag: 'et', reg: 'East', lat: 9.1, lon: 40.4, name: { es: 'Etiopía', en: 'Ethiopia', fr: 'Éthiopie' }, idioma: { es: 'Amhárico', en: 'Amharic', fr: 'Amharique' }, religion: { es: 'Ortodoxo', en: 'Orthodox', fr: 'Orthodoxe' }, bilaterales: { es: 'Sede UA.', en: 'AU HQ.', fr: 'Siège UA.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Cuna humanidad.', en: 'Cradle of humanity.', fr: 'Berceau humanité.' }, venezuela: { es: 'Hub diplomático.', en: 'Diplomatic hub.', fr: 'Moyeu diplomatique.' }, rec: { es: ['Café'], en: ['Coffee'], fr: ['Café'] }, tags: ['lalibela', 'mountains'] },
+            { id: 'GAB', flag: 'ga', reg: 'Central', lat: -0.8, lon: 11.6, name: { es: 'Gabón', en: 'Gabon', fr: 'Gabon' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Petróleo.', en: 'Oil.', fr: 'Pétrole.' }, acuerdos: { es: 'OPEP.', en: 'OPEC.', fr: 'OPEP.' }, historia: { es: 'Estabilidad.', en: 'Stability.', fr: 'Stabilité.' }, venezuela: { es: 'Socio OPEP.', en: 'OPEC Partner.', fr: 'Partenaire OPEP.' }, rec: { es: ['Petróleo', 'Manganeso'], en: ['Oil', 'Manganese'], fr: ['Pétrole', 'Manganèse'] }, tags: ['libreville', 'forest'] },
+            { id: 'GMB', flag: 'gm', reg: 'West', lat: 13.4, lon: -15.3, name: { es: 'Gambia', en: 'Gambia', fr: 'Gambie' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Cercanía.', en: 'Closeness.', fr: 'Proximité.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'País río.', en: 'River country.', fr: 'Pays rivière.' }, venezuela: { es: 'Cooperación.', en: 'Cooperation.', fr: 'Coopération.' }, rec: { es: ['Mani', 'Turismo'], en: ['Peanuts', 'Tourism'], fr: ['Arachides', 'Tourisme'] }, tags: ['banjul', 'river'] },
+            { id: 'GHA', flag: 'gh', reg: 'West', lat: 7.9, lon: -1.0, name: { es: 'Ghana', en: 'Ghana', fr: 'Ghana' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Democracia.', en: 'Democracy.', fr: 'Démocratie.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Kwame Nkrumah.', en: 'Kwame Nkrumah.', fr: 'Kwame Nkrumah.' }, venezuela: { es: 'Vínculo histórico.', en: 'Historical link.', fr: 'Lien histórico.' }, rec: { es: ['Oro', 'Cacao'], en: ['Gold', 'Cocoa'], fr: ['Or', 'Cacao'] }, tags: ['accra', 'fort'] },
+            { id: 'GN_WEST', flag: 'gn', reg: 'West', lat: 10.9, lon: -10.9, name: { es: 'Guinea', en: 'Guinea', fr: 'Guinée' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Minería.', en: 'Mining.', fr: 'Mines.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Sékou Touré.', en: 'Sékou Touré.', fr: 'Sékou Touré.' }, venezuela: { es: 'Bauxita.', en: 'Bauxite.', fr: 'Bauxite.' }, rec: { es: ['Bauxita', 'Oro'], en: ['Bauxite', 'Gold'], fr: ['Bauxite', 'Or'] }, tags: ['conakry', 'highlands'] },
+            { id: 'GNB', flag: 'gw', reg: 'West', lat: 11.8, lon: -15.1, name: { es: 'Guinea-Bisáu', en: 'Guinea-Bissau', fr: 'Guinée-Bissau' }, idioma: { es: 'Portugués', en: 'Portuguese', fr: 'Portugais' }, religion: { es: 'Mixta', en: 'Mixed', fr: 'Mixte' }, bilaterales: { es: 'Hermandad.', en: 'Brotherhood.', fr: 'Fraternité.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Amílcar Cabral.', en: 'Amílcar Cabral.', fr: 'Amílcar Cabral.' }, venezuela: { es: 'Aliado incondicional.', en: 'Unconditional ally.', fr: 'Allié inconditionnel.' }, rec: { es: ['Marañón'], en: ['Cashew'], fr: ['Anacarde'] }, tags: ['bissau', 'archipelago'] },
+            { id: 'KEN', flag: 'ke', reg: 'East', lat: -0.0, lon: 37.8, name: { es: 'Kenia', en: 'Kenya', fr: 'Kenya' }, idioma: { es: 'Suajili/Inglés', en: 'Swahili/English', fr: 'Swahili/Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Desarrollo.', en: 'Development.', fr: 'Développement.' }, acuerdos: { es: 'EAC.', en: 'EAC.', fr: 'EAC.' }, historia: { es: 'Mau Mau.', en: 'Mau Mau.', fr: 'Mau Mau.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Té', 'Turismo'], en: ['Tea', 'Tourism'], fr: ['Thé', 'Tourisme'] }, tags: ['nairobi', 'safari'] },
+            { id: 'LSO', flag: 'ls', reg: 'South', lat: -29.6, lon: 28.2, name: { es: 'Lesoto', en: 'Lesotho', fr: 'Lesotho' }, idioma: { es: 'Sesoto/Inglés', en: 'Sesotho/English', fr: 'Sesotho/Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Reino montaña.', en: 'Mountain kingdom.', fr: 'Royaume montagne.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Resistencia.', en: 'Resistance.', fr: 'Résistance.' }, venezuela: { es: 'Protocolo.', en: 'Protocol.', fr: 'Protocole.' }, rec: { es: ['Agua', 'Diamantes'], en: ['Water', 'Diamonds'], fr: ['Eau', 'Diamants'] }, tags: ['maseru', 'mountains'] },
+            { id: 'LBR', flag: 'lr', reg: 'West', lat: 6.4, lon: -9.3, name: { es: 'Liberia', en: 'Liberia', fr: 'Libéria' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Paz.', en: 'Peace.', fr: 'Paix.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Primera república.', en: 'First republic.', fr: 'Première république.' }, venezuela: { es: 'Intercambio.', en: 'Exchange.', fr: 'Échange.' }, rec: { es: ['Caucho', 'Hierro'], en: ['Rubber', 'Iron'], fr: ['Caoutchouc', 'Fer'] }, tags: ['monrovia', 'coast'] },
+            { id: 'LBY', flag: 'ly', reg: 'North', lat: 26.3, lon: 17.2, name: { es: 'Libia', en: 'Libya', fr: 'Libye' }, idioma: { es: 'Árabe', en: 'Arabic', fr: 'Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Socio OPEP.', en: 'OPEC Partner.', fr: 'Partenaire OPEP.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Transición.', en: 'Transition.', fr: 'Transition.' }, venezuela: { es: 'Vínculo histórico.', en: 'Historical link.', fr: 'Lien historique.' }, rec: { es: ['Petróleo'], en: ['Oil'], fr: ['Pétrole'] }, tags: ['tripoli', 'desert'] },
+            { id: 'MDG', flag: 'mg', reg: 'East', lat: -18.7, lon: 46.8, name: { es: 'Madagascar', en: 'Madagascar', fr: 'Madagascar' }, idioma: { es: 'Malgache/Francés', en: 'Malagasy/French', fr: 'Malgache/Français' }, religion: { es: 'Mixta', en: 'Mixed', fr: 'Mixte' }, bilaterales: { es: 'Biodiversidad.', en: 'Biodiversity.', fr: 'Biodiversité.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Isla continente.', en: 'Continent island.', fr: 'Île continent.' }, venezuela: { es: 'Cooperación.', en: 'Cooperation.', fr: 'Coopération.' }, rec: { es: ['Vainilla', 'Níquel'], en: ['Vanilla', 'Nickel'], fr: ['Vanille', 'Nickel'] }, tags: ['baobab', 'lemur'] },
+            { id: 'MWI', flag: 'mw', reg: 'East', lat: -13.2, lon: 34.3, name: { es: 'Malaui', en: 'Malawi', fr: 'Malawi' }, idioma: { es: 'Chichewa/Inglés', en: 'Chichewa/English', fr: 'Chichewa/Anglais' }, religion: { es: 'Cristianismo/Islam', en: 'Christianity/Islam', fr: 'Christianisme/Islam' }, bilaterales: { es: 'Paz.', en: 'Peace.', fr: 'Paix.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Estabilidad.', en: 'Stability.', fr: 'Stabilité.' }, venezuela: { es: 'Relaciones.', en: 'Relations.', fr: 'Relations.' }, rec: { es: ['Tabaco'], en: ['Tobacco'], fr: ['Tabac'] }, tags: ['lake-malawi', 'village'] },
+            { id: 'MLI', flag: 'ml', reg: 'West', lat: 17.5, lon: -3.9, name: { es: 'Malí', en: 'Mali', fr: 'Mali' }, idioma: { es: 'Bambara/Francés', en: 'Bambara/French', fr: 'Bambara/Français' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Seguridad.', en: 'Security.', fr: 'Sécurité.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Imperio de Malí.', en: 'Mali Empire.', fr: 'Empire du Mali.' }, venezuela: { es: 'Hermandad.', en: 'Brotherhood.', fr: 'Fraternité.' }, rec: { es: ['Oro', 'Algodón'], en: ['Gold', 'Cotton'], fr: ['Or', 'Coton'] }, tags: ['timbuktu', 'mosque'] },
+            { id: 'MRT', flag: 'mr', reg: 'North', lat: 21.0, lon: -10.9, name: { es: 'Mauritania', en: 'Mauritania', fr: 'Mauritanie' }, idioma: { es: 'Árabe', en: 'Arabic', fr: 'Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Puente regio.', en: 'Regional bridge.', fr: 'Pont régional.' }, acuerdos: { es: 'UMA.', en: 'AMU.', fr: 'UMA.' }, historia: { es: 'Tradición.', en: 'Tradition.', fr: 'Tradition.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Hierro', 'Pescado'], en: ['Iron', 'Fish'], fr: ['Fer', 'Poisson'] }, tags: ['nouakchott', 'desert'] },
+            { id: 'MUS', flag: 'mu', reg: 'East', lat: -20.3, lon: 57.5, name: { es: 'Mauricio', en: 'Mauritius', fr: 'Maurice' }, idioma: { es: 'Inglés/Francés', en: 'English/French', fr: 'Anglais/Français' }, religion: { es: 'Hinduismo/Crist.', en: 'Hinduism/Christ.', fr: 'Hindouisme/Christ.' }, bilaterales: { es: 'Economía.', en: 'Economy.', fr: 'Économie.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Hub financiero.', en: 'Financial hub.', fr: 'Pôle financier.' }, venezuela: { es: 'Protocolo.', en: 'Protocol.', fr: 'Protocole.' }, rec: { es: ['Servicios', 'Azúcar'], en: ['Services', 'Sugar'], fr: ['Services', 'Sucre'] }, tags: ['beach', 'resort'] },
+            { id: 'MAR', flag: 'ma', reg: 'North', lat: 31.7, lon: -7.0, name: { es: 'Marruecos', en: 'Morocco', fr: 'Maroc' }, idioma: { es: 'Árabe/Bereber', en: 'Arabic/Berber', fr: 'Arabe/Berbère' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Inversión.', en: 'Investment.', fr: 'Investissement.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Monarquía milenaria.', en: 'Ancient monarchy.', fr: 'Monarchie ancienne.' }, venezuela: { es: 'Relaciones.', en: 'Relations.', fr: 'Relations.' }, rec: { es: ['Fosfatos'], en: ['Phosphates'], fr: ['Phosphates'] }, tags: ['marrakech', 'atlas'] },
+            { id: 'MOZ', flag: 'mz', reg: 'South', lat: -18.6, lon: 35.5, name: { es: 'Mozambique', en: 'Mozambique', fr: 'Mozambique' }, idioma: { es: 'Portugués', en: 'Portuguese', fr: 'Portugais' }, religion: { es: 'Cristianismo/Islam', en: 'Christianity/Islam', fr: 'Christianisme/Islam' }, bilaterales: { es: 'Energía.', en: 'Energy.', fr: 'Énergie.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Resistencia.', en: 'Resistance.', fr: 'Résistance.' }, venezuela: { es: 'Solidaridad.', en: 'Solidarity.', fr: 'Solidarité.' }, rec: { es: ['Gas', 'Carbón'], en: ['Gas', 'Coal'], fr: ['Gaz', 'Charbon'] }, tags: ['maputo', 'beach'] },
+            { id: 'NAM', flag: 'na', reg: 'South', lat: -22.9, lon: 18.4, name: { es: 'Namibia', en: 'Namibia', fr: 'Namibie' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Aliado SWAPO.', en: 'SWAPO ally.', fr: 'Allié SWAPO.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Independencia 1990.', en: 'Independence 1990.', fr: 'Indépendance 1990.' }, venezuela: { es: 'Gran cercanía.', en: 'Close relations.', fr: 'Relations étroites.' }, rec: { es: ['Uranio', 'Diamantes'], en: ['Uranium', 'Diamonds'], fr: ['Uranium', 'Diamants'] }, tags: ['namib', 'dunes'] },
+            { id: 'NER', flag: 'ne', reg: 'West', lat: 17.6, lon: 8.0, name: { es: 'Níger', en: 'Niger', fr: 'Niger' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Uranio.', en: 'Uranium.', fr: 'Uranium.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Desafíos sahel.', en: 'Sahel challenges.', fr: 'Défis sahel.' }, venezuela: { es: 'Acercamiento.', en: 'Rapprochement.', fr: 'Rapprochement.' }, rec: { es: ['Uranio'], en: ['Uranium'], fr: ['Uranium'] }, tags: ['niamey', 'sahel'] },
+            { id: 'NGA', flag: 'ng', reg: 'West', lat: 9.0, lon: 8.6, name: { es: 'Nigeria', en: 'Nigeria', fr: 'Nigéria' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Islam/Crist.', en: 'Islam/Christ.', fr: 'Islam/Christ.' }, bilaterales: { es: 'Socio OPEP.', en: 'OPEC Partner.', fr: 'Partenaire OPEP.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Gigante africano.', en: 'African giant.', fr: 'Géant africain.' }, venezuela: { es: 'Vínculo OPEP.', en: 'OPEC link.', fr: 'Lien OPEP.' }, rec: { es: ['Petróleo', 'Gas'], en: ['Oil', 'Gas'], fr: ['Pétrole', 'Gaz'] }, tags: ['lagos', 'abuja'] },
+            { id: 'RWA', flag: 'rw', reg: 'East', lat: -1.9, lon: 29.8, name: { es: 'Ruanda', en: 'Rwanda', fr: 'Rwanda' }, idioma: { es: 'Kinyarwanda/Inglés', en: 'Kinyarwanda/English', fr: 'Kinyarwanda/Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Tecnología.', en: 'Technology.', fr: 'Technologie.' }, acuerdos: { es: 'EAC.', en: 'EAC.', fr: 'EAC.' }, historia: { es: 'Transformación.', en: 'Transformation.', fr: 'Transformation.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Café', 'Turismo'], en: ['Coffee', 'Tourism'], fr: ['Café', 'Tourisme'] }, tags: ['kigali', 'gorilla'] },
+            { id: 'STP', flag: 'st', reg: 'Central', lat: 0.1, lon: 6.6, name: { es: 'Sto. Tomé y Príncipe', en: 'Sao Tome & Principe', fr: 'Sao Tomé-et-Principe' }, idioma: { es: 'Portugués', en: 'Portuguese', fr: 'Portugais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Insularidad.', en: 'Insularity.', fr: 'Insularité.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Independencia 1975.', en: 'Independence 1975.', fr: 'Indépendance 1975.' }, venezuela: { es: 'Cercanía.', en: 'Closeness.', fr: 'Proximité.' }, rec: { es: ['Cacao'], en: ['Cocoa'], fr: ['Cacao'] }, tags: ['island', 'forest'] },
+            { id: 'SEN', flag: 'sn', reg: 'West', lat: 14.4, lon: -14.4, name: { es: 'Senegal', en: 'Senegal', fr: 'Sénégal' }, idioma: { es: 'Francés/Wolof', en: 'French/Wolof', fr: 'Français/Wolof' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Cultural.', en: 'Cultural.', fr: 'Culturel.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Léopold Senghor.', en: 'Léopold Senghor.', fr: 'Léopold Senghor.' }, venezuela: { es: 'Intercambio.', en: 'Exchange.', fr: 'Échange.' }, rec: { es: ['Fosfatos', 'Pesca'], en: ['Phosphates', 'Fishing'], fr: ['Phosphates', 'Pêche'] }, tags: ['dakar', 'goree'] },
+            { id: 'SYC', flag: 'sc', reg: 'East', lat: -4.6, lon: 55.4, name: { es: 'Seychelles', en: 'Seychelles', fr: 'Seychelles' }, idioma: { es: 'Criollo/Inglés/Fr.', en: 'Creole/English/Fr.', fr: 'Créole/Anglais/Fr.' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Turismo.', en: 'Tourism.', fr: 'Tourisme.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Paraíso insular.', en: 'Island paradise.', fr: 'Paradis insulaire.' }, venezuela: { es: 'Protocolo.', en: 'Protocol.', fr: 'Protocole.' }, rec: { es: ['Turismo', 'Atún'], en: ['Tourism', 'Tuna'], fr: ['Tourisme', 'Thon'] }, tags: ['beach', 'ocean'] },
+            { id: 'SLE', flag: 'sl', reg: 'West', lat: 8.4, lon: -11.7, name: { es: 'Sierra Leona', en: 'Sierra Leone', fr: 'Sierra Leone' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Islam/Crist.', en: 'Islam/Christ.', fr: 'Islam/Christ.' }, bilaterales: { es: 'Reconstrucción.', en: 'Reconstruction.', fr: 'Reconstruction.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Resiliencia.', en: 'Resilience.', fr: 'Résilience.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Diamantes'], en: ['Diamonds'], fr: ['Diamants'] }, tags: ['freetown', 'diamonds'] },
+            { id: 'SOM', flag: 'so', reg: 'East', lat: 5.1, lon: 46.1, name: { es: 'Somalia', en: 'Somalia', fr: 'Somalie' }, idioma: { es: 'Somalí/Árabe', en: 'Somali/Arabic', fr: 'Somali/Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Recuperación.', en: 'Recovery.', fr: 'Récupération.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Cuerno de África.', en: 'Horn of Africa.', fr: 'Corne de l\'Afrique.' }, venezuela: { es: 'Protocolo.', en: 'Protocol.', fr: 'Protocole.' }, rec: { es: ['Ganado'], en: ['Livestock'], fr: ['Bétail'] }, tags: ['mogadishu', 'coast'] },
+            { id: 'ZAF', flag: 'za', reg: 'South', lat: -30.5, lon: 22.9, name: { es: 'Sudáfrica', en: 'South Africa', fr: 'Afrique du Sud' }, idioma: { es: '11 lenguas of.', en: '11 official lang.', fr: '11 langues off.' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Socio estratégico.', en: 'Strategic partner.', fr: 'Partenaire stratégique.' }, acuerdos: { es: 'BRICS/SADC.', en: 'BRICS/SADC.', fr: 'BRICS/SADC.' }, historia: { es: 'Nelson Mandela.', en: 'Nelson Mandela.', fr: 'Nelson Mandela.' }, venezuela: { es: 'Relación BRICS.', en: 'BRICS relationship.', fr: 'Relation BRICS.' }, rec: { es: ['Oro', 'Platino'], en: ['Gold', 'Platinum'], fr: ['Or', 'Platine'] }, tags: ['capetown', 'safari'] },
+            { id: 'SSD', flag: 'ss', reg: 'East', lat: 6.8, lon: 31.3, name: { es: 'Sudán del Sur', en: 'South Sudan', fr: 'Soudan du Sud' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Nación joven.', en: 'Young nation.', fr: 'Jeune nation.' }, acuerdos: { es: 'EAC.', en: 'EAC.', fr: 'EAC.' }, historia: { es: 'Independencia 2011.', en: 'Independence 2011.', fr: 'Indépendance 2011.' }, venezuela: { es: 'Energía.', en: 'Energy.', fr: 'Énergie.' }, rec: { es: ['Petróleo'], en: ['Oil'], fr: ['Pétrole'] }, tags: ['juba', 'nile'] },
+            { id: 'SDN', flag: 'sd', reg: 'North', lat: 12.8, lon: 30.2, name: { es: 'Sudán', en: 'Sudan', fr: 'Soudan' }, idioma: { es: 'Árabe/Inglés', en: 'Arabic/English', fr: 'Arabe/Anglais' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Recursos.', en: 'Resources.', fr: 'Ressources.' }, acuerdos: { es: 'UA.', en: 'AU.', fr: 'UA.' }, historia: { es: 'Valle del Nilo.', en: 'Nile Valley.', fr: 'Vallée du Nil.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Oro', 'Petróleo'], en: ['Gold', 'Oil'], fr: ['Or', 'Pétrole'] }, tags: ['khartoum', 'pyramids'] },
+            { id: 'SWZ', flag: 'sz', reg: 'South', lat: -26.5, lon: 31.4, name: { es: 'Esuatini', en: 'Eswatini', fr: 'Eswatini' }, idioma: { es: 'Suazi/Inglés', en: 'Swazi/English', fr: 'Swazi/Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Monarquía.', en: 'Monarchy.', fr: 'Monarchie.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Tradición viva.', en: 'Living tradition.', fr: 'Tradition vivante.' }, venezuela: { es: 'Protocolo.', en: 'Protocol.', fr: 'Protocole.' }, rec: { es: ['Azúcar', 'Madera'], en: ['Sugar', 'Wood'], fr: ['Sucre', 'Bois'] }, tags: ['mbabane', 'culture'] },
+            { id: 'TZA', flag: 'tz', reg: 'East', lat: -6.3, lon: 34.8, name: { es: 'Tanzania', en: 'Tanzania', fr: 'Tanzanie' }, idioma: { es: 'Suajili/Inglés', en: 'Swahili/English', fr: 'Swahili/Anglais' }, religion: { es: 'Mixta', en: 'Mixed', fr: 'Mixte' }, bilaterales: { es: 'Unidad.', en: 'Unity.', fr: 'Unité.' }, acuerdos: { es: 'EAC.', en: 'EAC.', fr: 'EAC.' }, historia: { es: 'Julius Nyerere.', en: 'Julius Nyerere.', fr: 'Julius Nyerere.' }, venezuela: { es: 'Vínculo histórico.', en: 'Historical link.', fr: 'Lien historique.' }, rec: { es: ['Turismo', 'Oro'], en: ['Tourism', 'Gold'], fr: ['Tourisme', 'Or'] }, tags: ['kilimanjaro', 'zanzibar'] },
+            { id: 'TGO', flag: 'tg', reg: 'West', lat: 8.6, lon: 0.8, name: { es: 'Togo', en: 'Togo', fr: 'Togo' }, idioma: { es: 'Francés', en: 'French', fr: 'Français' }, religion: { es: 'Tradicional/Crist.', en: 'Traditional/Christ.', fr: 'Traditionnel/Crist.' }, bilaterales: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, acuerdos: { es: 'CEDEAO.', en: 'ECOWAS.', fr: 'CEDEAO.' }, historia: { es: 'Comercio.', en: 'Trade.', fr: 'Commerce.' }, venezuela: { es: 'Cercanía.', en: 'Closeness.', fr: 'Proximité.' }, rec: { es: ['Fosfatos'], en: ['Phosphates'], fr: ['Phosphates'] }, tags: ['lome', 'village'] },
+            { id: 'TUN', flag: 'tn', reg: 'North', lat: 33.8, lon: 9.5, name: { es: 'Túnez', en: 'Tunisia', fr: 'Tunisie' }, idioma: { es: 'Árabe', en: 'Arabic', fr: 'Arabe' }, religion: { es: 'Islam', en: 'Islam', fr: 'Islam' }, bilaterales: { es: 'Mediterráneo.', en: 'Mediterranean.', fr: 'Méditerranéen.' }, acuerdos: { es: 'UMA.', en: 'AMU.', fr: 'UMA.' }, historia: { es: 'Cartago.', en: 'Carthage.', fr: 'Carthage.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Turismo', 'Olivos'], en: ['Tourism', 'Olives'], fr: ['Tourisme', 'Olives'] }, tags: ['tunis', 'carthage'] },
+            { id: 'UGA', flag: 'ug', reg: 'East', lat: 1.3, lon: 32.3, name: { es: 'Uganda', en: 'Uganda', fr: 'Ouganda' }, idioma: { es: 'Inglés/Suajili', en: 'English/Swahili', fr: 'Anglais/Swahili' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Desarrollo.', en: 'Development.', fr: 'Développement.' }, acuerdos: { es: 'EAC.', en: 'EAC.', fr: 'EAC.' }, historia: { es: 'Perla de África.', en: 'Pearl of Africa.', fr: 'Perle de l\'Afrique.' }, venezuela: { es: 'Intercambio.', en: 'Exchange.', fr: 'Échange.' }, rec: { es: ['Café', 'Oro'], en: ['Coffee', 'Gold'], fr: ['Café', 'Or'] }, tags: ['kampala', 'source-nile'] },
+            { id: 'ZMB', flag: 'zm', reg: 'South', lat: -13.1, lon: 27.8, name: { es: 'Zambia', en: 'Zambia', fr: 'Zambie' }, idioma: { es: 'Inglés', en: 'English', fr: 'Anglais' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Minería.', en: 'Mining.', fr: 'Mines.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Kenneth Kaunda.', en: 'Kenneth Kaunda.', fr: 'Kenneth Kaunda.' }, venezuela: { es: 'Diplomacia.', en: 'Diplomacy.', fr: 'Diplomatie.' }, rec: { es: ['Cobre'], en: ['Copper'], fr: ['Cuivre'] }, tags: ['victoria-falls', 'copper'] },
+            { id: 'ZWE', flag: 'zw', reg: 'South', lat: -19.0, lon: 29.1, name: { es: 'Zimbabue', en: 'Zimbabwe', fr: 'Zimbabwe' }, idioma: { es: '16 lenguas of.', en: '16 official lang.', fr: '16 langues off.' }, religion: { es: 'Cristianismo', en: 'Christianity', fr: 'Christianisme' }, bilaterales: { es: 'Aliado ZANU-PF.', en: 'ZANU-PF ally.', fr: 'Allié ZANU-PF.' }, acuerdos: { es: 'SADC.', en: 'SADC.', fr: 'SADC.' }, historia: { es: 'Robert Mugabe.', en: 'Robert Mugabe.', fr: 'Robert Mugabe.' }, venezuela: { es: 'Aliado estratégico.', en: 'Strategic ally.', fr: 'Allié estratégico.' }, rec: { es: ['Oro', 'Litio'], en: ['Gold', 'Lithium'], fr: ['Or', 'Lithium'] }, tags: ['great-zimbabwe', 'falls'] }
+        ];
+
+        window.onload = () => {
+            feather.replace();
+            document.getElementById('login-form').onsubmit = (e) => {
+                e.preventDefault();
+                doLogin();
+            };
+            document.getElementById('region-filter').onchange = (e) => { currentSearch = document.getElementById('search-input')?.value.toLowerCase().trim() || ''; applyFilter(e.target.value); };
+            window.addEventListener('resize', () => { if(document.getElementById('login-screen').classList.contains('hidden-auth')) initMap(); });
+        };
+
+        function doLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const user = users.find(u => u.login === username && u.password === password);
+            if (!user) {
+                document.getElementById('loginError').style.display = 'block';
+                return;
+            }
+            document.getElementById('loginError').style.display = 'none';
+            currentUser = user;
+            document.getElementById('login-screen').classList.add('hidden-auth');
+            document.getElementById('user-info').innerText = `${user.name} | ${user.role === 'admin' ? 'Administrador' : 'Lector'}`;
+            setTimeout(() => {
+                initMap();
+                applyFilter(document.getElementById('region-filter').value);
+            }, 500);
+        }
+
+        function doLogout() {
+            currentUser = null;
+            document.getElementById('login-screen').classList.remove('hidden-auth');
+            document.getElementById('user-info').innerText = '';
+        }
+
+        function filterCountries() {
+            currentSearch = document.getElementById('search-input')?.value.toLowerCase().trim() || '';
+            applyFilter(document.getElementById('region-filter').value);
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = translations[lang][el.getAttribute('data-i18n')]; });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = translations[lang][el.getAttribute('data-i18n-placeholder')]; });
+            document.getElementById('stats-counter').innerText = translations[lang].syncing.replace('{n}', fullAfricaData.length);
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${lang}`).classList.add('active');
+            if (currentSelectedCountry) showInfo(currentSelectedCountry);
+        }
+
+        function initMap() {
+            const container = document.getElementById('africa-map-container');
+            container.innerHTML = '';
+            const map = new Datamap({
+                element: container, scope: 'world', projection: 'mercator',
+                setProjection: function(element) {
+                    const scaleFactor = Math.min(element.offsetWidth, element.offsetHeight) * 0.75;
+                    const projection = d3.geo.mercator().center([18, 2]).scale(scaleFactor).translate([element.offsetWidth / 2, element.offsetHeight / 2]);
+                    return { path: d3.geo.path().projection(projection), projection: projection };
+                },
+                fills: { defaultFill: 'rgba(255, 255, 255, 0.10)' },
+                geographyConfig: { borderColor: 'rgba(255, 255, 255, 0.30)', highlightOnHover: false, popupOnHover: false }
+            });
+
+            const svg = d3.select("#africa-map-container svg");
+            const markerGroup = svg.append("g");
+
+            fullAfricaData.forEach(country => {
+                const coords = map.projection([country.lon, country.lat]);
+                if (!coords) return;
+                const g = markerGroup.append("g").attr("class", `flag-marker region-${country.reg}`).attr("data-name", `${country.name.es} ${country.name.en} ${country.name.fr}`).attr("data-tags", country.tags.join(' ')).on("mousedown", () => showInfo(country));
+                const clipId = "c-" + country.id.replace(/[^a-zA-Z]/g, "");
+                svg.append("defs").append("clipPath").attr("id", clipId).append("circle").attr("cx", coords[0]).attr("cy", coords[1]).attr("r", 7.5);
+                g.append("image").attr("xlink:href", `https://flagcdn.com/w160/${country.flag}.png`).attr("x", coords[0] - 12).attr("y", coords[1] - 8).attr("width", 24).attr("height", 16).attr("clip-path", `url(#${clipId})`);
+                g.append("circle").attr("cx", coords[0]).attr("cy", coords[1]).attr("r", 7.5).attr("fill", "none").attr("stroke", "rgba(205,127,50,0.6)").attr("stroke-width", 1.2);
+            });
+            
+            document.getElementById('stats-counter').innerText = translations[currentLang].syncing.replace('{n}', fullAfricaData.length);
+        }
+
+        function applyFilter(region) {
+            const query = currentSearch.toLowerCase();
+            d3.selectAll(".flag-marker").each(function() {
+                const marker = d3.select(this);
+                const isRegion = region === 'all' || marker.classed(`region-${region}`);
+                let isSearch = true;
+                if (query) {
+                    const label = ((marker.attr('data-name') || '') + ' ' + (marker.attr('data-tags') || '')).toLowerCase();
+                    isSearch = label.includes(query);
+                }
+                const isMatch = isRegion && isSearch;
+                marker.transition().duration(300).style("opacity", isMatch ? "1" : "0.05");
+                marker.style("pointer-events", isMatch ? "auto" : "none");
+            });
+        }
+
+        function showInfo(country) {
+            currentSelectedCountry = country;
+            document.getElementById('selection-placeholder').classList.add('hidden');
+            const card = document.getElementById('selection-card');
+            card.classList.remove('hidden');
+
+            document.getElementById('side-name').innerText = country.name[currentLang];
+            document.getElementById('side-iso').innerText = `${translations[currentLang].idLabel}: ${country.id}`;
+            document.getElementById('side-flag').src = `https://flagcdn.com/w640/${country.flag}.png`;
+            
+            document.getElementById('side-idioma').innerText = country.idioma[currentLang];
+            document.getElementById('side-religion').innerText = country.religion[currentLang];
+            document.getElementById('side-bilaterales').innerText = country.bilaterales[currentLang];
+            document.getElementById('side-acuerdos').innerText = country.acuerdos[currentLang];
+            document.getElementById('side-historia').innerText = country.historia[currentLang];
+            document.getElementById('side-venezuela').innerText = country.venezuela[currentLang];
+            document.getElementById('side-capital').innerText = `${country.capital[currentLang].toUpperCase()} | CAPITAL`;
+            document.getElementById('side-autoridades').innerText = country.autoridades[currentLang];
+            document.getElementById('side-embajada').innerText = country.embajada[currentLang];
+
+            const gallery = document.getElementById('side-gallery');
+            gallery.innerHTML = '';
+            const tags = country.tags || ['culture'];
+            tags.slice(0, 3).forEach((tag, idx) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'culture-thumb';
+                const img = document.createElement('img');
+                img.src = `https://images.unsplash.com/search?q=${encodeURIComponent(country.name.es + ' ' + tag)}&w=400`;
+                img.onerror = () => img.src = `https://images.unsplash.com/photo-1516426122078-c23e76319801?w=400&sig=${country.id}${idx}`;
+                thumb.appendChild(img);
+                gallery.appendChild(thumb);
+            });
+
+            const rCont = document.getElementById('side-recursos');
+            rCont.innerHTML = '';
+            country.rec[currentLang].forEach(r => {
+                const s = document.createElement('span');
+                s.className = 'px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] text-orange-200';
+                s.innerText = r;
+                rCont.appendChild(s);
+            });
+            
+            document.querySelector('aside').scrollTo({ top: 0, behavior: 'smooth' });
+            feather.replace();
+
+            // Actualizar índice filtrado
+            filteredCountries = fullAfricaData.filter(c => {
+                const region = document.getElementById('region-filter').value;
+                const isRegion = region === 'all' || c.reg === region;
+                const query = currentSearch.toLowerCase();
+                const isSearch = !query || (c.name.es + ' ' + c.tags.join(' ')).toLowerCase().includes(query);
+                return isRegion && isSearch;
+            });
+            currentCountryIndex = filteredCountries.findIndex(c => c.id === country.id);
+        }
+
+        function nextCountry() {
+            if (filteredCountries.length === 0) return;
+            currentCountryIndex = (currentCountryIndex + 1) % filteredCountries.length;
+            showInfo(filteredCountries[currentCountryIndex]);
+        }
+
+        function previousCountry() {
+            if (filteredCountries.length === 0) return;
+            currentCountryIndex = (currentCountryIndex - 1 + filteredCountries.length) % filteredCountries.length;
+            showInfo(filteredCountries[currentCountryIndex]);
+        }
+
+        function toggleAllCountries() {
+            const modal = document.getElementById('countries-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                renderCountriesList();
+            }
+        }
+
+        function renderCountriesList() {
+            const list = document.getElementById('countries-list');
+            list.innerHTML = '';
+            fullAfricaData.forEach(country => {
+                const item = document.createElement('div');
+                item.className = 'country-item';
+                item.innerHTML = `
+                    <img src="https://flagcdn.com/w80/${country.flag}.png" alt="${country.name.es}">
+                    <div class="country-item-text">
+                        <div class="country-item-name">${country.name[currentLang]}</div>
+                        <div class="country-item-code">${country.id} | ${country.region || country.reg}</div>
+                    </div>
+                `;
+                item.onclick = () => {
+                    showInfo(country);
+                    toggleAllCountries();
+                };
+                list.appendChild(item);
+            });
+        }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AFRIDATA | Plataforma de Inteligencia África</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); border: 1px solid rgba(212,175,55,0.3); }
+        .module-btn.active { background: linear-gradient(135deg, #D4AF37, #E67E22); color: black; font-weight: bold; border-color: transparent; }
+        .filter-btn.active { background-color: rgba(212,175,55,0.2); border-color: #D4AF37; color: #D4AF37; }
+        .info-card { border-left: 3px solid #D4AF37; background: rgba(31,31,31,0.7); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #1f1f1f; border: 1px solid #D4AF37; color: white; border-radius: 12px; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: #1f1f1f; border-left: 4px solid #D4AF37; padding: 12px 20px; border-radius: 8px; z-index: 9999; }
+        .module-nav { overflow-x: auto; white-space: nowrap; scrollbar-width: thin; }
+        .module-nav::-webkit-scrollbar { height: 4px; }
+        .module-nav::-webkit-scrollbar-track { background: #2a2a2a; }
+        .module-nav::-webkit-scrollbar-thumb { background: #D4AF37; border-radius: 4px; }
+        @media (max-width: 768px) { .sidebar { max-height: 50vh; overflow-y: auto; } .map-area { height: 50vh; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
+        #map-layout { display: flex; flex: 1; flex-direction: row; overflow: hidden; }
+        #modulesContainer { display: none; padding: 80px 20px 20px; overflow-y: auto; height: 100%; }
+        @media (max-width: 768px) { #map-layout { flex-direction: column; } }
+    </style>
+</head>
+<body class="bg-black text-white overflow-hidden">
+
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&q=80&w=2044');">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+        <div class="relative glass-panel rounded-2xl p-6 sm:p-8 w-[90%] max-w-md text-center animate-fadeIn">
+            <div class="text-[10px] uppercase tracking-wider text-amber-600 border border-amber-600/50 inline-block px-3 py-1 rounded-full mb-4">AFRIDATA</div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-white to-amber-400 bg-clip-text text-transparent mb-6">AFRIDATA</h1>
+            <div class="flex justify-center gap-2 mb-4">
+                <button onclick="setLanguage('es')" class="lang-selector px-3 py-1 rounded text-sm border border-amber-700/50 hover:bg-amber-700/20">🇪🇸 ES</button>
+                <button onclick="setLanguage('en')" class="lang-selector px-3 py-1 rounded text-sm border border-amber-700/50 hover:bg-amber-700/20">🇬🇧 EN</button>
+                <button onclick="setLanguage('fr')" class="lang-selector px-3 py-1 rounded text-sm border border-amber-700/50 hover:bg-amber-700/20">🇫🇷 FR</button>
+            </div>
+            <input type="text" id="loginUser" class="w-full bg-white/5 border border-amber-700/30 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 mb-4" placeholder="Usuario" value="admin">
+            <input type="password" id="loginPass" class="w-full bg-white/5 border border-amber-700/30 rounded-xl px-4 py-3 text-white outline-none focus:border-amber-500 mb-6" placeholder="Contraseña" value="admin">
+            <button onclick="doLogin()" class="w-full bg-amber-700 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition">Iniciar Sesión</button>
+            <div id="loginError" class="text-amber-500 text-sm mt-4 hidden">Usuario o contraseña incorrectos</div>
+            <div class="text-white/40 text-[10px] mt-6">Ministerio del Poder Popular para Relaciones Exteriores<br>Despacho para África — Caracas</div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appPage" class="hidden flex flex-col h-screen">
+        <header class="bg-black/80 backdrop-blur-sm border-b border-amber-800/30 px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg flex items-center justify-center">🌍</div>
+                <h1 class="text-xl font-bold bg-gradient-to-r from-white to-amber-400 bg-clip-text text-transparent">AFRIDATA <span class="text-white/40 text-xs font-normal hidden sm:inline">MPPRE — Despacho para África</span></h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="flex gap-1"><button onclick="setLanguage('es')" class="lang-header text-xs px-2 py-1 rounded border border-amber-700/50 hover:bg-amber-700/20">ES</button><button onclick="setLanguage('en')" class="lang-header text-xs px-2 py-1 rounded border border-amber-700/50 hover:bg-amber-700/20">EN</button><button onclick="setLanguage('fr')" class="lang-header text-xs px-2 py-1 rounded border border-amber-700/50 hover:bg-amber-700/20">FR</button></div>
+                <span id="userName" class="text-amber-400 text-sm">Administrador</span>
+                <button onclick="doLogout()" class="text-white/60 hover:text-white text-sm"><i class="fas fa-sign-out-alt mr-1"></i> Salir</button>
+            </div>
+        </header>
+
+        <div class="module-nav flex gap-2 px-4 py-2 bg-black/40 border-b border-white/5 overflow-x-auto">
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="mapa"><i class="fas fa-map-marked-alt mr-1"></i> Mapa</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="paises"><i class="fas fa-list mr-1"></i> Países</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="autoridades"><i class="fas fa-user-tie mr-1"></i> Autoridades</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="bilateral"><i class="fas fa-handshake mr-1"></i> Bilaterales</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="multilateral"><i class="fas fa-globe mr-1"></i> Multilateral</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="hitos"><i class="fas fa-calendar-alt mr-1"></i> Hitos</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="embajadas"><i class="fas fa-building mr-1"></i> Embajadas</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="reportes"><i class="fas fa-chart-pie mr-1"></i> Reportes</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="auditoria"><i class="fas fa-clipboard-list mr-1"></i> Auditoría</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="equipo"><i class="fas fa-users mr-1"></i> Equipo</button>
+            <button class="module-btn px-4 py-2 rounded-lg text-sm font-medium transition whitespace-nowrap" data-module="admin"><i class="fas fa-cog mr-1"></i> Admin</button>
+        </div>
+
+        <!-- Layout: mapa + sidebar (visible por defecto) -->
+        <div id="map-layout" class="flex-1 flex flex-col md:flex-row overflow-hidden">
+            <aside class="sidebar w-full md:w-96 bg-black/40 backdrop-blur-sm border-r border-amber-800/30 overflow-y-auto p-4">
+                <div class="relative mb-4">
+                    <i class="fas fa-search absolute left-3 top-3 text-white/40 text-sm"></i>
+                    <input type="text" id="searchBox" class="w-full bg-white/5 border border-amber-700/30 rounded-xl pl-10 pr-4 py-2 text-white outline-none focus:border-amber-500" placeholder="Buscar país..." oninput="filterCountries()">
+                </div>
+                <div class="space-y-1 mb-6">
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm transition" onclick="filterRegion('all', this)">🌍 Todo África</button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm transition" onclick="filterRegion('norte', this)">🔴 África del Norte</button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm transition" onclick="filterRegion('occidental', this)">🔵 África Occidental</button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm transition" onclick="filterRegion('central', this)">🟢 África Central</button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm transition" onclick="filterRegion('oriental', this)">🟡 África Oriental</button>
+                    <button class="filter-btn w-full text-left px-3 py-2 rounded-lg text-sm transition" onclick="filterRegion('austral', this)">🟣 África Austral</button>
+                </div>
+                <div id="placeholderSidebar" class="text-center py-12 opacity-50"><i class="fas fa-globe-africa text-4xl mb-2"></i><p class="text-xs">Seleccione un país en el mapa</p></div>
+                <div id="countryDetail" class="hidden">
+                    <div class="flex gap-2 mb-4">
+                        <button onclick="prevCountry()" class="flex-1 bg-white/5 border border-amber-700/30 rounded-lg py-2 text-sm hover:bg-amber-700/20"><i class="fas fa-chevron-left mr-1"></i> Anterior</button>
+                        <button onclick="toggleAllCountriesModal()" class="flex-1 bg-white/5 border border-amber-700/30 rounded-lg py-2 text-sm hover:bg-amber-700/20"><i class="fas fa-list mr-1"></i> Lista</button>
+                        <button onclick="nextCountry()" class="flex-1 bg-white/5 border border-amber-700/30 rounded-lg py-2 text-sm hover:bg-amber-700/20">Siguiente <i class="fas fa-chevron-right ml-1"></i></button>
+                    </div>
+                    <h3 id="detailName" class="text-2xl font-bold text-amber-400">-</h3>
+                    <p id="detailCapital" class="text-xs text-blue-300 uppercase tracking-wider mt-1">-</p>
+                    <img id="detailFlag" class="w-full h-32 object-cover rounded-xl my-4 border border-amber-700/50">
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Autoridades</div><div id="detailAutoridades" class="text-sm">-</div></div>
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Embajada</div><div id="detailEmbajada" class="text-sm">-</div></div>
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Cultura</div><div id="detailCultura" class="text-sm">-</div></div>
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Tradiciones</div><div id="detailTradiciones" class="text-sm">-</div></div>
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Recursos</div><div id="detailRecursos" class="flex flex-wrap gap-1 mt-1"></div></div>
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Economía</div><div id="detailEconomia" class="text-sm">-</div></div>
+                    <div class="info-card"><div class="text-amber-500 text-[10px] uppercase tracking-wider">Relación con Venezuela</div><div id="detailVenezuela" class="text-sm">-</div></div>
+                </div>
+            </aside>
+            <main class="map-area flex-1 relative"><div id="map" class="h-full w-full"></div></main>
+        </div>
+
+        <!-- Contenedor para módulos (oculto inicialmente) -->
+        <div id="modulesContainer" class="hidden flex-1"></div>
+    </div>
+
+    <!-- Modal para lista de países -->
+    <div id="countriesModal" class="hidden fixed inset-0 z-30 bg-black/80 flex items-center justify-center p-4">
+        <div class="glass-panel rounded-2xl w-full max-w-md max-h-[80vh] overflow-y-auto p-4">
+            <div class="flex justify-between items-center mb-4"><h3 class="text-lg font-bold">Lista de Países</h3><button onclick="closeModal()" class="text-white/60 hover:text-white"><i class="fas fa-times"></i></button></div>
+            <div id="countriesList" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DATOS DE 55 PAÍSES ====================
+        const paisesDB = [
+            {id:1,nombre:"Argelia",capital:"Argel",region:"norte",presidente:"Abdelmadjid Tebboune",gobierno:"República Semipresidencial",poblacion:47.1,bandera:"dz",lat:28.0339,lng:1.6596,cultura:"Herencia bereber",tradicion:"Ramadán",recursos:"Gas, petróleo",economia:"PIB $187B",relacionesVenezuela:"1963",embajada:"Argel",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Abdelmadjid_Tebboune_in_2023.jpg/220px-Abdelmadjid_Tebboune_in_2023.jpg"},
+            {id:2,nombre:"Egipto",capital:"El Cairo",region:"norte",presidente:"Abdelfatah El-Sisi",gobierno:"República Semipresidencial",poblacion:114.5,bandera:"eg",lat:26.8206,lng:30.8025,cultura:"Faraones",tradicion:"Ramadán",recursos:"Canal de Suez",economia:"PIB $398B",relacionesVenezuela:"1949",embajada:"El Cairo",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Abdel_Fattah_el-Sisi_%28cropped%29.jpg/220px-Abdel_Fattah_el-Sisi_%28cropped%29.jpg"},
+            {id:3,nombre:"Libia",capital:"Trípoli",region:"norte",presidente:"Mohammed al-Menfi",gobierno:"Gobierno Interino",poblacion:7.0,bandera:"ly",lat:26.3351,lng:17.2283,cultura:"Herencia bereber",tradicion:"Festival de Ghadames",recursos:"Petróleo",economia:"PIB $48B",relacionesVenezuela:"1973",embajada:"Trípoli",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Mohamed_al-Menfi_%282021%29.jpg/220px-Mohamed_al-Menfi_%282021%29.jpg"},
+            {id:4,nombre:"Marruecos",capital:"Rabat",region:"norte",presidente:"Rey Mohammed VI",gobierno:"Monarquía Parlamentaria",poblacion:38.3,bandera:"ma",lat:31.7917,lng:-7.0926,cultura:"Árabe-bereber",tradicion:"Ramadán",recursos:"Fosfatos",economia:"PIB $132B",relacionesVenezuela:"1960",embajada:"Rabat",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/King_Mohammed_VI_of_Morocco_in_2023.jpg/220px-King_Mohammed_VI_of_Morocco_in_2023.jpg"},
+            {id:5,nombre:"Sudán",capital:"Jartum",region:"norte",presidente:"Abdel Fattah al-Burhan",gobierno:"Militar",poblacion:49.3,bandera:"sd",lat:12.8628,lng:30.2176,cultura:"Nubia",tradicion:"Bodas nubias",recursos:"Petróleo",economia:"PIB $34B",relacionesVenezuela:"1962",embajada:"N/A",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Abdel_Fattah_al-Burhan_in_2023.jpg/220px-Abdel_Fattah_al-Burhan_in_2023.jpg"},
+            {id:6,nombre:"Túnez",capital:"Túnez",region:"norte",presidente:"Kais Saied",gobierno:"República Presidencial",poblacion:12.6,bandera:"tn",lat:33.8869,lng:9.5375,cultura:"Cartaginesa",tradicion:"Festival de Cartago",recursos:"Fosfatos",economia:"PIB $46B",relacionesVenezuela:"1960",embajada:"Túnez",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Kais_Saied_in_2023.jpg/220px-Kais_Saied_in_2023.jpg"},
+            {id:7,nombre:"Sáhara Occidental",capital:"El Aaiún",region:"norte",presidente:"Brahim Ghali",gobierno:"Disputado",poblacion:0.6,bandera:"eh",lat:24.2155,lng:-12.8858,cultura:"Saharaui",tradicion:"Música hassani",recursos:"Fosfatos",economia:"En desarrollo",relacionesVenezuela:"Reconoce RASD",embajada:"N/A",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Brahim_Ghali_in_2023.jpg/220px-Brahim_Ghali_in_2023.jpg"}
+        ];
+        const nombresRest = ["Benín","Burkina Faso","Cabo Verde","Costa de Marfil","Gambia","Ghana","Guinea","Guinea-Bisáu","Liberia","Malí","Mauritania","Níger","Nigeria","Senegal","Sierra Leona","Togo","Camerún","Chad","Gabón","Guinea Ecuatorial","R. Centroafricana","R. D. Congo","R. Congo","Santo Tomé y Príncipe","Burundi","Comoras","Yibuti","Eritrea","Etiopía","Kenia","Madagascar","Malaui","Mauricio","Mozambique","Ruanda","Seychelles","Somalia","Sudán del Sur","Tanzania","Uganda","Angola","Botsuana","Esuatini","Lesoto","Namibia","Sudáfrica","Zambia","Zimbabue"];
+        const regionesRest = ["occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","occidental","central","central","central","central","central","central","central","central","central","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","oriental","austral","austral","austral","austral","austral","austral","austral","austral"];
+        const banderasRest = ["bj","bf","cv","ci","gm","gh","gn","gw","lr","ml","mr","ne","ng","sn","sl","tg","cm","td","ga","gq","cf","cd","cg","st","bi","km","dj","er","et","ke","mg","mw","mu","mz","rw","sc","so","ss","tz","ug","ao","bw","sz","ls","na","za","zm","zw"];
+        let nextId = paisesDB.length+1;
+        for(let i=0; i<nombresRest.length && paisesDB.length<55; i++){
+            paisesDB.push({id:nextId++, nombre:nombresRest[i], capital:"Capital", region:regionesRest[i], presidente:"Presidente", gobierno:"Gobierno", poblacion:Math.floor(Math.random()*50)+1, bandera:banderasRest[i], lat:(Math.random()*30-10), lng:(Math.random()*40+10), cultura:"Cultura local", tradicion:"Tradición", recursos:"Recursos variados", economia:"Economía en desarrollo", relacionesVenezuela:"2000", embajada:"Embajada", foto:"https://ui-avatars.com/api/?name="+encodeURIComponent(nombresRest[i])+"&background=141414&color=D4AF37&size=150"});
+        }
+
+        // Traducciones (simplificado)
+        const translations = { es:{ searchPlaceholder:"Buscar país...", selectCountry:"Seleccione un país en el mapa", previous:"Anterior", next:"Siguiente", list:"Lista", loginError:"Usuario o contraseña incorrectos" }, en:{ searchPlaceholder:"Search country...", selectCountry:"Select a country on the map", previous:"Previous", next:"Next", list:"List", loginError:"Incorrect username or password" }, fr:{ searchPlaceholder:"Rechercher pays...", selectCountry:"Sélectionnez un pays", previous:"Précédent", next:"Suivant", list:"Liste", loginError:"Nom d'utilisateur incorrect" } };
+        let currentLang = 'es';
+        function setLanguage(lang) { currentLang = lang; localStorage.setItem('afridata_lang', lang); applyTranslations(); }
+        function applyTranslations() {
+            let t = translations[currentLang];
+            document.getElementById('searchBox')?.setAttribute('placeholder', t.searchPlaceholder);
+            let ph = document.querySelector('#placeholderSidebar p');
+            if(ph) ph.innerText = t.selectCountry;
+            let prevBtn = document.querySelector('#countryDetail .flex button:first-child');
+            let nextBtn = document.querySelector('#countryDetail .flex button:last-child');
+            let listBtn = document.querySelector('#countryDetail .flex button:nth-child(2)');
+            if(prevBtn) prevBtn.innerHTML = `<i class="fas fa-chevron-left mr-1"></i> ${t.previous}`;
+            if(nextBtn) nextBtn.innerHTML = `${t.next} <i class="fas fa-chevron-right ml-1"></i>`;
+            if(listBtn) listBtn.innerHTML = `<i class="fas fa-list mr-1"></i> ${t.list}`;
+        }
+
+        // Variables globales
+        let map, markers = [], currentRegion = 'all';
+        let currentCountry = null, currentSearch = '', filteredList = [], currentIndex = 0;
+        let currentUser = null, auditLog = [];
+        let users = [{ id:1, name:"Administrador", login:"admin", password:"admin", role:"admin" }];
+        let nextUserId = 2;
+
+        // Funciones del mapa
+        function initMap() { if(map) map.remove(); map = L.map('map').setView([5,20],3); L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {subdomains:'abcd'}).addTo(map); addMarkers(currentRegion); }
+        function getRegionColor(r) { const c = { norte:"#ef4444", occidental:"#3b82f6", central:"#10b981", oriental:"#f59e0b", austral:"#9b5cf6" }; return c[r] || "#888"; }
+        function addMarkers(region) {
+            if(markers.length) markers.forEach(m=>map.removeLayer(m)); markers = [];
+            let filtered = region==='all' ? paisesDB : paisesDB.filter(p=>p.region===region);
+            filtered.forEach(p=>{
+                let icon = L.divIcon({html:`<div style="width:20px;height:20px;background:${getRegionColor(p.region)};border:2px solid #D4AF37;border-radius:50%;"></div>`, iconSize:[20,20]});
+                let marker = L.marker([p.lat,p.lng], {icon}).addTo(map);
+                marker.bindPopup(`<div class="text-center"><img src="https://flagcdn.com/w80/${p.bandera}.png" style="width:48px;border-radius:4px;margin-bottom:6px;"><div class="font-bold">${p.nombre}</div><button class="mt-2 bg-amber-700 hover:bg-amber-600 text-white text-xs px-3 py-1 rounded" onclick="selectCountryById(${p.id})">Ver ficha</button></div>`);
+                marker.on('click',()=>selectCountry(p));
+                markers.push(marker);
+            });
+        }
+        function selectCountry(c){
+            currentCountry = c;
+            document.getElementById('placeholderSidebar').style.display = 'none';
+            document.getElementById('countryDetail').style.display = 'block';
+            document.getElementById('detailName').innerText = c.nombre;
+            document.getElementById('detailCapital').innerText = c.capital;
+            document.getElementById('detailFlag').src = `https://flagcdn.com/w320/${c.bandera}.png`;
+            document.getElementById('detailAutoridades').innerHTML = `${c.presidente}<br>${c.gobierno}`;
+            document.getElementById('detailEmbajada').innerText = c.embajada;
+            document.getElementById('detailCultura').innerText = c.cultura;
+            document.getElementById('detailTradiciones').innerText = c.tradicion;
+            document.getElementById('detailEconomia').innerText = c.economia;
+            document.getElementById('detailVenezuela').innerText = `${c.relacionesVenezuela} · ${c.embajada}`;
+            let rd = document.getElementById('detailRecursos'); rd.innerHTML = '';
+            (c.recursos||'').split(',').forEach(r=>{ let sp = document.createElement('span'); sp.className = 'bg-amber-900/30 text-amber-400 text-xs px-2 py-1 rounded-full'; sp.innerText = r.trim(); rd.appendChild(sp); });
+            filteredList = paisesDB.filter(p=> (currentRegion==='all'||p.region===currentRegion) && (!currentSearch||p.nombre.toLowerCase().includes(currentSearch)));
+            currentIndex = filteredList.findIndex(x=>x.id===c.id);
+        }
+        function selectCountryById(id){ let c = paisesDB.find(p=>p.id===id); if(c) selectCountry(c); }
+        function filterCountries(){ currentSearch = document.getElementById('searchBox').value.toLowerCase().trim(); addMarkers(currentRegion); if(currentCountry) selectCountry(currentCountry); }
+        function filterRegion(region,btn){ currentRegion = region; document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); addMarkers(region); if(currentCountry) selectCountry(currentCountry); }
+        function nextCountry(){ if(filteredList.length){ currentIndex = (currentIndex+1)%filteredList.length; selectCountry(filteredList[currentIndex]); } }
+        function prevCountry(){ if(filteredList.length){ currentIndex = (currentIndex-1+filteredList.length)%filteredList.length; selectCountry(filteredList[currentIndex]); } }
+        function toggleAllCountriesModal(){
+            let modal = document.getElementById('countriesModal'); modal.classList.toggle('hidden');
+            if(!modal.classList.contains('hidden')){
+                let listDiv = document.getElementById('countriesList'); listDiv.innerHTML = '';
+                paisesDB.forEach(c=>{ let btn = document.createElement('button'); btn.className = 'w-full text-left px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition mb-1'; btn.innerHTML = `<img src="https://flagcdn.com/w40/${c.bandera}.png" class="inline w-5 mr-2"> ${c.nombre}`; btn.onclick = ()=>{ selectCountry(c); closeModal(); }; listDiv.appendChild(btn); });
+            }
+        }
+        function closeModal(){ document.getElementById('countriesModal').classList.add('hidden'); }
+
+        // Gestión de módulos: muestra/oculta el layout del mapa y carga el contenido
+        function showModule(moduleId) {
+            const mapLayout = document.getElementById('map-layout');
+            const modulesContainer = document.getElementById('modulesContainer');
+            if (moduleId === 'mapa') {
+                mapLayout.style.display = 'flex';
+                modulesContainer.style.display = 'none';
+                if (map) map.invalidateSize();
+            } else {
+                mapLayout.style.display = 'none';
+                modulesContainer.style.display = 'block';
+                // Cargar el contenido según el módulo
+                let content = '';
+                if (moduleId === 'paises') content = renderPaises();
+                else if (moduleId === 'autoridades') content = renderAutoridades();
+                else if (moduleId === 'bilateral') content = renderBilateral();
+                else if (moduleId === 'multilateral') content = renderMultilateral();
+                else if (moduleId === 'hitos') content = renderHitos();
+                else if (moduleId === 'embajadas') content = renderEmbajadas();
+                else if (moduleId === 'reportes') content = renderReportes();
+                else if (moduleId === 'auditoria') content = renderAuditoria();
+                else if (moduleId === 'equipo') content = renderEquipo();
+                else if (moduleId === 'admin') content = renderAdmin();
+                modulesContainer.innerHTML = content;
+                // Ejecutar scripts adicionales después de inyectar HTML
+                if (moduleId === 'autoridades') attachAuthoritySearch();
+                if (moduleId === 'auditoria') renderAuditLog();
+                if (moduleId === 'admin') loadAdminList();
+            }
+            // Actualizar clase activa en botones
+            document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.module-btn[data-module="${moduleId}"]`).classList.add('active');
+        }
+
+        // Renderizado de módulos (HTML puro, sin scripts internos)
+        function renderPaises() {
+            return `<div class="max-w-6xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Lista de Países</h2><div class="overflow-x-auto"><table class="w-full border-collapse"><thead><tr class="bg-white/5 border-b border-amber-800/30"><th class="p-3">#</th><th>País</th><th>Capital</th><th>Región</th><th>Presidente</th><th>Población</th><th></th></tr></thead><tbody>${paisesDB.map((p,i)=>`<tr class="border-b border-white/5"><td class="p-3">${i+1}</td><td class="p-3 font-medium">${p.nombre}</td><td class="p-3">${p.capital}</td><td class="p-3" style="color:${getRegionColor(p.region)}">${p.region}</td><td class="p-3">${p.presidente}</td><td class="p-3">${p.poblacion}M</td><td class="p-3"><button class="bg-amber-700/80 hover:bg-amber-600 px-3 py-1 rounded text-sm" onclick="selectCountryById(${p.id}); showModule('mapa');">Ver</button></td></tr>`).join('')}</tbody></table></div></div>`;
+        }
+        function renderAutoridades() {
+            return `<div class="max-w-6xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Autoridades</h2><input type="text" id="authSearch" class="w-full bg-white/5 border border-amber-700/30 rounded-xl px-4 py-2 text-white mb-6" placeholder="Buscar..."><div id="authGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${paisesDB.map(p=>`<div class="glass-panel rounded-xl overflow-hidden cursor-pointer hover:scale-105 transition" data-name="${p.presidente.toLowerCase()} ${p.nombre.toLowerCase()}" onclick="selectCountryById(${p.id}); showModule('mapa');"><div class="h-48 bg-gradient-to-t from-black/80 to-transparent flex items-end justify-center"><img src="${p.foto}" class="h-full w-full object-contain" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(p.presidente)}&background=141414&color=D4AF37&size=150'"></div><div class="p-4"><div class="font-bold text-amber-400">${p.presidente}</div><div class="text-sm text-white/70">${p.nombre}</div></div></div>`).join('')}</div></div>`;
+        }
+        function attachAuthoritySearch() {
+            let input = document.getElementById('authSearch');
+            if(input) {
+                input.oninput = () => {
+                    let val = input.value.toLowerCase();
+                    document.querySelectorAll('#authGrid > div').forEach(card => {
+                        card.style.display = card.getAttribute('data-name').includes(val) ? 'block' : 'none';
+                    });
+                };
+            }
+        }
+        function renderBilateral() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Relaciones Bilaterales</h2><div class="glass-panel rounded-xl p-6 space-y-4"><div class="info-card">🌍 Relaciones diplomáticas con 43 países africanos.</div><div class="info-card">🤝 Acuerdos vigentes: 80 tratados de cooperación.</div><div class="info-card">🏛️ Embajadas residentes: Argelia, Egipto, Marruecos, Túnez, Senegal, Malí, Nigeria, Guinea Ecuatorial, Etiopía, Kenia, Mozambique, Angola, Namibia, Sudáfrica, Uganda, Tanzania, R.D. Congo, Ghana.</div></div></div>`; }
+        function renderMultilateral() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Multilateral</h2><div class="glass-panel rounded-xl p-6 space-y-4"><div class="info-card">🇺🇳 ONU: 54 países africanos miembros.</div><div class="info-card">🌍 UA: Venezuela observador desde 2009.</div><div class="info-card">🛢️ OPEP: 7 miembros africanos.</div></div></div>`; }
+        function renderHitos() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Hitos Históricos</h2><div class="border-l-2 border-amber-500 pl-6 space-y-6"><div><div class="text-amber-400 font-bold">1948</div><div>Relaciones con Etiopía</div><div class="text-white/70">Primer país africano.</div></div><div><div class="text-amber-400 font-bold">1960</div><div>Independencias</div><div class="text-white/70">Nigeria y Marruecos.</div></div><div><div class="text-amber-400 font-bold">1994</div><div>Sudáfrica</div><div class="text-white/70">Post-Apartheid.</div></div></div></div>`; }
+        function renderEmbajadas() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Red Diplomática</h2><table class="w-full border-collapse"><thead><tr class="bg-white/5"><th class="p-3">País</th><th>Ciudad</th><th>Embajador</th></tr></thead><tbody><tr><td class="p-3">Argelia</td><td class="p-3">Argel</td><td class="p-3">José Sojo</td></tr><tr><td class="p-3">Egipto</td><td class="p-3">El Cairo</td><td class="p-3">Wilmer Barrientos</td></tr><tr><td class="p-3">Sudáfrica</td><td class="p-3">Pretoria</td><td class="p-3">Marín Moreno</td></tr></tbody></table></div>`; }
+        function renderReportes() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Reportes</h2><button class="bg-amber-700 hover:bg-amber-600 px-4 py-2 rounded-lg" onclick="exportCSV()"><i class="fas fa-file-csv mr-2"></i> Exportar CSV</button></div>`; }
+        function renderAuditoria() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Auditoría</h2><div id="auditLogDiv" class="glass-panel rounded-xl p-4"></div><button class="mt-4 bg-red-800/50 hover:bg-red-700 px-4 py-2 rounded-lg" onclick="clearAuditLog()">Limpiar</button></div>`; }
+        function renderEquipo() { return `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Equipo</h2><div class="grid grid-cols-1 sm:grid-cols-2 gap-4"><div class="glass-panel p-4"><div class="text-amber-400 font-bold">Walter Carrasquero</div><div>Estratega IT</div></div><div class="glass-panel p-4"><div class="text-amber-400 font-bold">Fernando Villegas</div><div>Arquitecto Datos</div></div><div class="glass-panel p-4"><div class="text-amber-400 font-bold">Raul Zavarce</div><div>Fullstack</div></div><div class="glass-panel p-4"><div class="text-amber-400 font-bold">Rober Lugo</div><div>DB Admin</div></div><div class="glass-panel p-4"><div class="text-amber-400 font-bold">Annie Aular</div><div>QA Analyst</div></div></div></div>`; }
+        function renderAdmin() { return (currentUser?.role === 'admin') ? `<div class="max-w-4xl mx-auto"><h2 class="text-2xl font-bold text-amber-400 mb-4">Admin</h2><div id="adminUsersList" class="glass-panel rounded-xl p-4 mb-6"></div><div class="glass-panel rounded-xl p-4"><h3>Crear usuario</h3><div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-2"><input type="text" id="newName" placeholder="Nombre" class="bg-white/5 border border-amber-700/30 rounded-lg px-3 py-2"><input type="text" id="newLogin" placeholder="Usuario" class="bg-white/5 border border-amber-700/30 rounded-lg px-3 py-2"><input type="password" id="newPass" placeholder="Contraseña" class="bg-white/5 border border-amber-700/30 rounded-lg px-3 py-2"><select id="newRole" class="bg-white/5 border border-amber-700/30 rounded-lg px-3 py-2"><option value="viewer">Lector</option><option value="admin">Admin</option></select></div><button onclick="createUser()" class="mt-4 bg-amber-700 hover:bg-amber-600 px-4 py-2 rounded-lg">Crear</button></div></div>` : `<div class="text-center text-red-400">Acceso restringido</div>`; }
+
+        // Auditoría y utilidades
+        function renderAuditLog(){ let cont = document.getElementById('auditLogDiv'); if(cont) cont.innerHTML = `<table class="w-full"><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Detalle</th></tr></thead><tbody>${auditLog.map(a=>`<tr><td class="p-2">${a.date}</td><td class="p-2">${a.user}</td><td class="p-2">${a.action}</td><td class="p-2">${a.detail}</td></tr>`).join('')||'<tr><td colspan="4" class="p-4 text-center">Sin registros</td></tr>'}</tbody></table>`; }
+        function addAudit(action,detail){ auditLog.unshift({date:new Date().toLocaleString(), user:currentUser?.name||'Sistema', action, detail}); if(auditLog.length>50) auditLog.pop(); if(document.getElementById('auditLogDiv')) renderAuditLog(); }
+        function clearAuditLog(){ auditLog=[]; renderAuditLog(); addAudit("Limpiar","Registros eliminados"); showToast("Auditoría limpiada"); }
+        function exportCSV(){ let csv="País,Capital,Presidente,Población,Región\n"; paisesDB.forEach(p=>csv+=`"${p.nombre}","${p.capital}","${p.presidente}",${p.poblacion},"${p.region}"\n`); let blob=new Blob(["\ufeff"+csv],{type:"text/csv"}); let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="afridata_paises.csv"; a.click(); addAudit("Exportar CSV","Descargó lista"); showToast("CSV exportado"); }
+        function showToast(msg){ let t=document.createElement('div'); t.className='toast'; t.innerHTML=`<i class="fas fa-info-circle mr-2"></i> ${msg}`; document.body.appendChild(t); setTimeout(()=>t.remove(),3000); }
+        function loadAdminList(){ if(!currentUser || currentUser.role!=='admin') return; let div=document.getElementById('adminUsersList'); if(div) div.innerHTML=users.map(u=>`<div class="flex justify-between items-center border-b border-white/10 py-2"><span>${u.name} (${u.login}) - ${u.role}</span>${u.login!=='admin'?`<button class="text-red-400 hover:text-red-300" onclick="deleteUser(${u.id})">Eliminar</button>`:''}</div>`).join(''); }
+        function createUser(){ let name=document.getElementById('newName')?.value.trim(); let login=document.getElementById('newLogin')?.value.trim(); let pass=document.getElementById('newPass')?.value; let role=document.getElementById('newRole')?.value; if(!name||!login||!pass){ showToast("Complete campos"); return; } if(users.find(u=>u.login===login)){ showToast("Usuario existe"); return; } users.push({id:nextUserId++, name, login, password:pass, role}); loadAdminList(); addAudit("Crear usuario",login); showToast("Creado"); }
+        function deleteUser(id){ users=users.filter(u=>u.id!==id); loadAdminList(); addAudit("Eliminar usuario",`ID ${id}`); showToast("Eliminado"); }
+
+        // Login/Logout
+        function doLogin(){
+            let user = document.getElementById('loginUser').value.trim();
+            let pass = document.getElementById('loginPass').value;
+            let found = users.find(u=>u.login===user && u.password===pass);
+            if(!found){ document.getElementById('loginError').classList.remove('hidden'); return; }
+            currentUser = found;
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('appPage').style.display = 'flex';
+            document.getElementById('userName').innerText = currentUser.name;
+            initMap();
+            addAudit("Inicio de sesión","Acceso correcto");
+            applyTranslations();
+        }
+        function doLogout(){
+            addAudit("Cierre de sesión","Usuario cerró");
+            currentUser = null;
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('appPage').style.display = 'none';
+            if(map) map.remove();
+        }
+
+        // Inicialización
+        window.addEventListener('load',()=>{
+            let savedLang = localStorage.getItem('afridata_lang') || 'es';
+            setLanguage(savedLang);
+            document.querySelectorAll('.module-btn').forEach(btn=>{
+                btn.addEventListener('click',()=>showModule(btn.getAttribute('data-module')));
+            });
+        });
+    </script>
+</body>
+</html>

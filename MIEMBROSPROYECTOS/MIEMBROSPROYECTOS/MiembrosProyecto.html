@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talent Folder - Proyecto AFRIDATA</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-glow: rgba(99, 102, 241, 0.4);
+            --secondary: #f8fafc;
+            --bg: #030712; 
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(99, 102, 241, 0.2);
+            --accent: #f59e0b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logo-svg {
+            width: clamp(80px, 15vw, 120px);
+            height: auto;
+            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+        }
+
+        .brand-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.05em;
+            color: #ffffff;
+            margin: 10px 0 0 0;
+            text-align: center;
+        }
+
+        .brand-text span {
+            color: var(--accent);
+            font-weight: 300;
+        }
+
+        @keyframes pulseNode {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.6; }
+        }
+
+        .node {
+            animation: pulseNode 3s infinite ease-in-out;
+            transform-origin: center;
+        }
+
+        .node-delayed {
+            animation-delay: 1.5s;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: clamp(30px, 8vw, 60px);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            padding-bottom: 40px;
+        }
+
+        .member-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: clamp(20px, 4vw, 32px);
+            display: flex;
+            flex-direction: row;
+            align-items: center; 
+            gap: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .member-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px -10px var(--primary-glow);
+            border-color: var(--primary);
+        }
+
+        .image-container {
+            flex-shrink: 0;
+        }
+
+        .member-card img {
+            width: clamp(70px, 12vw, 100px);
+            height: clamp(70px, 12vw, 100px);
+            border-radius: 18px;
+            object-fit: cover;
+            object-position: center 15%;
+            background: #1e293b;
+            border: 2px solid var(--border);
+            display: block;
+        }
+
+        .member-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .role-badge {
+            display: inline-block;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .member-info h2 {
+            margin: 0 0 8px 0;
+            color: #ffffff;
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .details-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .detail-item span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .detail-item i {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            color: var(--primary);
+        }
+
+        .contact-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .contact-btn {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            opacity: 0.7;
+        }
+
+        .contact-btn:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        @media (max-width: 480px) {
+            .member-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 24px;
+            }
+            .image-container { margin-bottom: 5px; }
+            .contact-footer, .detail-item { justify-content: center; }
+        }
+
+        @media (min-width: 481px) and (max-width: 1024px) {
+            .members-grid { grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="particles-js"></canvas>
+
+    <div class="container">
+        <header>
+            <div class="logo-wrapper">
+                <svg class="logo-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g opacity="0.4">
+                        <path d="M100 30 L150 70 L140 120 L100 180 L60 120 L50 70 Z" stroke="#6366f1" stroke-width="1" />
+                        <path d="M50 70 L150 70 M60 120 L140 120" stroke="#6366f1" stroke-width="1" />
+                        <line x1="100" y1="30" x2="100" y2="180" stroke="#6366f1" stroke-width="0.5" />
+                    </g>
+                    <path d="M85 50 C95 45 105 45 115 50 L140 70 L100 85 L60 70 Z" fill="#4f46e5" />
+                    <path d="M60 70 L100 85 L90 120 L55 110 C50 100 55 80 60 70 Z" fill="#4338ca" />
+                    <path d="M100 85 L140 70 L150 110 L130 135 L95 135 L90 120 Z" fill="#312e81" />
+                    <path d="M95 135 L130 135 L105 175 C100 180 95 175 95 170 Z" fill="#f59e0b" />
+                    <circle class="node" cx="100" cy="35" r="4" fill="#ef4444" />
+                    <circle class="node node-delayed" cx="55" cy="90" r="4" fill="#fbbf24" />
+                    <circle class="node" cx="100" cy="100" r="4" fill="#3b82f6" />
+                    <circle class="node node-delayed" cx="145" cy="95" r="4" fill="#10b981" />
+                    <circle class="node" cx="105" cy="155" r="4" fill="#8b5cf6" />
+                </svg>
+                <h1 class="brand-text">AFRI<span>DATA</span></h1>
+            </div>
+            
+            <p class="subtitle">Directorio profesional de especialistas y desarrolladores.</p>
+        </header>
+
+        <div id="members-list" class="members-grid">
+            <!-- Renderizado dinámico -->
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles-js');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        
+        function initParticles() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            const count = window.innerWidth < 600 ? 40 : 80;
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    size: Math.random() * 1.5
+                });
+            }
+        }
+
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#6366f1';
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i];
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            requestAnimationFrame(drawParticles);
+        }
+
+        window.addEventListener('resize', initParticles);
+        initParticles();
+        drawParticles();
+
+        const members = [
+            {
+                nombre: "Prof. Walter Carrasquero",
+                exp: "Experiencia - 20 Años",
+                cedula: "6.897.601",
+                correo: "w.carrasquero@afridata.com",
+                telefono: "0424-193-8899",
+                profesion: "Lic. Administración (Informática)",
+                rol: "Estratega IT & Consultoría",
+                foto: "https://imgur.com/KlKs3xB.png"
+            },
+            {
+                nombre: "Fernando Villegas",
+                exp: "Developer Senior",
+                cedula: "20.129.712",
+                correo: "ferjoseville@gmail.com",
+                telefono: "0412-3759137",
+                profesion: "T.S.U. en Informática",
+                rol: "Arq. Datos & Backend",
+                foto: "https://i.imgur.com/qf0oMuS.png"
+            },
+            {
+                nombre: "Raul Zavarce",
+                exp: "Fullstack Dev",
+                cedula: "13.308.756",
+                correo: "razavarce@gmail.com",
+                telefono: "0414-2857181",
+                profesion: "T.S.U. en Informática",
+                rol: "Desarrollo de Sistemas",
+                foto: "https://i.imgur.com/xMoIksT.png"
+            },
+            {
+                nombre: "Rober Lugo",
+                exp: "DB Admin",
+                cedula: "16.357.005",
+                correo: "roberalexis@gmail.com",
+                telefono: "0414-2857181",
+                profesion: "T.S.U. en Informática",
+                rol: "Especialista en Bases de Datos",
+                foto: "https://imgur.com/RCbrJZQ.png"
+            },
+            {
+                nombre: "Annie Aular",
+                exp: "System Analyst",
+                cedula: "18.271.471",
+                correo: "annieaular18@gmail.com",
+                telefono: "0424-2064646",
+                profesion: "T.S.U. en Informática",
+                rol: "Análisis & Calidad",
+                foto: "https://i.imgur.com/X3506Sc.png"
+            }
+        ];
+
+        function renderMembers() {
+            const container = document.getElementById('members-list');
+            container.innerHTML = members.map(m => `
+                <div class="member-card">
+                    <div class="image-container">
+                        <img src="${m.foto}" alt="${m.nombre}" onerror="this.src='https://api.dicebear.com/7.x/avataaars/svg?seed=fallback&backgroundColor=1e293b'">
+                    </div>
+                    <div class="member-info">
+                        <span class="role-badge" title="${m.rol}">${m.rol}</span>
+                        <h2 title="${m.nombre}">${m.nombre}</h2>
+                        <div class="details-list">
+                            <div class="detail-item"><i data-lucide="fingerprint"></i><span title="${m.cedula}">CI: ${m.cedula}</span></div>
+                            <div class="detail-item"><i data-lucide="graduation-cap"></i><span title="${m.profesion}">${m.profesion}</span></div>
+                            <div class="detail-item"><i data-lucide="activity"></i><span title="${m.exp}">${m.exp}</span></div>
+                        </div>
+                        <div class="contact-footer">
+                            <a href="mailto:${m.correo}" class="contact-btn"><i data-lucide="mail"></i> Mail</a>
+                            <a href="https://wa.me/${m.telefono.replace(/-/g, '')}" class="contact-btn"><i data-lucide="message-square"></i> WhatsApp</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        window.onload = renderMembers;
+    </script>
+</body>
+</html>

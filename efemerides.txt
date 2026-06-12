@@ -1,0 +1,277 @@
+{
+  "1": [
+    {"fecha": "1962", "titulo": "Independencia de Argelia", "desc": "Fin de la guerra de independencia. Argelia se independiza de Francia tras 132 años de colonización."},
+    {"fecha": "1962", "titulo": "Proclamación de la República", "desc": "Establecimiento de la República Democrática y Popular de Argelia como estado soberano."},
+    {"fecha": "1996", "titulo": "Constitución Nacional", "desc": "Aprobación de la carta magna que consolida el sistema político y social actual."}
+  ],
+  "2": [
+    {"fecha": "1975", "titulo": "Independencia de Angola", "desc": "Fin del dominio portugués tras la guerra de liberación nacional."},
+    {"fecha": "2010", "titulo": "Constitución de la Tercera República", "desc": "Promulgación del marco legal que reestructura el poder ejecutivo y legislativo."},
+    {"fecha": "2002", "titulo": "Acuerdo de Luena", "desc": "Fin oficial de la guerra civil y proceso de desmilitarización territorial."}
+  ],
+  "3": [
+    {"fecha": "1960", "titulo": "Independencia de Benín", "desc": "Proclamación de soberanía tras la disolución del imperio colonial francés."},
+    {"fecha": "1990", "titulo": "Conferencia Nacional Soberana", "desc": "Transición democrática histórica que abrió el sistema al multipartidismo."},
+    {"fecha": "1990", "titulo": "Constitución Actual", "desc": "Promulgación de la ley fundamental que rige la tercera república."}
+  ],
+  "4": [
+    {"fecha": "1966", "titulo": "Independencia de Botsuana", "desc": "Fin del protectorado británico y nacimiento de la República de Botsuana."},
+    {"fecha": "1965", "titulo": "Aprobación de la Constitución", "desc": "Establecimiento del marco institucional previo a la independencia formal."},
+    {"fecha": "1997", "titulo": "Sede del Parlamento", "desc": "Inauguración de la Asamblea Nacional en Gaborone como símbolo estatal."}
+  ],
+  "5": [
+    {"fecha": "1960", "titulo": "Independencia de Burkina Faso", "desc": "Fin de la colonización francesa bajo el nombre de Alto Volta."},
+    {"fecha": "1984", "titulo": "Cambio de Nombre", "desc": "Adopción oficial del nombre Burkina Faso (Tierra de Hombres Íntegros)."},
+    {"fecha": "1991", "titulo": "Constitución de la Cuarta República", "desc": "Restablecimiento del orden constitucional tras el período revolucionario."}
+  ],
+  "6": [
+    {"fecha": "1962", "titulo": "Independencia de Burundi", "desc": "Burundi se independiza de Bélgica bajo tutela de la ONU."},
+    {"fecha": "2005", "titulo": "Constitución Post-Transición", "desc": "Promulgación de la carta magna derivada del Acuerdo de Arusha."},
+    {"fecha": "2015", "titulo": "Reforma Constitucional", "desc": "Referéndum que modifica los límites de mandato y la estructura electoral."}
+  ],
+  "7": [
+    {"fecha": "1975", "titulo": "Independencia de Cabo Verde", "desc": "Fin de la administración portuguesa y reconocimiento internacional."},
+    {"fecha": "1992", "titulo": "Constitución Multipartidista", "desc": "Transición formal hacia un sistema democrático representativo."},
+    {"fecha": "2021", "titulo": "Alternancia Pacífica", "desc": "Primera transferencia de poder mediante elecciones competitivas."}
+  ],
+  "8": [
+    {"fecha": "1960", "titulo": "Independencia de Camerún", "desc": "Fin del mandato francés sobre la zona oriental del territorio."},
+    {"fecha": "1961", "titulo": "Reunificación Nacional", "desc": "Unión de los territorios francófono y anglófono en un solo estado."},
+    {"fecha": "1996", "titulo": "Constitución Unitaria", "desc": "Promulgación de la ley fundamental que centraliza la estructura estatal."}
+  ],
+  "9": [
+    {"fecha": "1960", "titulo": "Independencia de República Centroafricana", "desc": "Proclamación de soberanía tras la descolonización francesa."},
+    {"fecha": "2016", "titulo": "Constitución Actual", "desc": "Promulgación del marco legal tras el proceso de estabilización post-crisis."},
+    {"fecha": "1993", "titulo": "Primeras Elecciones Multipartidistas", "desc": "Transición democrática tras décadas de regímenes unipartidistas."}
+  ],
+  "10": [
+    {"fecha": "1960", "titulo": "Independencia de Chad", "desc": "Fin del protectorado francés y establecimiento de la soberanía estatal."},
+    {"fecha": "1996", "titulo": "Constitución de la Cuarta República", "desc": "Aprobación de la carta magna que regula la transición política."},
+    {"fecha": "2002", "titulo": "Acuerdo de Libreville", "desc": "Pacto de paz que pone fin a la rebelión del norte del país."}
+  ],
+  "11": [
+    {"fecha": "1975", "titulo": "Declaración de Independencia", "desc": "Proclamación unilateral de soberanía de las Islas Comoras."},
+    {"fecha": "2001", "titulo": "Acuerdo de Fomboni", "desc": "Creación de la Unión de las Comoras y descentralización insular."},
+    {"fecha": "2018", "titulo": "Reforma Constitucional", "desc": "Referéndum que reorganiza el sistema electoral y la presidencia."}
+  ],
+  "12": [
+    {"fecha": "1960", "titulo": "Independencia de República del Congo", "desc": "Fin del dominio colonial francés en Brazzaville."},
+    {"fecha": "2015", "titulo": "Constitución de la Quinta República", "desc": "Promulgación de la nueva carta magna tras referéndum nacional."},
+    {"fecha": "1992", "titulo": "Conferencia Nacional Soberana", "desc": "Proceso de transición hacia el multipartidismo y apertura política."}
+  ],
+  "13": [
+    {"fecha": "1960", "titulo": "Independencia de R.D. Congo", "desc": "Fin de la administración belga en Kinshasa."},
+    {"fecha": "2006", "titulo": "Constitución Actual", "desc": "Promulgación del marco legal post-conflicto y transición democrática."},
+    {"fecha": "2003", "titulo": "Acuerdo de Pretoria", "desc": "Fin oficial de la Segunda Guerra del Congo y desmovilización."}
+  ],
+  "14": [
+    {"fecha": "1960", "titulo": "Independencia de Costa de Marfil", "desc": "Proclamación de soberanía tras la disolución del imperio francés."},
+    {"fecha": "2000", "titulo": "Constitución de la Cuarta República", "desc": "Aprobación de la ley fundamental que reestructura el ejecutivo."},
+    {"fecha": "2011", "titulo": "Restauración del Orden Constitucional", "desc": "Fin de la crisis post-electoral y consolidación institucional."}
+  ],
+  "15": [
+    {"fecha": "1977", "titulo": "Independencia de Yibuti", "desc": "Fin del protectorado francés y nacimiento del estado soberano."},
+    {"fecha": "1992", "titulo": "Constitución Multipartidista", "desc": "Transición formal hacia un sistema democrático plural."},
+    {"fecha": "2010", "titulo": "Enmienda Presidencial", "desc": "Reforma que modifica los límites de mandato y la sucesión."}
+  ],
+  "16": [
+    {"fecha": "1922", "titulo": "Independencia de Egipto", "desc": "Declaración nominal de soberanía del Reino Unido."},
+    {"fecha": "1953", "titulo": "Proclamación de la República", "desc": "Fin de la monarquía y establecimiento del régimen republicano."},
+    {"fecha": "2014", "titulo": "Constitución Post-Transición", "desc": "Promulgación de la carta magna tras los procesos de 2011 y 2013."}
+  ],
+  "17": [
+    {"fecha": "1968", "titulo": "Independencia de Guinea Ecuatorial", "desc": "Fin de la colonización española y reconocimiento internacional."},
+    {"fecha": "1982", "titulo": "Constitución Actual", "desc": "Promulgación de la ley fundamental que rige el estado unitario."},
+    {"fecha": "2011", "titulo": "Reforma Constitucional", "desc": "Referéndum que ajusta la estructura de poder y mandato ejecutivo."}
+  ],
+  "18": [
+    {"fecha": "1993", "titulo": "Independencia de Eritrea", "desc": "Separación de Etiopía tras referéndum de autodeterminación."},
+    {"fecha": "1997", "titulo": "Constitución Ratificada", "desc": "Aprobación del marco legal pendiente de implementación plena."},
+    {"fecha": "2000", "titulo": "Acuerdo de Argel", "desc": "Fin de la guerra fronteriza con Etiopía y delimitación territorial."}
+  ],
+  "19": [
+    {"fecha": "1968", "titulo": "Independencia de Esuatini", "desc": "Fin del protectorado británico y nacimiento del reino soberano."},
+    {"fecha": "2005", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna que consolida el sistema monárquico."},
+    {"fecha": "1967", "titulo": "Adopción del Nombre Eswatini", "desc": "Cambio oficial de nombre previo a la independencia formal."}
+  ],
+  "20": [
+    {"fecha": "1896", "titulo": "Batalla de Adwa", "desc": "Victoria histórica que garantiza la soberanía frente a la expansión colonial."},
+    {"fecha": "1994", "titulo": "Constitución Federal", "desc": "Establecimiento de la República Federal Democrática de Etiopía."},
+    {"fecha": "1991", "titulo": "Caída del Régimen Derg", "desc": "Fin de la dictadura militar y transición hacia el gobierno civil."}
+  ],
+  "21": [
+    {"fecha": "1960", "titulo": "Independencia de Gabón", "desc": "Fin del dominio francés y proclamación de la república."},
+    {"fecha": "1991", "titulo": "Constitución Multipartidista", "desc": "Transición democrática y apertura del sistema político."},
+    {"fecha": "2003", "titulo": "Enmienda Presidencial", "desc": "Reforma constitucional que modifica los límites de mandato."}
+  ],
+  "22": [
+    {"fecha": "1965", "titulo": "Independencia de Gambia", "desc": "Fin del protectorado británico y soberanía estatal."},
+    {"fecha": "1970", "titulo": "Proclamación de la República", "desc": "Transición de dominio británico a sistema republicano."},
+    {"fecha": "2020", "titulo": "Comisión de la Verdad (TRRC)", "desc": "Inicio del proceso de reconciliación post-dictadura."}
+  ],
+  "23": [
+    {"fecha": "1957", "titulo": "Independencia de Ghana", "desc": "Primera nación subsahariana en lograr la independencia colonial."},
+    {"fecha": "1960", "titulo": "Proclamación de la República", "desc": "Fin de la monarquía británica y adopción del sistema republicano."},
+    {"fecha": "1992", "titulo": "Constitución de la Cuarta República", "desc": "Promulgación del marco legal que estabiliza la democracia moderna."}
+  ],
+  "24": [
+    {"fecha": "1958", "titulo": "Independencia de Guinea", "desc": "Única colonia francesa en rechazar la Comunidad Francesa."},
+    {"fecha": "2010", "titulo": "Constitución de la Cuarta República", "desc": "Aprobación de la carta magna tras transición militar."},
+    {"fecha": "2010", "titulo": "Primera Transferencia Pacífica", "desc": "Alternancia democrática por vía electoral tras décadas de inestabilidad."}
+  ],
+  "25": [
+    {"fecha": "1973", "titulo": "Independencia de Guinea-Bisáu", "desc": "Declaración unilateral de soberanía y fin de la guerra colonial."},
+    {"fecha": "1984", "titulo": "Constitución Actual", "desc": "Promulgación del marco legal reformado y vigente."},
+    {"fecha": "1999", "titulo": "Acuerdo de Abuja", "desc": "Fin de la guerra civil y desmilitarización del territorio."}
+  ],
+  "26": [
+    {"fecha": "1963", "titulo": "Independencia de Kenia", "desc": "Fin del dominio británico y proclamación de la soberanía."},
+    {"fecha": "1964", "titulo": "Proclamación de la República", "desc": "Transición a sistema republicano y fin de la monarquía constitucional."},
+    {"fecha": "2010", "titulo": "Constitución Devolutiva", "desc": "Reforma institucional que descentraliza el poder a los condados."}
+  ],
+  "27": [
+    {"fecha": "1966", "titulo": "Independencia de Lesoto", "desc": "Fin del protectorado británico y nacimiento del reino soberano."},
+    {"fecha": "1993", "titulo": "Restablecimiento Constitucional", "desc": "Fin de la intervención militar y retorno al orden democrático."},
+    {"fecha": "1993", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna que regula la monarquía parlamentaria."}
+  ],
+  "28": [
+    {"fecha": "1847", "titulo": "Independencia de Liberia", "desc": "Fundación de la primera república africana moderna."},
+    {"fecha": "1986", "titulo": "Constitución de la Tercera República", "desc": "Promulgación del marco legal tras el golpe militar de 1980."},
+    {"fecha": "2003", "titulo": "Acuerdo de Paz de Accra", "desc": "Fin de la guerra civil y desmovilización de facciones armadas."}
+  ],
+  "29": [
+    {"fecha": "1951", "titulo": "Independencia de Libia", "desc": "Creación del Reino Unido de Libia bajo tutela de la ONU."},
+    {"fecha": "1969", "titulo": "Revolución del 1 de Septiembre", "desc": "Derrocamiento de la monarquía y establecimiento de la Jamahiriya."},
+    {"fecha": "2011", "titulo": "Declaración de Liberación", "desc": "Fin del régimen de Gaddafi y transición post-revolucionaria."}
+  ],
+  "30": [
+    {"fecha": "1960", "titulo": "Independencia de Madagascar", "desc": "Fin del dominio colonial francés y soberanía estatal."},
+    {"fecha": "2010", "titulo": "Constitución de la Cuarta República", "desc": "Promulgación de la carta magna tras crisis política y transición."},
+    {"fecha": "2009", "titulo": "Transición Post-Crisis", "desc": "Reorganización institucional tras disputas electorales."}
+  ],
+  "31": [
+    {"fecha": "1964", "titulo": "Independencia de Malaui", "desc": "Fin del protectorado británico y proclamación de la república."},
+    {"fecha": "1994", "titulo": "Constitución de la Tercera República", "desc": "Establecimiento del sistema democrático multipartidista."},
+    {"fecha": "1993", "titulo": "Referéndum de Multipartidismo", "desc": "Aprobación popular para la apertura política y elecciones libres."}
+  ],
+  "32": [
+    {"fecha": "1960", "titulo": "Independencia de Mali", "desc": "Disolución de la Federación de Mali y soberanía estatal."},
+    {"fecha": "1992", "titulo": "Constitución de la Tercera República", "desc": "Promulgación del marco legal tras transición democrática."},
+    {"fecha": "2012", "titulo": "Declaración de Azawad", "desc": "Crisis territorial y ocupación norte por grupos separatistas."}
+  ],
+  "33": [
+    {"fecha": "1960", "titulo": "Independencia de Mauritania", "desc": "Fin del protectorado francés y nacimiento del estado soberano."},
+    {"fecha": "1991", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna que establece el sistema republicano."},
+    {"fecha": "2019", "titulo": "Primera Transferencia Pacífica", "desc": "Alternancia democrática por vía electoral tras décadas de estabilidad."}
+  ],
+  "34": [
+    {"fecha": "1968", "titulo": "Independencia de Mauricio", "desc": "Fin del dominio británico y proclamación de la república."},
+    {"fecha": "1992", "titulo": "Proclamación de la República", "desc": "Transición de monarquía constitucional a sistema republicano."},
+    {"fecha": "1991", "titulo": "Reforma Electoral", "desc": "Aprobación del sistema MMP y enmienda constitucional."}
+  ],
+  "35": [
+    {"fecha": "1956", "titulo": "Fin del Protectorado Francés", "desc": "Recuperación de la soberanía tras acuerdo de descolonización."},
+    {"fecha": "2011", "titulo": "Constitución Post-Primavera Árabe", "desc": "Reforma constitucional que amplía derechos y descentraliza poder."},
+    {"fecha": "1961", "titulo": "Consolidación Estatal", "desc": "Ascenso de Hassan II y estabilización de las instituciones nacionales."}
+  ],
+  "36": [
+    {"fecha": "1975", "titulo": "Independencia de Mozambique", "desc": "Fin del dominio portugués y proclamación de la república."},
+    {"fecha": "2004", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna que rige el sistema político moderno."},
+    {"fecha": "1992", "titulo": "Acuerdo General de Paz", "desc": "Fin de la guerra civil y desmovilización de RENAMO."}
+  ],
+  "37": [
+    {"fecha": "1990", "titulo": "Independencia de Namibia", "desc": "Fin de la administración sudafricana y reconocimiento de la ONU."},
+    {"fecha": "1990", "titulo": "Promulgación de la Constitución", "desc": "Establecimiento del marco legal democrático y republicano."},
+    {"fecha": "1988", "titulo": "Resolución 435 ONU", "desc": "Hoja de ruta internacional para la independencia y descolonización."}
+  ],
+  "38": [
+    {"fecha": "1960", "titulo": "Independencia de Níger", "desc": "Fin del dominio francés y proclamación de la soberanía."},
+    {"fecha": "2010", "titulo": "Constitución de la Séptima República", "desc": "Promulgación de la carta magna tras transición post-golpe."},
+    {"fecha": "2023", "titulo": "Transición Militar", "desc": "Golpe de estado y reconfiguración del poder ejecutivo."}
+  ],
+  "39": [
+    {"fecha": "1960", "titulo": "Independencia de Nigeria", "desc": "Fin del dominio británico y nacimiento del estado federal."},
+    {"fecha": "1999", "titulo": "Constitución de la Cuarta República", "desc": "Promulgación del marco legal tras transición militar a democracia."},
+    {"fecha": "1970", "titulo": "Fin de la Guerra de Biafra", "desc": "Reintegración del sudeste y consolidación de la unidad nacional."}
+  ],
+  "40": [
+    {"fecha": "1962", "titulo": "Independencia de Ruanda", "desc": "Fin del mandato belga y proclamación de la república."},
+    {"fecha": "2003", "titulo": "Constitución Post-Genocidio", "desc": "Promulgación de la carta magna con enfoque en reconciliación."},
+    {"fecha": "1994", "titulo": "Liberación y Fin del Genocidio", "desc": "Derrocamiento del régimen y establecimiento de transición nacional."}
+  ],
+  "41": [
+    {"fecha": "1975", "titulo": "Independencia de Santo Tomé y Príncipe", "desc": "Fin del dominio portugués y soberanía estatal."},
+    {"fecha": "2003", "titulo": "Constitución Reformada", "desc": "Aprobación de la carta magna que actualiza el marco institucional."},
+    {"fecha": "2011", "titulo": "Primera Transferencia Pacífica", "desc": "Alternancia democrática por vía electoral y estabilidad institucional."}
+  ],
+  "42": [
+    {"fecha": "1960", "titulo": "Independencia de Senegal", "desc": "Fin de la federación con Mali y proclamación de la república."},
+    {"fecha": "2001", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna que rige el sistema político moderno."},
+    {"fecha": "2024", "titulo": "Elecciones Anticipadas", "desc": "Alternancia democrática y consolidación del proceso electoral."}
+  ],
+  "43": [
+    {"fecha": "1976", "titulo": "Independencia de Seychelles", "desc": "Fin del dominio británico y proclamación de la república."},
+    {"fecha": "1993", "titulo": "Constitución Multipartidista", "desc": "Transición democrática y apertura del sistema político."},
+    {"fecha": "1977", "titulo": "Revolución del FLS", "desc": "Cambio de régimen y consolidación del frente de liberación."}
+  ],
+  "44": [
+    {"fecha": "1961", "titulo": "Independencia de Sierra Leona", "desc": "Fin del protectorado británico y soberanía estatal."},
+    {"fecha": "1991", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna tras período de inestabilidad."},
+    {"fecha": "2002", "titulo": "Fin de la Guerra Civil", "desc": "Declaración oficial de paz y desmovilización del RUF."}
+  ],
+  "45": [
+    {"fecha": "1960", "titulo": "Unificación de Somalia", "desc": "Fusión de territorios italiano y británico en un solo estado."},
+    {"fecha": "2012", "titulo": "Constitución Provisional", "desc": "Aprobación del marco legal federal tras transición post-conflicto."},
+    {"fecha": "2011", "titulo": "Formación del Gobierno Federal", "desc": "Fin del mandato TFG y reestructuración administrativa."}
+  ],
+  "46": [
+    {"fecha": "1910", "titulo": "Creación de la Unión Sudafricana", "desc": "Consolidación territorial bajo administración británica."},
+    {"fecha": "1994", "titulo": "Primeras Elecciones Democráticas", "desc": "Fin del apartheid y Día de la Libertad."},
+    {"fecha": "1996", "titulo": "Constitución Final", "desc": "Promulgación de la carta magna considerada modelo de derechos humanos."}
+  ],
+  "47": [
+    {"fecha": "2011", "titulo": "Independencia de Sudán del Sur", "desc": "Separación de Sudán tras referéndum de autodeterminación."},
+    {"fecha": "2011", "titulo": "Constitución Transitoria", "desc": "Marco legal provisional para la organización estatal."},
+    {"fecha": "2018", "titulo": "Acuerdo de Reconciliación", "desc": "Pacto de paz que finaliza la guerra civil interna."}
+  ],
+  "48": [
+    {"fecha": "1956", "titulo": "Independencia de Sudán", "desc": "Fin de la administración anglo-egipcia y soberanía nacional."},
+    {"fecha": "2019", "titulo": "Documento de Transición", "desc": "Hoja de ruta constitucional tras caída del régimen."},
+    {"fecha": "2020", "titulo": "Acuerdo de Juba", "desc": "Paz definitiva con grupos rebeldes y desmilitarización."}
+  ],
+  "49": [
+    {"fecha": "1961", "titulo": "Independencia de Tanganica", "desc": "Fin del mandato británico y proclamación de la república."},
+    {"fecha": "1964", "titulo": "Unión con Zanzíbar", "desc": "Creación oficial de la República Unida de Tanzania."},
+    {"fecha": "1977", "titulo": "Constitución Actual", "desc": "Consolidación institucional y fundación del CCM."}
+  ],
+  "50": [
+    {"fecha": "1960", "titulo": "Independencia de Togo", "desc": "Fin del dominio francés y soberanía estatal."},
+    {"fecha": "1992", "titulo": "Constitución de la Cuarta República", "desc": "Promulgación del marco legal democrático."},
+    {"fecha": "2017", "titulo": "Protestas por Alternancia", "desc": "Movilización ciudadana por reformas electorales y límites de mandato."}
+  ],
+  "51": [
+    {"fecha": "1956", "titulo": "Independencia de Túnez", "desc": "Fin del protectorado francés y soberanía nacional."},
+    {"fecha": "2014", "titulo": "Constitución Post-Revolución", "desc": "Primera carta magna democrática tras la Primavera Árabe."},
+    {"fecha": "1957", "titulo": "Proclamación de la República", "desc": "Abolición de la monarquía beylícal y sistema republicano."}
+  ],
+  "52": [
+    {"fecha": "1962", "titulo": "Independencia de Uganda", "desc": "Fin del protectorado británico y proclamación de la república."},
+    {"fecha": "1995", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna que rige el sistema político."},
+    {"fecha": "1986", "titulo": "Ascenso del NRM", "desc": "Fin de la guerra de Bush y reestructuración estatal."}
+  ],
+  "53": [
+    {"fecha": "1964", "titulo": "Independencia de Zambia", "desc": "Fin del dominio británico y proclamación de la república."},
+    {"fecha": "1991", "titulo": "Constitución de la Tercera República", "desc": "Promulgación del marco legal post-multipartidismo."},
+    {"fecha": "1991", "titulo": "Primera Elección Multipartidista", "desc": "Alternancia democrática y fin del régimen unipartidista."}
+  ],
+  "54": [
+    {"fecha": "1980", "titulo": "Independencia de Zimbabue", "desc": "Fin de Rhodesia y reconocimiento internacional."},
+    {"fecha": "2013", "titulo": "Constitución Actual", "desc": "Promulgación de la carta magna tras referéndum nacional."},
+    {"fecha": "1999", "titulo": "Reconfiguración Política", "desc": "Fundación del MDC y apertura del espectro opositor."}
+  ],
+  "55": [
+    {"fecha": "1976", "titulo": "Declaración de Independencia (RASD)", "desc": "Proclamación de soberanía del Sáhara Occidental."},
+    {"fecha": "1984", "titulo": "Admisión en la OUA", "desc": "Reconocimiento diplomático por la Organización de la Unidad Africana."},
+    {"fecha": "1991", "titulo": "Alto el Fuego (MINURSO)", "desc": "Entrada en vigor del cese de hostilidades y despliegue de la ONU."}
+  ]
+}

@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 11%;
+    --foreground: 0 0% 98%;
+    --card: 222 47% 14%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 47% 14%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 224 76% 33%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 160 91% 31%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 222 30% 20%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 45 74% 52%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 30% 25%;
+    --input: 222 30% 25%;
+    --ring: 45 74% 52%;
+    --radius: 0.625rem;
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 224 76% 33%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 222 30% 20%;
+    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-border: 222 30% 25%;
+    --sidebar-ring: 45 74% 52%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-diplomatic-blue-dark text-foreground font-sans antialiased;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold tracking-tight;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+  
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-xl border border-white/5;
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-wealth-gold via-wealth-gold-light to-wealth-gold;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-wealth-gold to-wealth-gold-dark text-diplomatic-blue-dark font-semibold rounded-lg 
+           transition-all duration-300 hover:shadow-glow hover:scale-105 active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 border-2 border-wealth-gold text-wealth-gold font-semibold rounded-lg 
+           transition-all duration-300 hover:bg-wealth-gold hover:text-diplomatic-blue-dark;
+  }
+  
+  .section-padding {
+    @apply px-4 sm:px-6 lg:px-8 xl:px-16 2xl:px-24;
+  }
+  
+  .heading-xl {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-heading font-bold leading-tight;
+  }
+  
+  .heading-lg {
+    @apply text-3xl sm:text-4xl md:text-5xl font-heading font-bold leading-tight;
+  }
+  
+  .heading-md {
+    @apply text-2xl sm:text-3xl md:text-4xl font-heading font-bold leading-tight;
+  }
+  
+  .body-lg {
+    @apply text-base sm:text-lg leading-relaxed;
+  }
+  
+  .body-md {
+    @apply text-sm sm:text-base leading-relaxed;
+  }
+  
+  .nav-link {
+    @apply relative text-white/80 hover:text-white transition-colors duration-300 py-2;
+  }
+  
+  .nav-link::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-0.5 bg-wealth-gold transition-all duration-300;
+  }
+  
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+  
+  .card-hover {
+    @apply transition-all duration-500 hover:-translate-y-2 hover:shadow-glass;
+  }
+  
+  .hexagon {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  
+  .diagonal-line {
+    background: linear-gradient(135deg, transparent 45%, rgba(212, 175, 55, 0.3) 45%, rgba(212, 175, 55, 0.3) 55%, transparent 55%);
+  }
+}
+
+@layer utilities {
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  .animation-delay-500 {
+    animation-delay: 500ms;
+  }
+  
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d4af37, #1e3a8a);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #f0d878, #3b82f6);
+}
+
+/* Selección de texto */
+::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: white;
+}

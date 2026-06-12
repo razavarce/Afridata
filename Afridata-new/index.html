@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFRIDATA - Plataforma de Inteligencia África</title>
+    <!-- Leaflet (mapa) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Librerías PDF/CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Estilos principales -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Feather Icons (para iconos) -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+</head>
+<body>
+    <!-- Pantalla de login (diseño original mejorado) -->
+    <div id="loginPage">
+        <div class="dev-banner">⚠️ AFRIDATA v15.0 — PLATAFORMA DE INTELIGENCIA</div>
+        <div class="login-container">
+            <h1>AFRIDATA</h1>
+            <div class="lang-selector" style="margin-bottom:25px;justify-content:center;">
+                <select id="langSelect" onchange="setLanguageFromSelect()" style="padding:8px 12px;border-radius:8px;background:var(--bg-input);color:white;border:1px solid rgba(212,175,55,0.3);">
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="en">🇬🇧 English</option>
+                    <option value="fr">🇫🇷 Français</option>
+                </select>
+            </div>
+            <div class="login-field">
+                <label>Usuario</label>
+                <i class="fas fa-user field-icon"></i>
+                <input type="text" id="loginUser" placeholder="Ingrese su usuario" value="admin">
+            </div>
+            <div class="login-field">
+                <label>Contraseña</label>
+                <i class="fas fa-lock field-icon"></i>
+                <input type="password" id="loginPass" placeholder="Ingrese su contraseña" value="admin">
+            </div>
+            <button class="login-btn" onclick="doLogin()">Iniciar Sesión</button>
+            <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
+            <div class="login-footer">Ministerio del Poder Popular para Relaciones Exteriores<br>Despacho para África — Caracas</div>
+        </div>
+    </div>
+
+    <!-- Aplicación principal (oculta hasta login) -->
+    <div id="appPage" style="display:none;">
+        <div class="app-header">
+            <h1><div class="logo-icon">🌍</div> AFRIDATA <small>MPPRE — Despacho para África</small></h1>
+            <div class="header-right">
+                <div class="header-user"><div class="avatar">👤</div><span id="headerUsername">Administrador</span><span class="role-badge role-admin" id="headerRole">Admin</span></div>
+                <button class="header-btn" onclick="showModule('reportes')"><i class="fas fa-chart-bar"></i> Reportes</button>
+                <button class="header-btn" onclick="showModule('admin')"><i class="fas fa-cog"></i> Admin</button>
+                <button class="header-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
+        </div>
+        <div class="module-nav">
+            <button class="module-btn active" onclick="showModule('mapa')"><i class="fas fa-map-marked-alt"></i> Mapa</button>
+            <button class="module-btn" onclick="showModule('paises')"><i class="fas fa-list"></i> Países</button>
+            <button class="module-btn" onclick="showModule('autoridades')"><i class="fas fa-user-tie"></i> Autoridades</button>
+            <button class="module-btn" onclick="showModule('bilateral')"><i class="fas fa-handshake"></i> Bilaterales</button>
+            <button class="module-btn" onclick="showModule('multilateral')"><i class="fas fa-globe"></i> Multilateral</button>
+            <button class="module-btn" onclick="showModule('hitos')"><i class="fas fa-calendar-alt"></i> Hitos</button>
+            <button class="module-btn" onclick="showModule('embajadas')"><i class="fas fa-building"></i> Embajadas</button>
+            <button class="module-btn" onclick="showModule('auditoria')"><i class="fas fa-clipboard-list"></i> Auditoría</button>
+            <button class="module-btn" onclick="showModule('equipo')"><i class="fas fa-users"></i> Equipo</button>
+        </div>
+        <div class="app-layout" id="appLayout">
+            <!-- Sidebar con ficha del país -->
+            <div class="sidebar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-box" id="searchBox" placeholder="Buscar país..." oninput="filterCountries()">
+                </div>
+                <div class="filter-group">
+                    <h3><i class="fas fa-globe-africa"></i> Regiones</h3>
+                    <button class="filter-btn active" onclick="filterRegion('all', this)">Todo África</button>
+                    <button class="filter-btn" onclick="filterRegion('norte', this)">África del Norte</button>
+                    <button class="filter-btn" onclick="filterRegion('occidental', this)">África Occidental</button>
+                    <button class="filter-btn" onclick="filterRegion('central', this)">África Central</button>
+                    <button class="filter-btn" onclick="filterRegion('oriental', this)">África Oriental</button>
+                    <button class="filter-btn" onclick="filterRegion('austral', this)">África Austral</button>
+                </div>
+                <div id="selection-placeholder" class="py-10 text-center opacity-50">
+                    <i class="fas fa-globe-africa text-4xl mb-2"></i>
+                    <p class="text-xs">Seleccione un país en el mapa</p>
+                </div>
+                <div id="selection-card" class="hidden">
+                    <div class="flex justify-between mb-4 gap-2">
+                        <button onclick="previousCountry()" class="px-3 py-1 bg-orange-700/30 text-white text-xs rounded">◀ Anterior</button>
+                        <button onclick="toggleAllCountries()" class="px-3 py-1 bg-blue-700/30 text-white text-xs rounded">📋 Lista</button>
+                        <button onclick="nextCountry()" class="px-3 py-1 bg-orange-700/30 text-white text-xs rounded">Siguiente ▶</button>
+                    </div>
+                    <h2 id="side-name" class="text-xl font-bold text-gold mb-1">-</h2>
+                    <p id="side-capital" class="text-blue-400 text-[10px] mb-2">-</p>
+                    <img id="side-flag" class="w-full h-32 object-cover rounded-xl mb-4 border border-gold">
+                    <div class="info-item"><span class="label">Autoridades</span><div id="side-autoridades" class="value">-</div></div>
+                    <div class="info-item"><span class="label">Embajada</span><div id="side-embajada" class="value">-</div></div>
+                    <div class="info-item"><span class="label">Cultura</span><div id="side-cultura" class="value">-</div></div>
+                    <div class="info-item"><span class="label">Tradiciones</span><div id="side-tradiciones" class="value">-</div></div>
+                    <div class="info-item"><span class="label">Recursos</span><div id="side-recursos" class="value"></div></div>
+                    <div class="info-item"><span class="label">Economía</span><div id="side-economia" class="value">-</div></div>
+                    <div class="info-item"><span class="label">Relación con Venezuela</span><div id="side-venezuela" class="value">-</div></div>
+                </div>
+            </div>
+            <div class="map-area">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="module-content" id="modulesContainer" style="display:none;">
+            <!-- Panel Países (tabla) -->
+            <div class="module-panel active" id="panel-paises">
+                <h2>Lista de Países Africanos</h2>
+                <div style="overflow-x:auto;"><table class="data-table" id="paisesTable"><thead><tr><th>#</th><th>País</th><th>Capital</th><th>Región</th><th>Presidente</th><th>Gobierno</th><th>Población</th><th>Acción</th></tr></thead><tbody id="paisesBody"></tbody></table></div>
+            </div>
+            <!-- Panel Autoridades -->
+            <div class="module-panel" id="panel-autoridades">
+                <div class="authorities-header"><h2>Autoridades Africanas</h2><div class="authorities-stats"><div class="authority-stat"><div class="stat-value" id="totalLeaders">55</div><div class="stat-label">Líderes</div></div></div></div>
+                <div class="authority-search-container"><input type="text" class="authority-search-input" id="authoritySearch" placeholder="Buscar líder..." oninput="filterAuthorities()"></div>
+                <div class="authorities-grid" id="autoridadesCards"></div>
+            </div>
+            <!-- Panel Bilaterales -->
+            <div class="module-panel" id="panel-bilateral"><h2>Relaciones Bilaterales</h2><div id="bilateralContent"></div></div>
+            <!-- Panel Multilateral -->
+            <div class="module-panel" id="panel-multilateral"><h2>Multilateral</h2><div id="multilateralContent"></div></div>
+            <!-- Panel Hitos -->
+            <div class="module-panel" id="panel-hitos"><div class="timeline" id="hitosTimeline"></div></div>
+            <!-- Panel Embajadas -->
+            <div class="module-panel" id="panel-embajadas"><h2>Red Diplomática</h2><table class="data-table"><thead><tr><th>#</th><th>País</th><th>Ciudad</th><th>Embajador</th><th>Estado</th></tr></thead><tbody id="embajadasBody"></tbody></table></div>
+            <!-- Panel Reportes -->
+            <div class="module-panel" id="panel-reportes"><h2>Reportes</h2><button class="admin-btn admin-btn-primary" onclick="openDownloadModal()">Descargar Reportes</button><div id="reportContent"></div></div>
+            <!-- Panel Auditoría -->
+            <div class="module-panel" id="panel-auditoria"><h2>Auditoría</h2><div id="auditTable"></div></div>
+            <!-- Panel Admin -->
+            <div class="module-panel" id="panel-admin"><div id="adminContent"></div><div id="viewerMessage">Acceso restringido</div></div>
+            <!-- Panel Equipo -->
+            <div class="module-panel" id="panel-equipo"><div class="team-grid" id="teamGrid"></div></div>
+        </div>
+    </div>
+
+    <!-- Modales auxiliares -->
+    <div id="countries-modal" class="country-modal"><div class="modal-content"><div class="modal-header"><h2>Lista de Países</h2><button class="modal-close" onclick="toggleAllCountries()">✖</button></div><div id="countries-list" class="p-4"></div></div></div>
+    <div id="downloadModal" class="download-modal"><div class="download-content"><div class="download-header"><h2>Descargar Reporte</h2><button class="modal-close" onclick="closeDownloadModal()">✖</button></div><div class="download-body"><button class="admin-btn" onclick="generateReport('resumen')">PDF Resumen</button><button class="admin-btn" onclick="exportCSV()">CSV Países</button></div></div></div>
+
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
