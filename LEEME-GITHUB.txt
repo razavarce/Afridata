@@ -1,0 +1,79 @@
+COMO PUBLICAR AFRIDATA EN GITHUB PAGES
+=======================================
+
+SITIO EN LINEA
+--------------
+  https://razavarce.github.io/Afridata/
+
+REGLA DE ORO
+------------
+  .cmd y .bat  -> DOBLE CLIC en el Explorador de Windows (o CMD)
+  .sh          -> solo si usa Git Bash (ver abajo)
+
+NO ejecute archivos .bat ni .cmd dentro de Git Bash.
+NO pegue el contenido de un script linea por linea en la terminal.
+
+
+PUBLICAR (recomendado - hace todo)
+-----------------------------------
+1. Edite en su PC: pagina afridataV10.5.5.html
+
+2. Doble clic en:
+
+   PUBLICAR-GITHUB-PAGES.cmd
+
+3. Ese script automaticamente:
+   - Copia v10.5.5 a index.html y html (lo que ve GitHub Pages)
+   - Crea el commit
+   - Integra con GitHub (pull/merge si hace falta)
+   - Sube los cambios (push)
+
+4. Si dice LISTO, espere 1-2 minutos y abra:
+   https://razavarce.github.io/Afridata/
+   Recargue con Ctrl+F5
+
+
+SOLO SINCRONIZAR (sin commit nuevo)
+-----------------------------------
+  SUBIR-AHORA.cmd
+
+
+SI USA GIT BASH
+---------------
+  cmd.exe //c "D:\Proyecto Viceministerio de África en Vzla\PUBLICAR-GITHUB-PAGES.cmd"
+
+
+ARCHIVOS IMPORTANTES
+--------------------
+  pagina afridataV10.5.5.html  -> archivo maestro (edite este)
+  index.html                   -> se genera al publicar (NO edite a mano)
+  html                         -> copia espejo (se genera al publicar)
+  README.md                    -> descripcion del repo (ya corregido)
+  .nojekyll                    -> evita que GitHub rompa los estilos CSS
+
+
+POR QUE ANTES SE VIAN MAL LOS FONDOS
+------------------------------------
+- GitHub usaba README.md como pagina (HTML dentro de Markdown).
+- No habia index.html ni .nojekyll.
+- PUBLICAR-GITHUB-PAGES.cmd corrige todo eso.
+
+
+SI APARECE CONFLICTO (solo la primera vez)
+------------------------------------------
+1. Abra los archivos con marcas: <<<<<<<  =======  >>>>>>>
+2. En index.html, html y README.md deje SU version nueva
+3. En CMD:
+   git add index.html html README.md
+   git commit -m "Integra cambios con GitHub"
+   git push -u origin main
+4. O ejecute de nuevo PUBLICAR-GITHUB-PAGES.cmd
+
+
+SI PIDE CONTRASENA
+------------------
+GitHub ya no acepta la clave de la cuenta.
+Use un Personal Access Token:
+  GitHub -> Settings -> Developer settings -> Personal access tokens
+
+Repositorio: https://github.com/razavarce/Afridata

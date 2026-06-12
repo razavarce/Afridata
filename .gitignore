@@ -1,0 +1,14 @@
+# Carpetas de desarrollo que no van al sitio publico
+Kimi_Agent_Error de idioma/
+Afridata-new/
+Qwen Studio_files/
+node_modules/
+.vscode/
+
+# Copias y respaldos locales
+backup_*
+*.bak
+
+# Archivos temporales de Windows
+Thumbs.db
+Desktop.ini
