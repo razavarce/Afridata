@@ -77,3 +77,23 @@ Use un Personal Access Token:
   GitHub -> Settings -> Developer settings -> Personal access tokens
 
 Repositorio: https://github.com/razavarce/Afridata
+
+
+DOCUMENTOS COMPARTIDOS (CARPETAS DE PAISES)
+--------------------------------------------
+GitHub BLOQUEA subir el token en el codigo. No use CONFIGURAR-TOKEN
+para publicar: ese archivo queda solo en su PC.
+
+PARA SUBIR DOCUMENTOS DESDE LA WEB (github.io):
+  1. Entre como admin (admin / admin)
+  2. Panel Admin -> Documentos compartidos (GitHub)
+  3. Pegue el token y clic en Guardar
+  4. Probar conexion
+
+Repita el paso 3 en cada navegador/PC que vaya a SUBIR archivos.
+Todos pueden VER documentos sin token (boton Actualizar en cada pais).
+
+Si GitHub bloqueo un push con el token:
+  1. GitHub -> Settings -> Developer settings -> revoque ese token
+  2. Cree un token nuevo (Contents: Read and write en Afridata)
+  3. Ejecute PUBLICAR-GITHUB-PAGES.cmd de nuevo (sin token en archivos)
