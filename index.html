@@ -1068,6 +1068,35 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                     <h3><i class="fas fa-users"></i> Usuarios del Sistema</h3>
                     <div class="user-list" id="userList"></div>
                 </div>
+                <div class="admin-section" id="adminDocsSyncSection">
+                    <h3><i class="fas fa-cloud-upload-alt"></i> Documentos compartidos (GitHub)</h3>
+                    <p id="githubDocsSyncHelp" style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-bottom:12px;">
+                        Los documentos de las carpetas de países se sincronizan en GitHub para que <b>todos los usuarios</b> los vean desde cualquier equipo o la web.
+                    </p>
+                    <div id="githubDocsSyncEmbedded" style="display:none;padding:12px 14px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;font-size:13px;margin-bottom:12px;">
+                        <i class="fas fa-check-circle"></i> <b>Token del equipo activo</b> — configurado en <code>afridata-sync-config.js</code>. Todos pueden subir y ver documentos sin configurar cada PC.
+                    </div>
+                    <div id="githubDocsSyncManual">
+                        <p style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-bottom:12px;">
+                            Alternativa: configure un token solo en este navegador (Panel Admin). Para todo el equipo use <code>CONFIGURAR-TOKEN-DOCS.cmd</code>.
+                        </p>
+                        <div class="admin-form">
+                            <div class="form-group" style="flex:2;">
+                                <label>Token GitHub (PAT)</label>
+                                <input type="password" id="githubDocsSyncToken" placeholder="ghp_... o github_pat_..." autocomplete="off">
+                            </div>
+                            <div class="form-group" style="justify-content:flex-end;">
+                                <label>&nbsp;</label>
+                                <button class="admin-btn admin-btn-primary" type="button" onclick="saveGithubDocsSyncToken()"><i class="fas fa-save"></i> Guardar token</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+                        <button class="admin-btn" type="button" onclick="testGithubDocsSync()"><i class="fas fa-plug"></i> Probar conexión</button>
+                        <button class="admin-btn" type="button" onclick="refreshAllSharedDocs()"><i class="fas fa-sync-alt"></i> Descargar documentos compartidos</button>
+                    </div>
+                    <div id="githubDocsSyncStatus" style="margin-top:10px;color:var(--text-muted);font-size:12px;">Sin configurar</div>
+                </div>
                 <div class="admin-section">
                     <h3><i class="fas fa-images"></i> Carga Masiva de Fotos de Autoridades</h3>
                     <p style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-bottom:12px;">Importa todas las fotos (extraídas del Word) y el sistema intentará asignarlas automáticamente por nombre de presidente y país.</p>
@@ -1399,13 +1428,16 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
     </div>
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="afridata-sync-config.js"></script>
 <script>
 /**
  * AFRIDATA v10.5.5 — Plataforma MPPRE (Venezuela–África)
  * Documentación completa: ver DOCUMENTACION.md en la carpeta del proyecto.
  * Módulos: mapa, países, autoridades, bilaterales, multilateral, hitos,
- * embajadas, reportes, auditoría, admin, documentos (IndexedDB).
+ * embajadas, reportes, auditoría, admin, documentos (IndexedDB + GitHub).
  */
+// Token GitHub: se carga desde afridata-sync-config.js (equipo) o Panel Admin (por navegador).
+var AFRIDATA_DOCS_GITHUB_TOKEN = (typeof window.AFRIDATA_DOCS_GITHUB_TOKEN === 'string') ? window.AFRIDATA_DOCS_GITHUB_TOKEN : '';
 // ==================== DATOS COMPLETOS DE PAÍSES (55) ====================
 const paisesDB = [
 {id:1,nombre:"Argelia",oficial:"República Argelina Democrática y Popular",capital:"Argel",region:"norte",presidente:"Abdelmadjid Tebboune",presidente_anterior:"Ahmed Ben Bella (1963-1965)",censo_poblacion:"44.700.000 (2021)",gobierno:"República Semipresidencial",poblacion:47.1,area:2381741,idioma:"Árabe, Tamazight",moneda:"Dinar argelino (DZD)",industrias:"Petróleo, Gas Natural, Minería",relacionesVenezuela:"1963",embajada:"Argel — Emb. José De Jesús Sojo Reyes",bandera:"dz",lat:28.0339,lng:1.6596,cultura:"Herencia bereber y árabe, gastronomía couscous, música raï, tradiciones del Sahara",tradicion:"Ramadán, Festival Internacional de Cine de Argel, bodas bereberes",recursos:"3er mayor productor de gas del mundo, reservas de petróleo, minería",economia:"PIB: $187B | PIB/cap: $4,000 | Inflación: 9.3%. Dependencia del petróleo y gas.",foto:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Abdelmadjid_Tebboune_in_2023.jpg/440px-Abdelmadjid_Tebboune_in_2023.jpg"},
@@ -2182,13 +2214,14 @@ function renderCarpetaInfo(countryId) {
                 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
                     <div style="display:flex;flex-direction:column;gap:4px;">
                         <div style="font-weight:800;color:var(--gold-primary);font-family:'Space Grotesk',sans-serif;">${escapeHtml(p.nombre)}</div>
-                        <div style="color:var(--text-muted);font-size:12px;">Sube y visualiza archivos. No requiere servidor.</div>
+                        <div style="color:var(--text-muted);font-size:12px;">Sube archivos compartidos para todo el equipo. Se sincronizan automáticamente en la nube.</div>
                     </div>
                     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                         <label class="admin-btn admin-btn-primary" style="margin:0;cursor:pointer;">
                             <i class="fas fa-upload"></i> Subir documento
                             <input type="file" id="uploadDocsInput_${p.id}" multiple accept="*/*" style="display:none;" onchange="handleDocsUploadInput(${p.id}, this)" />
                         </label>
+                        <button class="admin-btn" type="button" style="margin:0;" onclick="refreshSharedDocsForCountry(${p.id})"><i class="fas fa-sync-alt"></i> Actualizar</button>
                         <button class="admin-btn admin-btn-danger" type="button" style="margin:0;" onclick="clearAllDocsForCountry(${p.id})"><i class="fas fa-trash-alt"></i> Eliminar documentos</button>
                     </div>
                 </div>
@@ -2210,6 +2243,373 @@ const MAX_DOC_FILE_SIZE = 25 * 1024 * 1024;
 const docsCache = {};
 const docsCacheLoading = {};
 let docsDbPromise = null;
+
+// ================= DOCUMENTOS COMPARTIDOS (GitHub — visible para todos) =================
+const DOCS_SHARED_SYNC = {
+    enabled: true,
+    repo: 'razavarce/Afridata',
+    branch: 'main',
+    manifestPath: 'documentos/manifest.json',
+    filesBasePath: 'documentos/paises'
+};
+const GITHUB_SYNC_TOKEN_KEY = 'afridata_github_sync_token';
+let docsManifestCache = { data: null, sha: null, fetchedAt: 0 };
+
+function isEmbeddedGithubDocsToken() {
+    const t = (typeof AFRIDATA_DOCS_GITHUB_TOKEN === 'string') ? AFRIDATA_DOCS_GITHUB_TOKEN.trim() : '';
+    return !!t && t !== 'PEGAR_TOKEN_AQUI';
+}
+
+function getGithubSyncToken() {
+    if (isEmbeddedGithubDocsToken()) return AFRIDATA_DOCS_GITHUB_TOKEN.trim();
+    try { return localStorage.getItem(GITHUB_SYNC_TOKEN_KEY) || ''; } catch (e) { return ''; }
+}
+
+function saveGithubDocsSyncToken() {
+    if (isEmbeddedGithubDocsToken()) {
+        showToast('El token del equipo ya está configurado en afridata-sync-config.js', 'info');
+        return;
+    }
+    const input = document.getElementById('githubDocsSyncToken');
+    const token = (input?.value || '').trim();
+    try { localStorage.setItem(GITHUB_SYNC_TOKEN_KEY, token); } catch (e) { }
+    updateGithubDocsSyncStatus();
+    showToast(token ? 'Token GitHub guardado para sincronizar documentos' : 'Token eliminado', 'success');
+}
+
+function updateGithubDocsSyncStatus() {
+    const el = document.getElementById('githubDocsSyncStatus');
+    const embeddedBox = document.getElementById('githubDocsSyncEmbedded');
+    const manualBox = document.getElementById('githubDocsSyncManual');
+    if (embeddedBox && manualBox) {
+        const embedded = isEmbeddedGithubDocsToken();
+        embeddedBox.style.display = embedded ? 'block' : 'none';
+        manualBox.style.display = embedded ? 'none' : 'block';
+    }
+    if (!el) return;
+    const token = getGithubSyncToken();
+    if (isEmbeddedGithubDocsToken()) {
+        el.textContent = 'Token del equipo activo: todos pueden subir y ver documentos compartidos.';
+    } else if (token) {
+        el.textContent = 'Sincronización activa en este navegador: las subidas se comparten con todos.';
+    } else {
+        el.textContent = 'Sin token. Ejecute CONFIGURAR-TOKEN-DOCS.cmd o guarde un token aquí.';
+    }
+}
+
+async function testGithubDocsSync() {
+    const st = document.getElementById('githubDocsSyncStatus');
+    const token = getGithubSyncToken();
+    if (!token) {
+        if (st) st.textContent = 'Configure y guarde un token GitHub primero.';
+        showToast('Falta el token GitHub', 'error');
+        return;
+    }
+    if (st) st.textContent = 'Probando conexión...';
+    try {
+        await githubApiRequest('', { token });
+        const manifest = await fetchSharedManifestWithSha({ force: true });
+        const countries = manifest?.data?.countries ? Object.keys(manifest.data.countries).length : 0;
+        if (st) st.textContent = `Conexión OK. Países con documentos compartidos: ${countries}.`;
+        showToast('Conexión con GitHub correcta', 'success');
+    } catch (e) {
+        if (st) st.textContent = `Error: ${e.message || e}`;
+        showToast('No se pudo conectar con GitHub', 'error');
+    }
+}
+
+function githubContentsApiPath(filePath) {
+    return `contents/${encodeURIComponent(filePath)}`;
+}
+
+function getSharedManifestUrl() {
+    return `https://raw.githubusercontent.com/${DOCS_SHARED_SYNC.repo}/${DOCS_SHARED_SYNC.branch}/${DOCS_SHARED_SYNC.manifestPath}?t=${Date.now()}`;
+}
+
+function getSharedDocFileUrl(remotePath) {
+    return `https://raw.githubusercontent.com/${DOCS_SHARED_SYNC.repo}/${DOCS_SHARED_SYNC.branch}/${remotePath}`;
+}
+
+function sanitizeDocFileName(name) {
+    return String(name || 'documento').replace(/[^\w.\-()áéíóúñÁÉÍÓÚÑ ]/gi, '_').replace(/\s+/g, '_').slice(0, 120);
+}
+
+function getSharedDocPath(countryId, doc) {
+    return `${DOCS_SHARED_SYNC.filesBasePath}/${countryId}/${doc.id}_${sanitizeDocFileName(doc.name)}`;
+}
+
+function utf8ToBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let binary = '';
+    bytes.forEach(b => { binary += String.fromCharCode(b); });
+    return btoa(binary);
+}
+
+async function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+    });
+}
+
+async function githubApiRequest(path, { method = 'GET', body = null, token } = {}) {
+    const t = token || getGithubSyncToken();
+    if (!t) throw new Error('Token GitHub no configurado');
+    const headers = {
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        Authorization: `Bearer ${t}`
+    };
+    const url = path
+        ? `https://api.github.com/repos/${DOCS_SHARED_SYNC.repo}/${path}`
+        : `https://api.github.com/repos/${DOCS_SHARED_SYNC.repo}`;
+    const res = await fetch(url, {
+        method,
+        headers,
+        body: body ? JSON.stringify(body) : null
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || `GitHub API ${res.status}`);
+    }
+    if (res.status === 204) return null;
+    return res.json();
+}
+
+async function fetchSharedManifest({ force = false } = {}) {
+    if (!DOCS_SHARED_SYNC.enabled) return docsManifestCache;
+    const now = Date.now();
+    if (!force && docsManifestCache.data && (now - docsManifestCache.fetchedAt) < 20000) {
+        return docsManifestCache;
+    }
+    try {
+        const res = await fetch(getSharedManifestUrl(), { cache: 'no-store' });
+        if (res.status === 404) {
+            docsManifestCache = { data: { version: 1, countries: {} }, sha: null, fetchedAt: now };
+            return docsManifestCache;
+        }
+        if (!res.ok) return docsManifestCache;
+        const data = await res.json();
+        docsManifestCache = { data, sha: docsManifestCache.sha, fetchedAt: now };
+        return docsManifestCache;
+    } catch (e) {
+        return docsManifestCache;
+    }
+}
+
+async function fetchSharedManifestWithSha({ force = false } = {}) {
+    if (!DOCS_SHARED_SYNC.enabled) return docsManifestCache;
+    const token = getGithubSyncToken();
+    if (!token) return fetchSharedManifest({ force });
+    try {
+        const data = await githubApiRequest(`${githubContentsApiPath(DOCS_SHARED_SYNC.manifestPath)}?ref=${DOCS_SHARED_SYNC.branch}`, { token });
+        const json = JSON.parse(atob(String(data.content || '').replace(/\n/g, '')));
+        docsManifestCache = { data: json, sha: data.sha, fetchedAt: Date.now() };
+        return docsManifestCache;
+    } catch (e) {
+        return fetchSharedManifest({ force });
+    }
+}
+
+async function fetchRemoteDocBlob(remotePath) {
+    const res = await fetch(getSharedDocFileUrl(remotePath), { cache: 'no-store' });
+    if (!res.ok) return null;
+    return res.blob();
+}
+
+async function mergeCountryDocsFromShared(countryId) {
+    if (!DOCS_SHARED_SYNC.enabled) return false;
+    const manifestWrap = await fetchSharedManifest();
+    const remoteList = manifestWrap?.data?.countries?.[String(countryId)];
+    if (!Array.isArray(remoteList) || !remoteList.length) return false;
+
+    const key = String(countryId);
+    const local = Array.isArray(docsCache[key]) ? [...docsCache[key]] : [];
+    const localById = new Map(local.map(d => [String(d.id), d]));
+    let changed = false;
+
+    for (const remote of remoteList) {
+        if (!remote?.id || !remote?.path) continue;
+        const id = String(remote.id);
+        const localDoc = localById.get(id);
+        const remoteTs = Number(remote.lastModified || 0);
+        const localTs = Number(localDoc?.lastModified || 0);
+        if (localDoc && localTs >= remoteTs && getDocBlob(localDoc)) continue;
+
+        const blob = await fetchRemoteDocBlob(remote.path);
+        if (!blob) continue;
+        if (localDoc) revokeDocPreviewUrl(localDoc);
+
+        const merged = {
+            id: remote.id,
+            name: remote.name,
+            mimeType: remote.mimeType || blob.type || '',
+            kind: remote.kind || inferFileKind(remote.mimeType, remote.name),
+            sizeBytes: remote.sizeBytes || blob.size,
+            lastModified: remote.lastModified || Date.now(),
+            uploadedAt: remote.uploadedAt || '',
+            textPreview: remote.textPreview || '',
+            blob,
+            remotePath: remote.path,
+            sharedSynced: true
+        };
+        if (merged.kind === 'text' && !merged.textPreview && blob.size < 512000) {
+            try { merged.textPreview = await blob.text(); } catch (e) { }
+        }
+        localById.set(id, merged);
+        changed = true;
+    }
+
+    if (!changed) return false;
+    const mergedArr = Array.from(localById.values());
+    docsCache[key] = mergedArr;
+    try { await idbSetDocs(getDocsStorageKey(countryId), mergedArr.map(serializeDocForStorage)); } catch (e) { }
+    return true;
+}
+
+async function pushCountryDocsToShared(countryId, docsArr) {
+    if (!DOCS_SHARED_SYNC.enabled) return { ok: true, skipped: true };
+    const token = getGithubSyncToken();
+    if (!token) return { ok: false, skipped: true, reason: 'no-token' };
+
+    try {
+        const manifestWrap = await fetchSharedManifestWithSha({ force: true });
+        const manifest = manifestWrap?.data || { version: 1, countries: {} };
+        if (!manifest.countries) manifest.countries = {};
+        const key = String(countryId);
+        const remoteById = new Map((manifest.countries[key] || []).map(d => [String(d.id), d]));
+
+        for (const doc of docsArr) {
+            const blob = getDocBlob(doc);
+            if (!blob) continue;
+            const remotePath = getSharedDocPath(countryId, doc);
+            const base64 = await blobToBase64(blob);
+            let fileSha = remoteById.get(String(doc.id))?.sha || null;
+            try {
+                const existing = await githubApiRequest(`${githubContentsApiPath(remotePath)}?ref=${DOCS_SHARED_SYNC.branch}`, { token });
+                fileSha = existing.sha;
+            } catch (e) { fileSha = null; }
+
+            const putRes = await githubApiRequest(githubContentsApiPath(remotePath), {
+                method: 'PUT',
+                token,
+                body: {
+                    message: `AFRIDATA: documento ${doc.name} (país ${countryId})`,
+                    content: base64,
+                    branch: DOCS_SHARED_SYNC.branch,
+                    ...(fileSha ? { sha: fileSha } : {})
+                }
+            });
+
+            remoteById.set(String(doc.id), {
+                id: doc.id,
+                name: doc.name,
+                mimeType: doc.mimeType || '',
+                kind: doc.kind || inferFileKind(doc.mimeType, doc.name),
+                sizeBytes: doc.sizeBytes || blob.size,
+                lastModified: doc.lastModified || Date.now(),
+                uploadedAt: doc.uploadedAt || new Date().toLocaleString('es-VE'),
+                textPreview: (doc.textPreview && doc.kind === 'text') ? String(doc.textPreview).slice(0, 2000) : '',
+                path: remotePath,
+                sha: putRes?.content?.sha || fileSha
+            });
+        }
+
+        manifest.countries[key] = Array.from(remoteById.values());
+        manifest.updatedAt = new Date().toISOString();
+        const manifestJson = JSON.stringify(manifest, null, 2);
+
+        await githubApiRequest(githubContentsApiPath(DOCS_SHARED_SYNC.manifestPath), {
+            method: 'PUT',
+            token,
+            body: {
+                message: `AFRIDATA: actualizar índice documentos país ${countryId}`,
+                content: utf8ToBase64(manifestJson),
+                branch: DOCS_SHARED_SYNC.branch,
+                ...(manifestWrap.sha ? { sha: manifestWrap.sha } : {})
+            }
+        });
+
+        docsManifestCache = { data: manifest, sha: null, fetchedAt: Date.now() };
+        return { ok: true };
+    } catch (e) {
+        console.error('pushCountryDocsToShared', e);
+        return { ok: false, error: e.message || String(e) };
+    }
+}
+
+async function removeCountryDocsFromShared(countryId) {
+    if (!DOCS_SHARED_SYNC.enabled) return;
+    const token = getGithubSyncToken();
+    if (!token) return;
+    try {
+        const manifestWrap = await fetchSharedManifestWithSha({ force: true });
+        const manifest = manifestWrap?.data || { version: 1, countries: {} };
+        const key = String(countryId);
+        const remoteList = manifest.countries?.[key] || [];
+        for (const remote of remoteList) {
+            if (!remote?.path) continue;
+            try {
+                const existing = await githubApiRequest(`${githubContentsApiPath(remote.path)}?ref=${DOCS_SHARED_SYNC.branch}`, { token });
+                await githubApiRequest(githubContentsApiPath(remote.path), {
+                    method: 'DELETE',
+                    token,
+                    body: {
+                        message: `AFRIDATA: eliminar documento ${remote.name}`,
+                        sha: existing.sha,
+                        branch: DOCS_SHARED_SYNC.branch
+                    }
+                });
+            } catch (e) { }
+        }
+        if (manifest.countries) delete manifest.countries[key];
+        manifest.updatedAt = new Date().toISOString();
+        await githubApiRequest(githubContentsApiPath(DOCS_SHARED_SYNC.manifestPath), {
+            method: 'PUT',
+            token,
+            body: {
+                message: `AFRIDATA: limpiar documentos país ${countryId}`,
+                content: utf8ToBase64(JSON.stringify(manifest, null, 2)),
+                branch: DOCS_SHARED_SYNC.branch,
+                ...(manifestWrap.sha ? { sha: manifestWrap.sha } : {})
+            }
+        });
+        docsManifestCache = { data: manifest, sha: null, fetchedAt: Date.now() };
+    } catch (e) {
+        console.warn('removeCountryDocsFromShared', e);
+    }
+}
+
+async function refreshSharedDocsForCountry(countryId) {
+    docsManifestCache.fetchedAt = 0;
+    const changed = await mergeCountryDocsFromShared(countryId);
+    renderDocsListForCountry(countryId);
+    showToast(changed ? 'Documentos compartidos actualizados' : 'Ya tienes los documentos más recientes', changed ? 'success' : 'info');
+}
+
+async function refreshAllSharedDocs() {
+    docsManifestCache.fetchedAt = 0;
+    const manifestWrap = await fetchSharedManifest({ force: true });
+    const ids = Object.keys(manifestWrap?.data?.countries || {});
+    if (!ids.length) {
+        showToast('No hay documentos compartidos en la nube todavía', 'info');
+        return;
+    }
+    let updated = 0;
+    for (const id of ids) {
+        if (await mergeCountryDocsFromShared(id)) updated++;
+    }
+    const activeId = document.getElementById('countryModal')?.dataset?.countryId;
+    if (activeId) renderDocsListForCountry(activeId);
+    showToast(`Sincronización completa (${updated} país(es) actualizado(s))`, 'success');
+}
+
+function prefetchSharedDocsManifest() {
+    if (!DOCS_SHARED_SYNC.enabled) return;
+    fetchSharedManifest().catch(() => { });
+}
 
 function getDocsStorageKey(countryId) {
     return `${DOCS_BY_COUNTRY_PREFIX}${String(countryId)}`;
@@ -2302,8 +2702,11 @@ async function ensureDocsLoaded(countryId) {
         }
 
         docsCache[key] = docs;
+        if (DOCS_SHARED_SYNC.enabled) {
+            try { await mergeCountryDocsFromShared(countryId); } catch (e) { console.warn('mergeCountryDocsFromShared', e); }
+        }
         delete docsCacheLoading[key];
-        return docs;
+        return docsCache[key];
     })();
 
     return docsCacheLoading[key];
@@ -2330,17 +2733,26 @@ function serializeDocForStorage(doc) {
     return base;
 }
 
-async function persistDocsForCountry(countryId, docsArr) {
+async function persistDocsForCountry(countryId, docsArr, options = {}) {
     const key = String(countryId);
     const arr = (Array.isArray(docsArr) ? docsArr : []).map(serializeDocForStorage);
     docsCache[key] = arr;
     try {
         await idbSetDocs(getDocsStorageKey(countryId), arr);
-        return true;
     } catch (e) {
         showToast('No se pudieron guardar los documentos. Intenta archivos más pequeños.', 'error');
         return false;
     }
+    if (DOCS_SHARED_SYNC.enabled && options.syncShared !== false) {
+        const syncResult = await pushCountryDocsToShared(countryId, arr);
+        if (options.onSharedSync) options.onSharedSync(syncResult);
+        else if (syncResult?.reason === 'no-token') {
+            showToast('Guardado en este equipo. Configure token GitHub en Admin para compartir con todos.', 'info');
+        } else if (syncResult?.error) {
+            showToast('Guardado localmente. Error al compartir: ' + syncResult.error, 'error');
+        }
+    }
+    return true;
 }
 
 function getDocBlob(d) {
@@ -2393,6 +2805,7 @@ async function clearAllDocsForCountry(countryId) {
     docs.forEach(revokeDocPreviewUrl);
     const ok = await persistDocsForCountry(countryId, []);
     if (!ok) return;
+    removeCountryDocsFromShared(countryId);
     renderDocsListForCountry(countryId);
     try { registerAudit('Docs - Eliminar todos', `countryId=${countryId}, count=${docs.length}`); } catch (e) { }
     showToast('Documentos eliminados', 'success');
@@ -2683,7 +3096,15 @@ async function handleDocsUploadInput(countryId, inputEl) {
         return;
     }
 
-    const ok = await persistDocsForCountry(countryId, docs);
+    const ok = await persistDocsForCountry(countryId, docs, {
+        onSharedSync(syncResult) {
+            if (syncResult?.ok && !syncResult.skipped) {
+                showToast(`Documentos compartidos con todos (${uploaded}${skipped ? ` · omitidos: ${skipped}` : ''})`, 'success');
+            } else if (syncResult?.error) {
+                showToast(`Guardados localmente. Error al compartir: ${syncResult.error}`, 'error');
+            }
+        }
+    });
     if (!ok) {
         if (inputEl) inputEl.value = '';
         return;
@@ -2691,7 +3112,9 @@ async function handleDocsUploadInput(countryId, inputEl) {
     renderDocsListForCountry(countryId);
     try { registerAudit('Docs - Subir/Actualizar', `countryId=${countryId}, files=${uploaded}`); } catch (e) { }
     if (inputEl) inputEl.value = '';
-    showToast(`Documentos guardados: ${uploaded}${skipped ? ` · omitidos: ${skipped}` : ''}`, 'success');
+    if (!getGithubSyncToken()) {
+        showToast(`Documentos guardados en este equipo: ${uploaded}${skipped ? ` · omitidos: ${skipped}` : ''}. Configure token en Admin para compartir.`, 'success');
+    }
 }
 
 async function handleDocsReplaceSingleFile(countryId, docId, file) {
@@ -3201,6 +3624,11 @@ function initAdminPanel() {
     renderAdminEfemeridesList();
     loadAdminBilateralForm();
     renderAdminHitosList();
+    updateGithubDocsSyncStatus();
+    const tokenInput = document.getElementById('githubDocsSyncToken');
+    if (tokenInput && !tokenInput.value) {
+        try { tokenInput.value = localStorage.getItem(GITHUB_SYNC_TOKEN_KEY) || ''; } catch (e) { }
+    }
 }
 function loadCountryForEdit() {
     const id = parseInt(document.getElementById('editCountrySelect').value);
@@ -3679,6 +4107,7 @@ function doLogin() {
             renderBilateralContent();
             renderMultilateralContent();
             startAuthorityPhotoSync();
+            prefetchSharedDocsManifest();
         }, 300);
     } else {
         if (le) { le.style.display = 'block'; le.textContent = translations[currentLanguage].loginError; }

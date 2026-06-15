@@ -122,7 +122,13 @@ echo    OK: index.html y html sincronizados desde v10.5.5
 
 echo.
 
-
+findstr /C:"PEGAR_TOKEN_AQUI" "afridata-sync-config.js" >nul 2>&1
+if not errorlevel 1 (
+    echo NOTA: Token local no configurado. Para documentos en la WEB use Panel Admin.
+) else (
+    echo OK: Token local configurado (no se sube a GitHub).
+)
+echo.
 
 git checkout main 2>nul
 
@@ -142,7 +148,12 @@ echo [3/5] Agregando archivos del sitio...
 
 git add "index.html" "html" "README.md" ".nojekyll" ".gitignore"
 
+git add "documentos/manifest.json" 2>nul
+git add "documentos" 2>nul
 git add "pagina afridataV10.5.5.html"
+git add "afridata-sync-config.example.js" "CONFIGURAR-TOKEN-DOCS.cmd" 2>nul
+rem NUNCA subir afridata-sync-config.js (contiene token local)
+if exist "afridata-sync-config.js" git reset HEAD "afridata-sync-config.js" 2>nul
 
 git add "PUBLICAR-GITHUB-PAGES.cmd" "copiar-pages.ps1" "SUBIR-AHORA.cmd" "LEEME-GITHUB.txt" 2>nul
 

@@ -9,6 +9,9 @@ node_modules/
 backup_*
 *.bak
 
+# Token local — NUNCA subir a GitHub (GitHub lo bloquea)
+afridata-sync-config.js
+
 # Archivos temporales de Windows
 Thumbs.db
 Desktop.ini
