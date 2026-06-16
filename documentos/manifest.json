@@ -1,7 +1,21 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-15T17:49:47.830Z",
+  "updatedAt": "2026-06-16T13:49:36.945Z",
   "countries": {
+    "1": [
+      {
+        "id": "doc_1781617774529_f11d3f51b00a68",
+        "name": "Resumen África es un continente vasto y diverso con.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 40769,
+        "lastModified": 1763045616000,
+        "uploadedAt": "16/6/2026, 9:49:34 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781617774529_f11d3f51b00a68_Resumen_África_es_un_continente_vasto_y_diverso_con.docx",
+        "sha": "66b6d165829e8a4d6e53f025a6fb17dcc71f5a92"
+      }
+    ],
     "6": [
       {
         "id": "doc_1781545766945_42471b0b1ccac",
@@ -29,14 +43,14 @@
       },
       {
         "id": "doc_1781545766946_370f9689158eb8",
-        "name": "2. MICROPERFIL TÚNEZ 2026 (2).docx",
+        "name": "2. MICROPERFIL TÃNEZ 2026 (2).docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "kind": "file",
         "sizeBytes": 95389,
         "lastModified": 1781545608242,
         "uploadedAt": "15/6/2026, 1:49:26 p. m.",
         "textPreview": "",
-        "path": "documentos/paises/6/doc_1781545766946_370f9689158eb8_2._MICROPERFIL_TÚNEZ_2026_(2).docx",
+        "path": "documentos/paises/6/doc_1781545766946_370f9689158eb8_2._MICROPERFIL_TÃNEZ_2026_(2).docx",
         "sha": "87abeea6ba193881ff9fc820bad644dd2f52b7c0"
       },
       {
@@ -89,7 +103,7 @@
       },
       {
         "id": "doc_1781545766947_bd0237b7d01118",
-        "name": "5. Balance de la Cooperación Tunez (Mayo 2026).docx",
+        "name": "5. Balance de la CooperacioÌn Tunez (Mayo 2026).docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "kind": "file",
         "sizeBytes": 1862598,
@@ -125,14 +139,14 @@
       },
       {
         "id": "doc_1781545766947_7b51ac7ef59858",
-        "name": "8. FICHA TELEGRÁFICA TUNEZ 2026 (2).pptx",
+        "name": "8. FICHA TELEGRÃFICA TUNEZ 2026 (2).pptx",
         "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "kind": "file",
         "sizeBytes": 39351,
         "lastModified": 1781545711415,
         "uploadedAt": "15/6/2026, 1:49:26 p. m.",
         "textPreview": "",
-        "path": "documentos/paises/6/doc_1781545766947_7b51ac7ef59858_8._FICHA_TELEGRÁFICA_TUNEZ_2026_(2).pptx",
+        "path": "documentos/paises/6/doc_1781545766947_7b51ac7ef59858_8._FICHA_TELEGRÃFICA_TUNEZ_2026_(2).pptx",
         "sha": "e97668c045f80e537c405d1001b7db8c22ffd20b"
       },
       {
