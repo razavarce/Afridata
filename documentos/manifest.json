@@ -1,19 +1,67 @@
 {
   "version": 1,
-  "updatedAt": "2026-06-16T13:49:36.945Z",
+  "updatedAt": "2026-06-16T14:58:16.297Z",
   "countries": {
     "1": [
       {
         "id": "doc_1781617774529_f11d3f51b00a68",
-        "name": "Resumen África es un continente vasto y diverso con.docx",
+        "name": "Resumen Ãfrica es un continente vasto y diverso con.docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "kind": "file",
         "sizeBytes": 40769,
         "lastModified": 1763045616000,
         "uploadedAt": "16/6/2026, 9:49:34 a. m.",
         "textPreview": "",
-        "path": "documentos/paises/1/doc_1781617774529_f11d3f51b00a68_Resumen_África_es_un_continente_vasto_y_diverso_con.docx",
+        "path": "documentos/paises/1/doc_1781617774529_f11d3f51b00a68_Resumen_Ãfrica_es_un_continente_vasto_y_diverso_con.docx",
         "sha": "66b6d165829e8a4d6e53f025a6fb17dcc71f5a92"
+      },
+      {
+        "id": "doc_1781183036145_4356c8b0a47e8",
+        "name": "Academia de redes de Cisco.pdf",
+        "mimeType": "application/pdf",
+        "kind": "pdf",
+        "sizeBytes": 226265,
+        "lastModified": 1741198477055,
+        "uploadedAt": "11/6/2026, 9:04:20 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183036145_4356c8b0a47e8_Academia_de_redes_de_Cisco.pdf",
+        "sha": "b731c301e0a400994e6c85f13a9987a8fa5326b4"
+      },
+      {
+        "id": "doc_1781183074716_5ea90f569dd408",
+        "name": "(I)TALLER_1_PARTE_1.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "kind": "file",
+        "sizeBytes": 201622,
+        "lastModified": 1734017021941,
+        "uploadedAt": "11/6/2026, 9:04:34 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183074716_5ea90f569dd408_(I)TALLER_1_PARTE_1.xlsx",
+        "sha": "2ac80294628ac30d9f8746771fd2a5f37215a614"
+      },
+      {
+        "id": "doc_1781183090388_313fb05cac33e",
+        "name": "Mapa Mental Pensamiento Estratégico y Prospectiva Estratégica en Informática.pdf",
+        "mimeType": "application/pdf",
+        "kind": "pdf",
+        "sizeBytes": 1926434,
+        "lastModified": 1733859187128,
+        "uploadedAt": "11/6/2026, 9:04:50 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183090388_313fb05cac33e_Mapa_Mental_Pensamiento_Estratégico_y_Prospectiva_Estratégica_en_Informática.pdf",
+        "sha": "0ed12c5ef1ce08dc1a972960c594ac384e05ac7d"
+      },
+      {
+        "id": "doc_1781183123662_2f1c947b93f0a",
+        "name": "maria trabajo.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 1472971,
+        "lastModified": 1770138698281,
+        "uploadedAt": "11/6/2026, 9:05:23 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183123662_2f1c947b93f0a_maria_trabajo.docx",
+        "sha": "4915a8f056125c10c187353cb55317146ce9b30b"
       }
     ],
     "6": [
@@ -43,14 +91,14 @@
       },
       {
         "id": "doc_1781545766946_370f9689158eb8",
-        "name": "2. MICROPERFIL TÃNEZ 2026 (2).docx",
+        "name": "2. MICROPERFIL TÃÂNEZ 2026 (2).docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "kind": "file",
         "sizeBytes": 95389,
         "lastModified": 1781545608242,
         "uploadedAt": "15/6/2026, 1:49:26 p. m.",
         "textPreview": "",
-        "path": "documentos/paises/6/doc_1781545766946_370f9689158eb8_2._MICROPERFIL_TÃNEZ_2026_(2).docx",
+        "path": "documentos/paises/6/doc_1781545766946_370f9689158eb8_2._MICROPERFIL_TÃÂNEZ_2026_(2).docx",
         "sha": "87abeea6ba193881ff9fc820bad644dd2f52b7c0"
       },
       {
@@ -103,7 +151,7 @@
       },
       {
         "id": "doc_1781545766947_bd0237b7d01118",
-        "name": "5. Balance de la CooperacioÌn Tunez (Mayo 2026).docx",
+        "name": "5. Balance de la CooperacioÃÂn Tunez (Mayo 2026).docx",
         "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "kind": "file",
         "sizeBytes": 1862598,
@@ -139,14 +187,14 @@
       },
       {
         "id": "doc_1781545766947_7b51ac7ef59858",
-        "name": "8. FICHA TELEGRÃFICA TUNEZ 2026 (2).pptx",
+        "name": "8. FICHA TELEGRÃÂFICA TUNEZ 2026 (2).pptx",
         "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "kind": "file",
         "sizeBytes": 39351,
         "lastModified": 1781545711415,
         "uploadedAt": "15/6/2026, 1:49:26 p. m.",
         "textPreview": "",
-        "path": "documentos/paises/6/doc_1781545766947_7b51ac7ef59858_8._FICHA_TELEGRÃFICA_TUNEZ_2026_(2).pptx",
+        "path": "documentos/paises/6/doc_1781545766947_7b51ac7ef59858_8._FICHA_TELEGRÃÂFICA_TUNEZ_2026_(2).pptx",
         "sha": "e97668c045f80e537c405d1001b7db8c22ffd20b"
       },
       {
