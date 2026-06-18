@@ -1,5 +1,226 @@
 {
   "version": 1,
-  "updatedAt": "",
-  "countries": {}
+  "updatedAt": "2026-06-16T14:58:16.297Z",
+  "countries": {
+    "1": [
+      {
+        "id": "doc_1781617774529_f11d3f51b00a68",
+        "name": "Resumen Ãfrica es un continente vasto y diverso con.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 40769,
+        "lastModified": 1763045616000,
+        "uploadedAt": "16/6/2026, 9:49:34 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781617774529_f11d3f51b00a68_Resumen_Ãfrica_es_un_continente_vasto_y_diverso_con.docx",
+        "sha": "66b6d165829e8a4d6e53f025a6fb17dcc71f5a92"
+      },
+      {
+        "id": "doc_1781183036145_4356c8b0a47e8",
+        "name": "Academia de redes de Cisco.pdf",
+        "mimeType": "application/pdf",
+        "kind": "pdf",
+        "sizeBytes": 226265,
+        "lastModified": 1741198477055,
+        "uploadedAt": "11/6/2026, 9:04:20 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183036145_4356c8b0a47e8_Academia_de_redes_de_Cisco.pdf",
+        "sha": "b731c301e0a400994e6c85f13a9987a8fa5326b4"
+      },
+      {
+        "id": "doc_1781183074716_5ea90f569dd408",
+        "name": "(I)TALLER_1_PARTE_1.xlsx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "kind": "file",
+        "sizeBytes": 201622,
+        "lastModified": 1734017021941,
+        "uploadedAt": "11/6/2026, 9:04:34 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183074716_5ea90f569dd408_(I)TALLER_1_PARTE_1.xlsx",
+        "sha": "2ac80294628ac30d9f8746771fd2a5f37215a614"
+      },
+      {
+        "id": "doc_1781183090388_313fb05cac33e",
+        "name": "Mapa Mental Pensamiento Estratégico y Prospectiva Estratégica en Informática.pdf",
+        "mimeType": "application/pdf",
+        "kind": "pdf",
+        "sizeBytes": 1926434,
+        "lastModified": 1733859187128,
+        "uploadedAt": "11/6/2026, 9:04:50 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183090388_313fb05cac33e_Mapa_Mental_Pensamiento_Estratégico_y_Prospectiva_Estratégica_en_Informática.pdf",
+        "sha": "0ed12c5ef1ce08dc1a972960c594ac384e05ac7d"
+      },
+      {
+        "id": "doc_1781183123662_2f1c947b93f0a",
+        "name": "maria trabajo.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 1472971,
+        "lastModified": 1770138698281,
+        "uploadedAt": "11/6/2026, 9:05:23 a. m.",
+        "textPreview": "",
+        "path": "documentos/paises/1/doc_1781183123662_2f1c947b93f0a_maria_trabajo.docx",
+        "sha": "4915a8f056125c10c187353cb55317146ce9b30b"
+      }
+    ],
+    "6": [
+      {
+        "id": "doc_1781545766945_42471b0b1ccac",
+        "name": "1. AYUDA MEMORIA TUNEZ.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 40987,
+        "lastModified": 1781545625404,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766945_42471b0b1ccac_1._AYUDA_MEMORIA_TUNEZ.docx",
+        "sha": "655738d8910c16408b2bb4258ab84864c8eca98d"
+      },
+      {
+        "id": "doc_1781545766946_35cdf606ab24a",
+        "name": "1_4990480392810140236.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 40987,
+        "lastModified": 1781545568068,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766946_35cdf606ab24a_1_4990480392810140236.docx",
+        "sha": "655738d8910c16408b2bb4258ab84864c8eca98d"
+      },
+      {
+        "id": "doc_1781545766946_370f9689158eb8",
+        "name": "2. MICROPERFIL TÃÂNEZ 2026 (2).docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 95389,
+        "lastModified": 1781545608242,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766946_370f9689158eb8_2._MICROPERFIL_TÃÂNEZ_2026_(2).docx",
+        "sha": "87abeea6ba193881ff9fc820bad644dd2f52b7c0"
+      },
+      {
+        "id": "doc_1781545766946_1ef835c493718",
+        "name": "3. TEMAS DE CONVERSACION TUNEZ.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 24296,
+        "lastModified": 1781545687364,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766946_1ef835c493718_3._TEMAS_DE_CONVERSACION_TUNEZ.docx",
+        "sha": "4d2ee49b5a959232523abede7218ab8937638d89"
+      },
+      {
+        "id": "doc_1781545766947_7d342655775df",
+        "name": "4.1 CV PRESIDENTE KAIS SAIED 2026.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 157553,
+        "lastModified": 1781545720912,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_7d342655775df_4.1_CV_PRESIDENTE_KAIS_SAIED_2026.docx",
+        "sha": "2416f9400b945939b055039308d064b5145013e7"
+      },
+      {
+        "id": "doc_1781545766947_492976352492d",
+        "name": "4.2 CV JEFA DE GOBIERNO DE TUNEZ 2026.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 328129,
+        "lastModified": 1781545615777,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_492976352492d_4.2_CV_JEFA_DE_GOBIERNO_DE_TUNEZ_2026.docx",
+        "sha": "7742485459a3725656df15a4829fea2091e1c6f6"
+      },
+      {
+        "id": "doc_1781545766947_2a13863f3ed798",
+        "name": "4.3 CV CANCILLER NAFTI 2026.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 360623,
+        "lastModified": 1781545620693,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_2a13863f3ed798_4.3_CV_CANCILLER_NAFTI_2026.docx",
+        "sha": "3ded8312f3592e425e23363c68b8b5ac269ebc5c"
+      },
+      {
+        "id": "doc_1781545766947_bd0237b7d01118",
+        "name": "5. Balance de la CooperacioÃÂn Tunez (Mayo 2026).docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 1862598,
+        "lastModified": 1781545704875,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_bd0237b7d01118_5._Balance_de_la_Cooperacio_n_Tunez_(Mayo_2026).docx",
+        "sha": "5c15ab90ef0f04973aab805bc136722b4625ab60"
+      },
+      {
+        "id": "doc_1781545766947_0425522195196",
+        "name": "6. PERFIL POLITICO TUNEZ (MAYO 2026).docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 1886597,
+        "lastModified": 1781545631751,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_0425522195196_6._PERFIL_POLITICO_TUNEZ_(MAYO_2026).docx",
+        "sha": "1d0efa879710e0c7a27e92445a9d0946cd5fe3f5"
+      },
+      {
+        "id": "doc_1781545766947_3ef5a7ef9aa5e8",
+        "name": "7. ACUERDOS SUSCRITOS CON TUNEZ 2026.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 22344,
+        "lastModified": 1781545727279,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_3ef5a7ef9aa5e8_7._ACUERDOS_SUSCRITOS_CON_TUNEZ_2026.docx",
+        "sha": "44cfb1dbfd43d8e765f7d0b31b81264f4c64ac22"
+      },
+      {
+        "id": "doc_1781545766947_7b51ac7ef59858",
+        "name": "8. FICHA TELEGRÃÂFICA TUNEZ 2026 (2).pptx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        "kind": "file",
+        "sizeBytes": 39351,
+        "lastModified": 1781545711415,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_7b51ac7ef59858_8._FICHA_TELEGRÃÂFICA_TUNEZ_2026_(2).pptx",
+        "sha": "e97668c045f80e537c405d1001b7db8c22ffd20b"
+      },
+      {
+        "id": "doc_1781545766947_17d3a8470fe4",
+        "name": "9. CRONOLOGIA DE VISITAS TUNEZ 2026.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 21789,
+        "lastModified": 1781545699948,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_17d3a8470fe4_9._CRONOLOGIA_DE_VISITAS_TUNEZ_2026.docx",
+        "sha": "73cdfd2b88ba7139e2051b8ac573321486dea7d6"
+      },
+      {
+        "id": "doc_1781545766947_4aa1a863c00418",
+        "name": "10. LINEAS COMUNICACIONALES TUNEZ 2026.docx",
+        "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "kind": "file",
+        "sizeBytes": 19959,
+        "lastModified": 1781545693728,
+        "uploadedAt": "15/6/2026, 1:49:26 p. m.",
+        "textPreview": "",
+        "path": "documentos/paises/6/doc_1781545766947_4aa1a863c00418_10._LINEAS_COMUNICACIONALES_TUNEZ_2026.docx",
+        "sha": "c043025d87dd160579691ac12abe0c09f739414f"
+      }
+    ]
+  }
 }

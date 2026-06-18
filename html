@@ -59,7 +59,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
 .login-container { background: rgba(20, 20, 20, 0.92); border: 1px solid var(--gold-primary); border-radius: 24px; padding: 50px 45px 40px; width: 440px; max-width: 92%; text-align: center; position: relative; z-index: 5; box-shadow: 0 0 30px rgba(212, 175, 55, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); animation: fadeInUp 0.6s ease; }
 @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 .login-logos { display: flex; justify-content: center; align-items: center; margin-bottom: 20px; }
-.afridata-logo { width: 148px; height: 148px; object-fit: contain; display: block; filter: drop-shadow(0 10px 28px rgba(0,0,0,0.35)); }
+.afridata-logo { width: 348px; height: 348px; object-fit: contain; display: block; filter: drop-shadow(0 10px 28px rgba(0,0,0,0.35)); }
 .afridata-logo-header { width: 44px; height: 44px; object-fit: contain; border-radius: 50%; flex-shrink: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25)); }
 .africa-map-card { position: relative; width: 128px; height: 128px; border-radius: 24px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.35); background: radial-gradient(circle at top, rgba(212,175,55,0.12), rgba(255,255,255,0.04)); box-shadow: 0 16px 50px rgba(0,0,0,0.2); }
 .mini-africa-map { width: 100%; height: 100%; background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Africa_%28orthographic_projection%29.svg/1024px-Africa_%28orthographic_projection%29.svg.png') center center / contain no-repeat; filter: saturate(1.2) brightness(1.05); }
@@ -1074,11 +1074,12 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                         Los documentos de las carpetas de países se sincronizan en GitHub para que <b>todos los usuarios</b> los vean desde cualquier equipo o la web.
                     </p>
                     <div id="githubDocsSyncEmbedded" style="display:none;padding:12px 14px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;font-size:13px;margin-bottom:12px;">
-                        <i class="fas fa-check-circle"></i> <b>Token del equipo activo</b> — configurado en <code>afridata-sync-config.js</code>. Todos pueden subir y ver documentos sin configurar cada PC.
+                        <i class="fas fa-check-circle"></i> <b>Token activo en este equipo</b> — desde archivo local o guardado aquí. Las subidas se comparten con todos.
                     </div>
                     <div id="githubDocsSyncManual">
                         <p style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-bottom:12px;">
-                            Alternativa: configure un token solo en este navegador (Panel Admin). Para todo el equipo use <code>CONFIGURAR-TOKEN-DOCS.cmd</code>.
+                            <b>Para la web pública:</b> pegue el token aquí y Guardar (en cada navegador que suba archivos).
+                            GitHub <b>no permite</b> incluir el token en el código del repositorio.
                         </p>
                         <div class="admin-form">
                             <div class="form-group" style="flex:2;">
@@ -2289,7 +2290,7 @@ function updateGithubDocsSyncStatus() {
     if (!el) return;
     const token = getGithubSyncToken();
     if (isEmbeddedGithubDocsToken()) {
-        el.textContent = 'Token del equipo activo: todos pueden subir y ver documentos compartidos.';
+        el.textContent = 'Token activo en este equipo. Las subidas se comparten con todos los usuarios.';
     } else if (token) {
         el.textContent = 'Sincronización activa en este navegador: las subidas se comparten con todos.';
     } else {
