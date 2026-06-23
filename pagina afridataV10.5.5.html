@@ -1071,7 +1071,7 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                 <div class="admin-section" id="adminDocsSyncSection">
                     <h3><i class="fas fa-cloud-upload-alt"></i> Documentos compartidos (GitHub)</h3>
                     <p id="githubDocsSyncHelp" style="color:var(--text-muted);font-size:13px;line-height:1.6;margin-bottom:12px;">
-                        Los documentos de las carpetas de países se sincronizan en GitHub para que <b>todos los usuarios</b> los vean desde cualquier equipo o la web.
+                        Sincroniza en GitHub los <b>documentos</b> y los datos del panel admin: <b>hitos, bilaterales, efemérides, países y embajadas</b>. Todos los usuarios verán los mismos cambios.
                     </p>
                     <div id="githubDocsSyncEmbedded" style="display:none;padding:12px 14px;border-radius:12px;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;font-size:13px;margin-bottom:12px;">
                         <i class="fas fa-check-circle"></i> <b>Token activo en este equipo</b> — desde archivo local o guardado aquí. Las subidas se comparten con todos.
@@ -1094,7 +1094,8 @@ body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 
                     </div>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
                         <button class="admin-btn" type="button" onclick="testGithubDocsSync()"><i class="fas fa-plug"></i> Probar conexión</button>
-                        <button class="admin-btn" type="button" onclick="refreshAllSharedDocs()"><i class="fas fa-sync-alt"></i> Descargar documentos compartidos</button>
+                        <button class="admin-btn" type="button" onclick="refreshAllSharedContent()"><i class="fas fa-sync-alt"></i> Descargar todo compartido</button>
+                        <button class="admin-btn" type="button" onclick="refreshSharedAdminData()"><i class="fas fa-cloud-download-alt"></i> Actualizar datos del panel</button>
                     </div>
                     <div id="githubDocsSyncStatus" style="margin-top:10px;color:var(--text-muted);font-size:12px;">Sin configurar</div>
                 </div>
@@ -1548,8 +1549,9 @@ function loadHitosData() {
         hitosData = HITOS_DEFAULT.slice();
     }
 }
-function persistHitosData() {
+function persistHitosData(options = {}) {
     try { localStorage.setItem(HITOS_STORAGE_KEY, JSON.stringify(hitosData)); } catch (e) { }
+    if (options.sync !== false) schedulePushSharedAdminData();
 }
 
 let map, markers = [], currentRegion = 'all';
@@ -1605,8 +1607,9 @@ function loadPaisesOverrides() {
     }
     applyPaisesOverrides();
 }
-function persistPaisesOverrides() {
+function persistPaisesOverrides(options = {}) {
     try { localStorage.setItem(PAISES_OVERRIDES_STORAGE_KEY, JSON.stringify(paisesOverrides)); } catch (e) { }
+    if (options.sync !== false) schedulePushSharedAdminData();
 }
 function syncPaisesOverrideForCountry(p) {
     if (!p) return;
@@ -2290,9 +2293,9 @@ function updateGithubDocsSyncStatus() {
     if (!el) return;
     const token = getGithubSyncToken();
     if (isEmbeddedGithubDocsToken()) {
-        el.textContent = 'Token activo en este equipo. Las subidas se comparten con todos los usuarios.';
+        el.textContent = 'Token activo: documentos y datos del panel (hitos, bilaterales, etc.) se comparten con todos.';
     } else if (token) {
-        el.textContent = 'Sincronización activa en este navegador: las subidas se comparten con todos.';
+        el.textContent = 'Sincronización activa en este navegador: cambios del panel y documentos se comparten con todos.';
     } else {
         el.textContent = 'Sin token. Ejecute CONFIGURAR-TOKEN-DOCS.cmd o guarde un token aquí.';
     }
@@ -2610,6 +2613,174 @@ async function refreshAllSharedDocs() {
 function prefetchSharedDocsManifest() {
     if (!DOCS_SHARED_SYNC.enabled) return;
     fetchSharedManifest().catch(() => { });
+    pullSharedAdminData().catch(() => { });
+}
+
+// ================= DATOS ADMIN COMPARTIDOS (hitos, bilaterales, efemérides, países, embajadas) =================
+const SHARED_ADMIN_DATA = {
+    path: 'datos/afridata-shared.json',
+    localTsKey: 'afridata_shared_admin_ts'
+};
+let sharedAdminCache = { data: null, sha: null, fetchedAt: 0 };
+let sharedAdminPushTimer = null;
+
+function getSharedAdminDataUrl() {
+    return `https://raw.githubusercontent.com/${DOCS_SHARED_SYNC.repo}/${DOCS_SHARED_SYNC.branch}/${SHARED_ADMIN_DATA.path}?t=${Date.now()}`;
+}
+
+function collectSharedAdminSnapshot() {
+    return {
+        version: 1,
+        updatedAt: new Date().toISOString(),
+        hitos: hitosData,
+        bilateral: bilateralData,
+        efemerides: efemeridesDB,
+        paisesOverrides: paisesOverrides,
+        embajadas: typeof getEmbajadasList === 'function' ? getEmbajadasList() : embajadasData,
+        embajadasEnVzla: typeof getEmbajadasEnVzlaList === 'function' ? getEmbajadasEnVzlaList() : embajadasEnVzlaData
+    };
+}
+
+function refreshSharedAdminUi() {
+    applyPaisesOverrides();
+    if (typeof loadHitos === 'function') loadHitos();
+    if (typeof renderBilateralContent === 'function') renderBilateralContent();
+    if (typeof loadEmbajadas === 'function') loadEmbajadas();
+    if (typeof loadEmbajadasEnVzla === 'function') loadEmbajadasEnVzla();
+    if (typeof loadPaisesTable === 'function') loadPaisesTable();
+    if (typeof loadAutoridades === 'function') loadAutoridades();
+    if (typeof renderAdminEfemeridesList === 'function') renderAdminEfemeridesList();
+    if (typeof renderAdminHitosList === 'function') renderAdminHitosList();
+    const countryId = document.getElementById('countryModal')?.dataset?.countryId;
+    if (countryId && typeof renderEfemeridesForCountry === 'function') renderEfemeridesForCountry(Number(countryId));
+}
+
+function applySharedAdminSnapshot(data, options = {}) {
+    if (!data || typeof data !== 'object') return false;
+    if (Array.isArray(data.hitos)) {
+        hitosData = data.hitos.length ? data.hitos : hitosData;
+        try { localStorage.setItem(HITOS_STORAGE_KEY, JSON.stringify(hitosData)); } catch (e) { }
+    }
+    if (data.bilateral && typeof data.bilateral === 'object') {
+        Object.keys(data.bilateral).forEach(k => { bilateralData[k] = data.bilateral[k]; });
+        try { localStorage.setItem(BILATERAL_STORAGE_KEY, JSON.stringify(bilateralData)); } catch (e) { }
+        try { ensureBilateralDefaults(); } catch (e) { }
+    }
+    if (data.efemerides && typeof data.efemerides === 'object') {
+        efemeridesDB = data.efemerides;
+        try { localStorage.setItem(EFEMERIDES_STORAGE_KEY, JSON.stringify(efemeridesDB)); } catch (e) { }
+    }
+    if (data.paisesOverrides && typeof data.paisesOverrides === 'object') {
+        paisesOverrides = data.paisesOverrides;
+        try { localStorage.setItem(PAISES_OVERRIDES_STORAGE_KEY, JSON.stringify(paisesOverrides)); } catch (e) { }
+    }
+    if (Array.isArray(data.embajadas) && data.embajadas.length) {
+        embajadasData = data.embajadas;
+        try { localStorage.setItem(EMBAJADAS_STORAGE_KEY, JSON.stringify(embajadasData)); } catch (e) { }
+    }
+    if (Array.isArray(data.embajadasEnVzla) && data.embajadasEnVzla.length) {
+        embajadasEnVzlaData = data.embajadasEnVzla;
+        try { localStorage.setItem(EMBAJADAS_EN_VZLA_STORAGE_KEY, JSON.stringify(embajadasEnVzlaData)); } catch (e) { }
+    }
+    if (data.updatedAt) {
+        try { localStorage.setItem(SHARED_ADMIN_DATA.localTsKey, data.updatedAt); } catch (e) { }
+    }
+    if (options.refreshUi !== false) refreshSharedAdminUi();
+    return true;
+}
+
+async function fetchSharedAdminDataPublic(force = false) {
+    const now = Date.now();
+    if (!force && sharedAdminCache.data && (now - sharedAdminCache.fetchedAt) < 20000) {
+        return sharedAdminCache;
+    }
+    try {
+        const res = await fetch(getSharedAdminDataUrl(), { cache: 'no-store' });
+        if (res.status === 404) {
+            sharedAdminCache = { data: null, sha: null, fetchedAt: now };
+            return sharedAdminCache;
+        }
+        if (!res.ok) return sharedAdminCache;
+        const data = await res.json();
+        sharedAdminCache = { data, sha: sharedAdminCache.sha, fetchedAt: now };
+        return sharedAdminCache;
+    } catch (e) {
+        return sharedAdminCache;
+    }
+}
+
+async function fetchSharedAdminDataWithSha(force = false) {
+    const token = getGithubSyncToken();
+    if (!token) return fetchSharedAdminDataPublic(force);
+    try {
+        const data = await githubApiRequest(`${githubContentsApiPath(SHARED_ADMIN_DATA.path)}?ref=${DOCS_SHARED_SYNC.branch}`, { token });
+        const json = JSON.parse(atob(String(data.content || '').replace(/\n/g, '')));
+        sharedAdminCache = { data: json, sha: data.sha, fetchedAt: Date.now() };
+        return sharedAdminCache;
+    } catch (e) {
+        return fetchSharedAdminDataPublic(force);
+    }
+}
+
+async function pullSharedAdminData(force = false) {
+    if (!DOCS_SHARED_SYNC.enabled) return false;
+    const wrap = await fetchSharedAdminDataPublic(force);
+    const remote = wrap?.data;
+    if (!remote || !remote.updatedAt) return false;
+    let localTs = '';
+    try { localTs = localStorage.getItem(SHARED_ADMIN_DATA.localTsKey) || ''; } catch (e) { }
+    if (!force && localTs && localTs >= remote.updatedAt) return false;
+    applySharedAdminSnapshot(remote);
+    return true;
+}
+
+function schedulePushSharedAdminData() {
+    if (!DOCS_SHARED_SYNC.enabled) return;
+    clearTimeout(sharedAdminPushTimer);
+    sharedAdminPushTimer = setTimeout(() => { pushSharedAdminData().catch(() => { }); }, 900);
+}
+
+async function pushSharedAdminData() {
+    if (!DOCS_SHARED_SYNC.enabled) return { ok: true, skipped: true };
+    const token = getGithubSyncToken();
+    if (!token) {
+        if (currentUser?.role === 'admin') {
+            showToast('Guardado en este equipo. Configure token GitHub en Admin para compartir con todos.', 'info');
+        }
+        return { ok: false, skipped: true, reason: 'no-token' };
+    }
+    try {
+        const wrap = await fetchSharedAdminDataWithSha(true);
+        const snapshot = collectSharedAdminSnapshot();
+        const json = JSON.stringify(snapshot, null, 2);
+        await githubApiRequest(githubContentsApiPath(SHARED_ADMIN_DATA.path), {
+            method: 'PUT',
+            token,
+            body: {
+                message: 'AFRIDATA: actualizar datos compartidos del panel admin',
+                content: utf8ToBase64(json),
+                branch: DOCS_SHARED_SYNC.branch,
+                ...(wrap.sha ? { sha: wrap.sha } : {})
+            }
+        });
+        sharedAdminCache = { data: snapshot, sha: null, fetchedAt: Date.now() };
+        try { localStorage.setItem(SHARED_ADMIN_DATA.localTsKey, snapshot.updatedAt); } catch (e) { }
+        return { ok: true };
+    } catch (e) {
+        console.warn('pushSharedAdminData', e);
+        return { ok: false, error: e.message || String(e) };
+    }
+}
+
+async function refreshSharedAdminData() {
+    sharedAdminCache.fetchedAt = 0;
+    const changed = await pullSharedAdminData(true);
+    showToast(changed ? 'Datos del panel actualizados desde la nube' : 'Ya tienes los datos más recientes', changed ? 'success' : 'info');
+}
+
+async function refreshAllSharedContent() {
+    await refreshAllSharedDocs();
+    await refreshSharedAdminData();
 }
 
 function getDocsStorageKey(countryId) {
@@ -3321,33 +3492,37 @@ function loadHitos() {
 function loadEmbajadas() {
     const t = document.getElementById('embajadasBody');
     if (!t) return;
-    const emb = [
-        { num: 1, pais: "Argelia", ciudad: "Argel", embajador: "José D. Sojo Reyes", concurrencias: "N/A" },
-        { num: 2, pais: "Egipto", ciudad: "El Cairo", embajador: "Wilmer Barrientos", concurrencias: "N/A" },
-        { num: 3, pais: "Marruecos", ciudad: "Rabat", embajador: "Dana Casanova", concurrencias: "N/A" },
-        { num: 4, pais: "Túnez", ciudad: "Túnez", embajador: "Carlos Feo", concurrencias: "N/A" },
-        { num: 5, pais: "Senegal", ciudad: "Dakar", embajador: "Alejandro Correa", concurrencias: "Benín, Gambia" },
-        { num: 6, pais: "Malí", ciudad: "Bamako", embajador: "Oscar Romero", concurrencias: "Burkina Faso, Níger" },
-        { num: 7, pais: "Nigeria", ciudad: "Abuya", embajador: "David Nieves", concurrencias: "Liberia, S. Leona" },
-        { num: 8, pais: "Guinea Ecuatorial", ciudad: "Malabo", embajador: "Nelson Ortega", concurrencias: "N/A" },
-        { num: 9, pais: "Etiopía", ciudad: "Adís Abeba", embajador: "Modesto Ruiz", concurrencias: "N/A" },
-        { num: 10, pais: "Kenia", ciudad: "Nairobi", embajador: "José Ávila", concurrencias: "Ruanda, Uganda" },
-        { num: 11, pais: "Mozambique", ciudad: "Maputo", embajador: "Juan C. Fernández", concurrencias: "Malaui" },
-        { num: 12, pais: "Angola", ciudad: "Luanda", embajador: "Marlon Peña", concurrencias: "S. Tomé, Zambia" },
-        { num: 13, pais: "Namibia", ciudad: "Windhoek", embajador: "Omar Berroteran", concurrencias: "Botsuana" },
-        { num: 14, pais: "Sudáfrica", ciudad: "Pretoria", embajador: "Marín Moreno", concurrencias: "Comoras, Lesoto, Mauricio" },
-        { num: 15, pais: "Uganda", ciudad: "Kampala", embajador: "Fátima Fernández", concurrencias: "Burundi" },
-        { num: 16, pais: "Tanzania", ciudad: "Dar es-Salam", embajador: "Por confirmar", concurrencias: "N/A" },
-        { num: 17, pais: "R. D. del Congo", ciudad: "Kinsasa", embajador: "Por confirmar", concurrencias: "R. Centroafricana" },
-        { num: 18, pais: "Ghana", ciudad: "Accra", embajador: "Por confirmar", concurrencias: "N/A" }
-    ];
-    t.innerHTML = emb.map(e => `<tr><td style="text-align:center;font-weight:700;color:var(--gold-primary);">${e.num}</td><td><strong>${e.pais}</strong></td><td>${e.ciudad}</td><td>${e.embajador}</td><td style="font-size:10px;">${e.concurrencias}</td><td><span class="badge badge-green">Activa</span></td></tr>`).join('');
+    const emb = getEmbajadasList();
+    t.innerHTML = emb.map(e => `<tr><td style="text-align:center;font-weight:700;color:var(--gold-primary);">${e.num}</td><td><strong>${escapeHtml(e.pais)}</strong></td><td>${escapeHtml(e.ciudad)}</td><td>${escapeHtml(e.embajador)}</td><td style="font-size:10px;">${escapeHtml(e.concurrencias || 'N/A')}</td><td><span class="badge badge-green">${escapeHtml(e.estado || 'Activa')}</span></td></tr>`).join('');
 }
-// Nueva función: Embajadas africanas activas en Venezuela
 function loadEmbajadasEnVzla() {
     const tbody = document.getElementById('embajadasEnVzlaBody');
     if (!tbody) return;
-    const embajadas = [
+    const embajadas = getEmbajadasEnVzlaList();
+    tbody.innerHTML = embajadas.map(e => `<tr><td><strong>${escapeHtml(e.pais)}</strong></td><td>${escapeHtml(e.ciudad)}</td><td>${escapeHtml(e.embajador)}</td><td><span class="badge badge-green">${escapeHtml(e.estado || 'Activa')}</span></td></tr>`).join('');
+}
+
+const EMBAJADAS_DEFAULT = [
+        { num: 1, pais: "Argelia", ciudad: "Argel", embajador: "José D. Sojo Reyes", concurrencias: "N/A", estado: "Activa" },
+        { num: 2, pais: "Egipto", ciudad: "El Cairo", embajador: "Wilmer Barrientos", concurrencias: "N/A", estado: "Activa" },
+        { num: 3, pais: "Marruecos", ciudad: "Rabat", embajador: "Dana Casanova", concurrencias: "N/A", estado: "Activa" },
+        { num: 4, pais: "Túnez", ciudad: "Túnez", embajador: "Carlos Feo", concurrencias: "N/A", estado: "Activa" },
+        { num: 5, pais: "Senegal", ciudad: "Dakar", embajador: "Alejandro Correa", concurrencias: "Benín, Gambia", estado: "Activa" },
+        { num: 6, pais: "Malí", ciudad: "Bamako", embajador: "Oscar Romero", concurrencias: "Burkina Faso, Níger", estado: "Activa" },
+        { num: 7, pais: "Nigeria", ciudad: "Abuya", embajador: "David Nieves", concurrencias: "Liberia, S. Leona", estado: "Activa" },
+        { num: 8, pais: "Guinea Ecuatorial", ciudad: "Malabo", embajador: "Nelson Ortega", concurrencias: "N/A", estado: "Activa" },
+        { num: 9, pais: "Etiopía", ciudad: "Adís Abeba", embajador: "Modesto Ruiz", concurrencias: "N/A", estado: "Activa" },
+        { num: 10, pais: "Kenia", ciudad: "Nairobi", embajador: "José Ávila", concurrencias: "Ruanda, Uganda", estado: "Activa" },
+        { num: 11, pais: "Mozambique", ciudad: "Maputo", embajador: "Juan C. Fernández", concurrencias: "Malaui", estado: "Activa" },
+        { num: 12, pais: "Angola", ciudad: "Luanda", embajador: "Marlon Peña", concurrencias: "S. Tomé, Zambia", estado: "Activa" },
+        { num: 13, pais: "Namibia", ciudad: "Windhoek", embajador: "Omar Berroteran", concurrencias: "Botsuana", estado: "Activa" },
+        { num: 14, pais: "Sudáfrica", ciudad: "Pretoria", embajador: "Marín Moreno", concurrencias: "Comoras, Lesoto, Mauricio", estado: "Activa" },
+        { num: 15, pais: "Uganda", ciudad: "Kampala", embajador: "Fátima Fernández", concurrencias: "Burundi", estado: "Activa" },
+        { num: 16, pais: "Tanzania", ciudad: "Dar es-Salam", embajador: "Por confirmar", concurrencias: "N/A", estado: "Activa" },
+        { num: 17, pais: "R. D. del Congo", ciudad: "Kinsasa", embajador: "Por confirmar", concurrencias: "R. Centroafricana", estado: "Activa" },
+        { num: 18, pais: "Ghana", ciudad: "Accra", embajador: "Por confirmar", concurrencias: "N/A", estado: "Activa" }
+];
+const EMBAJADAS_EN_VZLA_DEFAULT = [
         { pais: "Argelia", ciudad: "Caracas", embajador: "Emb. Abdelkader Bensmail", estado: "Activa" },
         { pais: "Egipto", ciudad: "Caracas", embajador: "Emb. Mahmoud Talaat", estado: "Activa" },
         { pais: "Marruecos", ciudad: "Caracas", embajador: "Emb. Bouchra Boudchiche", estado: "Activa" },
@@ -3356,9 +3531,30 @@ function loadEmbajadasEnVzla() {
         { pais: "Guinea Ecuatorial", ciudad: "Caracas", embajador: "Emb. Miguel Ntutumu", estado: "Activa" },
         { pais: "Angola", ciudad: "Caracas", embajador: "Emb. Maria Augusta", estado: "Activa" },
         { pais: "Ghana", ciudad: "Caracas", embajador: "Emb. Martha Pobee", estado: "Activa" }
-    ];
-    tbody.innerHTML = embajadas.map(e => `<tr><td><strong>${e.pais}</strong></td><td>${e.ciudad}</td><td>${e.embajador}</td><td><span class="badge badge-green">${e.estado}</span></td></tr>`).join('');
+];
+const EMBAJADAS_STORAGE_KEY = 'afridata_embajadas_v1';
+const EMBAJADAS_EN_VZLA_STORAGE_KEY = 'afridata_embajadas_en_vzla_v1';
+let embajadasData = [];
+let embajadasEnVzlaData = [];
+function loadEmbajadasData() {
+    try {
+        const raw = localStorage.getItem(EMBAJADAS_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : null;
+        embajadasData = (Array.isArray(parsed) && parsed.length) ? parsed : EMBAJADAS_DEFAULT.slice();
+    } catch (e) { embajadasData = EMBAJADAS_DEFAULT.slice(); }
+    try {
+        const raw2 = localStorage.getItem(EMBAJADAS_EN_VZLA_STORAGE_KEY);
+        const parsed2 = raw2 ? JSON.parse(raw2) : null;
+        embajadasEnVzlaData = (Array.isArray(parsed2) && parsed2.length) ? parsed2 : EMBAJADAS_EN_VZLA_DEFAULT.slice();
+    } catch (e) { embajadasEnVzlaData = EMBAJADAS_EN_VZLA_DEFAULT.slice(); }
 }
+function persistEmbajadasData(options = {}) {
+    try { localStorage.setItem(EMBAJADAS_STORAGE_KEY, JSON.stringify(embajadasData)); } catch (e) { }
+    try { localStorage.setItem(EMBAJADAS_EN_VZLA_STORAGE_KEY, JSON.stringify(embajadasEnVzlaData)); } catch (e) { }
+    if (options.sync !== false) schedulePushSharedAdminData();
+}
+function getEmbajadasList() { return Array.isArray(embajadasData) && embajadasData.length ? embajadasData : EMBAJADAS_DEFAULT; }
+function getEmbajadasEnVzlaList() { return Array.isArray(embajadasEnVzlaData) && embajadasEnVzlaData.length ? embajadasEnVzlaData : EMBAJADAS_EN_VZLA_DEFAULT; }
 
 // ==================== BILATERALES ENRIQUECIDOS ====================
 let bilateralData = {
@@ -3416,7 +3612,7 @@ let bilateralData = {
 };
 const BILATERAL_STORAGE_KEY = 'afridata_bilateral_v1';
 function loadBilateral() { try { const raw = localStorage.getItem(BILATERAL_STORAGE_KEY); if (raw) { const parsed = JSON.parse(raw); Object.keys(parsed).forEach(k => { bilateralData[k] = parsed[k]; }); } } catch (e) { } finally { try { ensureBilateralDefaults(); } catch (e) { /* ignore if function not yet defined */ } } }
-function persistBilateral() { try { localStorage.setItem(BILATERAL_STORAGE_KEY, JSON.stringify(bilateralData)); } catch (e) { } }
+function persistBilateral(options = {}) { try { localStorage.setItem(BILATERAL_STORAGE_KEY, JSON.stringify(bilateralData)); } catch (e) { } if (options.sync !== false) schedulePushSharedAdminData(); }
 
 // Asegura que exista una entrada bilateral para cada país en `paisesDB`.
 function ensureBilateralDefaults() {
@@ -3441,7 +3637,7 @@ function ensureBilateralDefaults() {
             coopAreas: ['Comercio', 'Cultura', 'Educación']
         };
     });
-    try { persistBilateral(); } catch (e) { }
+    try { persistBilateral({ sync: false }); } catch (e) { }
 }
 function toggleBilateralCard(id) { const c = document.querySelector(`[data-country-id="${id}"]`); if (c) c.classList.toggle('expanded'); }
 function renderBilateralContent() {
@@ -4002,7 +4198,7 @@ function closeDownloadModal() { document.getElementById('downloadModal').classLi
 let efemeridesDB = {};
 const EFEMERIDES_STORAGE_KEY = 'afridata_efemerides_v1';
 function loadEfemerides() { try { const raw = localStorage.getItem(EFEMERIDES_STORAGE_KEY); if (raw) efemeridesDB = JSON.parse(raw); } catch (e) { } }
-function persistEfemerides() { try { localStorage.setItem(EFEMERIDES_STORAGE_KEY, JSON.stringify(efemeridesDB)); } catch (e) { } }
+function persistEfemerides(options = {}) { try { localStorage.setItem(EFEMERIDES_STORAGE_KEY, JSON.stringify(efemeridesDB)); } catch (e) { } if (options.sync !== false) schedulePushSharedAdminData(); }
 function renderEfemeridesForCountry(countryId) {
     const container = document.getElementById('efemeridesContent');
     if (!container) return;
@@ -4096,8 +4292,9 @@ function doLogin() {
             showModule('mapa');
             loadPaisesTable();
             loadAutoridades();
+            loadEmbajadasData();
             loadEmbajadas();
-            loadEmbajadasEnVzla();    // ← nueva tabla
+            loadEmbajadasEnVzla();
             initAdminPanel();
             loadUsers();
             loadHitos();
@@ -4109,6 +4306,7 @@ function doLogin() {
             renderMultilateralContent();
             startAuthorityPhotoSync();
             prefetchSharedDocsManifest();
+            pullSharedAdminData().then(changed => { if (changed) refreshSharedAdminUi(); }).catch(() => { });
         }, 300);
     } else {
         if (le) { le.style.display = 'block'; le.textContent = translations[currentLanguage].loginError; }
@@ -4267,6 +4465,8 @@ window.addEventListener('load', function () {
     loadHitosData();
     loadBilateral();
     loadEfemerides();
+    loadEmbajadasData();
+    pullSharedAdminData().then(changed => { if (changed) refreshSharedAdminUi(); }).catch(() => { });
     renderAuditLog();
     loadUsers();
     document.getElementById('reportDate').textContent = new Date().toLocaleDateString('es-VE', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });

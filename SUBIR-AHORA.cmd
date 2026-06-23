@@ -1,6 +1,9 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
+rem Evita que Git abra vim/notepad pidiendo mensaje de commit
+set GIT_EDITOR=true
+set GIT_MERGE_AUTOEDIT=no
 
 echo.
 echo ============================================
@@ -46,7 +49,7 @@ git pull --rebase origin main 2>nul
 if errorlevel 1 (
     echo Rebase no aplico. Intentando merge con historiales distintos...
     git rebase --abort 2>nul
-    git pull origin main --no-rebase --allow-unrelated-histories
+    git pull origin main --no-rebase --no-edit --allow-unrelated-histories
     if errorlevel 1 (
         echo.
         echo ============================================
@@ -73,7 +76,7 @@ for /f %%i in ('git rev-list --count HEAD..origin/main 2^>nul') do set BEHIND2=%
 if not defined BEHIND2 set BEHIND2=0
 if %BEHIND2% GTR 0 (
     echo Aun atrasado. Intentando merge normal...
-    git pull origin main --no-rebase
+    git pull origin main --no-rebase --no-edit
 )
 
 echo.

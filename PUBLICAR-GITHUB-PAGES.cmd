@@ -150,6 +150,8 @@ git add "index.html" "html" "README.md" ".nojekyll" ".gitignore"
 
 git add "documentos/manifest.json" 2>nul
 git add "documentos" 2>nul
+git add "datos/afridata-shared.json" 2>nul
+git add "datos" 2>nul
 git add "pagina afridataV10.5.5.html"
 git add "afridata-sync-config.example.js" "CONFIGURAR-TOKEN-DOCS.cmd" 2>nul
 rem NUNCA subir afridata-sync-config.js (contiene token local)
